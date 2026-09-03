@@ -7,6 +7,7 @@ namespace Nowo\PdfEditorBundle\DependencyInjection;
 use Nowo\PdfEditorBundle\Config\EditorProfile;
 use Nowo\PdfEditorBundle\Document\WorkspaceManager;
 use Nowo\PdfEditorBundle\Engine\PdfEngineInterface;
+use Nowo\PdfEditorBundle\Engine\ProcessRunnerInterface;
 use Nowo\PdfEditorBundle\Engine\PythonPdfEngine;
 use Nowo\PdfEditorBundle\Exception\UnknownProfileException;
 use Nowo\PdfEditorBundle\Security\AllowAllPdfEditorAccessChecker;
@@ -77,6 +78,8 @@ final class PdfEditorExtension extends Extension implements PrependExtensionInte
         ]);
         $container->setDefinition('nowo_pdf_editor.engine', $engine);
         $container->setAlias(PdfEngineInterface::class, 'nowo_pdf_editor.engine');
+
+        $container->setAlias(ProcessRunnerInterface::class, 'nowo_pdf_editor.process_runner');
 
         $workspace = new Definition(WorkspaceManager::class, [
             '$profile' => new Reference('nowo_pdf_editor.profile'),

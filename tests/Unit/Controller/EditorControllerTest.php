@@ -153,6 +153,73 @@ final class EditorControllerTest extends TestCase
         self::assertSame($pdf, (string) file_get_contents($ws->pdfPath));
     }
 
+    public function testInspectInClientMode(): void
+    {
+        $root = $this->workspaceRoot();
+        $ws = $this->seedWorkspace($root);
+        $profile = new \Nowo\PdfEditorBundle\Config\EditorProfile(
+            name: 'default',
+            pythonBinary: 'python3',
+            engineScript: '/tmp/missing-engine.py',
+            timeout: 5.0,
+            idleTimeout: 2.0,
+            maxUploadBytes: 1024 * 1024,
+            renderDpi: 72,
+            workspaceDir: $root,
+            engineMode: 'client',
+            allowUnauthenticated: true,
+            roles: ['ROLE_ADMIN'],
+        );
+        $controller = $this->controllerWithProfile($root, $profile);
+        $json = json_decode((string) $controller->inspect($ws->id)->getContent(), true);
+        self::assertTrue($json['client']);
+        self::assertNull($json['pageCount']);
+    }
+
+    public function testApplyEmptyPdfBody(): void
+    {
+        $root = $this->workspaceRoot();
+        $ws = $this->seedWorkspace($root);
+        $request = Request::create('/', 'POST', [], [], [], [], '');
+        $request->headers->set('Content-Type', 'application/pdf');
+        $request->headers->set('X-CSRF-TOKEN', 'token');
+        $this->expectException(PdfEditorException::class);
+        $this->controller(workspaceRoot: $root)->apply($request, $ws->id);
+    }
+
+    public function testApplyInvalidBase64Pdf(): void
+    {
+        $root = $this->workspaceRoot();
+        $ws = $this->seedWorkspace($root);
+        $request = Request::create('/', 'POST', [], [], [], [], '{"pdf":"%%%"}');
+        $request->headers->set('X-CSRF-TOKEN', 'token');
+        $this->expectException(PdfEditorException::class);
+        $this->controller(workspaceRoot: $root)->apply($request, $ws->id);
+    }
+
+    public function testApplyBase64PdfOk(): void
+    {
+        $root = $this->workspaceRoot();
+        $ws = $this->seedWorkspace($root);
+        $pdf = '%PDF-1.4 from-b64';
+        $request = Request::create('/', 'POST', [], [], [], [], json_encode(['pdf' => base64_encode($pdf)], JSON_THROW_ON_ERROR));
+        $request->headers->set('X-CSRF-TOKEN', 'token');
+        $response = $this->controller(workspaceRoot: $root)->apply($request, $ws->id);
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame($pdf, (string) file_get_contents($ws->pdfPath));
+    }
+
+    public function testApplyRejectsNonPdfClientPayload(): void
+    {
+        $root = $this->workspaceRoot();
+        $ws = $this->seedWorkspace($root);
+        $request = Request::create('/', 'POST', [], [], [], [], 'NOT-A-PDF');
+        $request->headers->set('Content-Type', 'application/pdf');
+        $request->headers->set('X-CSRF-TOKEN', 'token');
+        $this->expectException(PdfEditorException::class);
+        $this->controller(workspaceRoot: $root)->apply($request, $ws->id);
+    }
+
     public function testViewInline(): void
     {
         $root = $this->workspaceRoot();
@@ -239,9 +306,21 @@ final class EditorControllerTest extends TestCase
 
     private function controllerWithEngine(string $root, PdfEngineInterface $engine): EditorController
     {
+        return $this->controllerWithProfile($root, ProfileFactory::create($root), $engine);
+    }
+
+    private function controllerWithProfile(
+        string $root,
+        \Nowo\PdfEditorBundle\Config\EditorProfile $profile,
+        ?PdfEngineInterface $engine = null,
+    ): EditorController {
         $access = $this->createMock(PdfEditorAccessCheckerInterface::class);
         $access->method('canUseEditor')->willReturn(true);
-        $workspaces = new WorkspaceManager(ProfileFactory::create($root));
+        $workspaces = new WorkspaceManager($profile);
+        if ($engine === null) {
+            $engine = $this->createMock(PdfEngineInterface::class);
+            $engine->method('inspect')->willReturn(['pageCount' => 1]);
+        }
         $forms = $this->createMock(FormFactoryInterface::class);
         $forms->method('create')->willReturnCallback(function () {
             $form = $this->createMock(FormInterface::class);
@@ -253,6 +332,7 @@ final class EditorControllerTest extends TestCase
         $tokens = $this->createMock(TokenStorageInterface::class);
         $urls = $this->createMock(UrlGeneratorInterface::class);
         $csrfMgr = $this->createMock(CsrfTokenManagerInterface::class);
+        $csrfMgr->method('isTokenValid')->willReturn(true);
 
         return new EditorController(
             $access,
@@ -263,7 +343,7 @@ final class EditorControllerTest extends TestCase
             $twig,
             $tokens,
             $urls,
-            ProfileFactory::create($root),
+            $profile,
             $csrfMgr,
         );
     }

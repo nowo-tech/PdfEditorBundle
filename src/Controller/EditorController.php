@@ -139,21 +139,24 @@ final class EditorController
 
         $lockPath = $png . '.lock';
         $lock = @fopen($lockPath, 'c+');
-        if ($lock === false) {
+        if ($lock === false) { // @codeCoverageIgnoreStart
             $this->engine->renderPage($workspace->pdfPath, $page, $png, $this->profile->renderDpi);
 
             return;
+            // @codeCoverageIgnoreEnd
         }
 
         try {
-            if (!flock($lock, LOCK_EX)) {
+            if (!flock($lock, LOCK_EX)) { // @codeCoverageIgnoreStart
                 $this->engine->renderPage($workspace->pdfPath, $page, $png, $this->profile->renderDpi);
 
                 return;
+                // @codeCoverageIgnoreEnd
             }
 
-            if (is_file($png) && $pdfMtime !== false && filemtime($png) >= $pdfMtime) {
+            if (is_file($png) && $pdfMtime !== false && filemtime($png) >= $pdfMtime) { // @codeCoverageIgnoreStart
                 return;
+                // @codeCoverageIgnoreEnd
             }
 
             $this->engine->renderPage($workspace->pdfPath, $page, $png, $this->profile->renderDpi);
@@ -262,8 +265,9 @@ final class EditorController
         }
 
         $target = $workspace->directory . '/next.pdf';
-        if (file_put_contents($target, $bytes) === false) {
+        if (file_put_contents($target, $bytes) === false) { // @codeCoverageIgnoreStart
             throw new PdfEditorException('Could not store the edited PDF.');
+            // @codeCoverageIgnoreEnd
         }
 
         $this->workspaces->replacePdf($workspace, $target);

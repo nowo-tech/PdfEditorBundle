@@ -91,6 +91,14 @@ final class WorkspaceManagerTest extends TestCase
         self::assertSame('Scenario.pdf', $workspace->originalName);
     }
 
+    public function testCreateFromPathMissingFixture(): void
+    {
+        $root = sys_get_temp_dir() . '/pdfed-' . bin2hex(random_bytes(4));
+        mkdir($root, 0700, true);
+        $this->expectException(DocumentException::class);
+        (new WorkspaceManager(ProfileFactory::create($root)))->createFromPath($root . '/missing.pdf');
+    }
+
     public function testRejectsNonPdf(): void
     {
         $root = sys_get_temp_dir() . '/pdfed-' . bin2hex(random_bytes(4));

@@ -81,6 +81,7 @@ See [docs/INSTALLATION.md](docs/INSTALLATION.md).
 - [Architecture decisions (ADR)](docs/adr/README.md)
 - [Demo with FrankenPHP](docs/DEMO-FRANKENPHP.md)
 - [Security](docs/SECURITY.md)
+- [GitHub CI](docs/GITHUB_CI.md)
 - [Testing](docs/TESTING.md)
 - [Changelog](docs/CHANGELOG.md)
 - [Contributing](docs/CONTRIBUTING.md)

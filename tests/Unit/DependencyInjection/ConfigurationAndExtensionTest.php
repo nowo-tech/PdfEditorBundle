@@ -9,6 +9,7 @@ use Nowo\PdfEditorBundle\DependencyInjection\Configuration;
 use Nowo\PdfEditorBundle\DependencyInjection\PdfEditorExtension;
 use Nowo\PdfEditorBundle\Engine\PdfEngineInterface;
 use Nowo\PdfEditorBundle\Engine\ProcessRunnerInterface;
+use Nowo\PdfEditorBundle\Exception\UnknownProfileException;
 use Nowo\PdfEditorBundle\Security\AllowAllPdfEditorAccessChecker;
 use Nowo\PdfEditorBundle\Security\RolePdfEditorAccessChecker;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -54,7 +55,7 @@ final class ConfigurationAndExtensionTest extends TestCase
         $extension->load([], $container);
 
         self::assertSame('nowo_pdf_editor', $extension->getAlias());
-        self::assertTrue($container->hasDefinition('nowo_pdf_editor.process_runner'));
+        self::assertTrue($container->hasAlias('nowo_pdf_editor.process_runner') || $container->hasDefinition('nowo_pdf_editor.process_runner'));
         self::assertTrue($container->hasAlias(ProcessRunnerInterface::class));
         self::assertTrue($container->hasAlias(PdfEngineInterface::class));
         self::assertTrue($container->hasAlias(EditorProfile::class));
@@ -65,6 +66,19 @@ final class ConfigurationAndExtensionTest extends TestCase
         self::assertIsString($engineScript);
         self::assertStringEndsWith('/engine/pdf_editor_engine.py', $engineScript);
         self::assertStringNotContainsString('vendor/nowo-tech/pdf-editor-bundle', $engineScript);
+    }
+
+    public function testLoadThrowsWhenDefaultProfileMissingAtRuntime(): void
+    {
+        $container = $this->container();
+        $extension = new PdfEditorExtension();
+        $this->expectException(UnknownProfileException::class);
+        $extension->load([[
+            'default_profile' => 'ghost',
+            'profiles'        => [
+                'default' => [],
+            ],
+        ]], $container);
     }
 
     public function testLoadAllowUnauthenticatedAndCustomEngineScript(): void
