@@ -1,0 +1,56 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}PdfEditorBundle — Symfony 8.1 demo{% endblock %}
+
+{% block body %}
+    <div class="demo-landing">
+        <section class="demo-hero">
+            <div>
+                <h1>{{ 'demo.home.title'|trans }}</h1>
+                <p class="demo-lead">{{ 'demo.home.lead'|trans|raw }}</p>
+                <div class="demo-chip-row">
+                    <span class="demo-chip">Symfony {{ symfony_version }}</span>
+                    <span class="demo-chip">PHP {{ php_version }}</span>
+                    <span class="demo-chip">FrankenPHP {{ frankenphp_mode }}</span>
+                    <span class="demo-chip">engine: {{ profile.engineMode }}</span>
+                </div>
+                <div class="demo-actions">
+                    <a href="{{ path('demo_scenarios') }}" class="demo-btn demo-btn-primary">{{ 'demo.home.browse_scenarios'|trans }}</a>
+                    <a href="{{ path('nowo_pdf_editor_home') }}" class="demo-btn demo-btn-secondary">{{ 'demo.home.upload'|trans }}</a>
+                </div>
+            </div>
+            <aside class="demo-panel">
+                <h2>{{ 'demo.home.runtime'|trans }}</h2>
+                <ul class="demo-stack-list">
+                    <li><span>{{ 'demo.home.stack_symfony'|trans }}</span><span>{{ symfony_version }}</span></li>
+                    <li><span>{{ 'demo.home.stack_engine'|trans }}</span><span>{{ profile.engineMode }}</span></li>
+                    <li><span>{{ 'demo.home.stack_timeout'|trans }}</span><span>{{ profile.timeout }}s</span></li>
+                    <li><span>{{ 'demo.home.stack_dpi'|trans }}</span><span>{{ profile.renderDpi }}</span></li>
+                    <li><span>{{ 'demo.home.stack_fixtures'|trans }}</span><span>{{ 'demo.home.stack_fixtures_value'|trans }}</span></li>
+                </ul>
+            </aside>
+        </section>
+
+        <section class="demo-grid">
+            <article class="demo-card">
+                <h3>{{ 'demo.home.card_hub_title'|trans }}</h3>
+                <p>{{ 'demo.home.card_hub_text'|trans }}</p>
+            </article>
+            <article class="demo-card">
+                <h3>{{ 'demo.home.card_live_title'|trans }}</h3>
+                <p>{{ 'demo.home.card_live_text'|trans }}</p>
+            </article>
+            <article class="demo-card">
+                <h3>{{ 'demo.home.card_portable_title'|trans }}</h3>
+                <p>{{ 'demo.home.card_portable_text'|trans }}</p>
+            </article>
+        </section>
+
+        <section class="demo-steps">
+            <div class="demo-step"><strong>1</strong> {{ 'demo.home.step1'|trans|raw }}</div>
+            <div class="demo-step"><strong>2</strong> {{ 'demo.home.step2'|trans }}</div>
+            <div class="demo-step"><strong>3</strong> {{ 'demo.home.step3'|trans|raw }}</div>
+            <div class="demo-step"><strong>4</strong> {{ 'demo.home.step4'|trans }}</div>
+        </section>
+    </div>
+{% endblock %}

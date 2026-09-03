@@ -1,0 +1,73 @@
+pdf_editor.home.title: Éditeur PDF
+pdf_editor.home.heading: Éditeur visuel PDF
+pdf_editor.home.lead: Ouvrez un PDF pour modifier le texte, les formulaires, filigranes, pages et annotations.
+pdf_editor.home.open: Ouvrir le PDF
+pdf_editor.upload.label: Fichier PDF
+pdf_editor.upload.not_pdf: Envoyez un fichier PDF.
+pdf_editor.tool.select: Sélectionner
+pdf_editor.tool.text: Texte
+pdf_editor.tool.form: Champ de formulaire
+pdf_editor.tool.watermark: Filigrane
+pdf_editor.tool.annotate: Note
+pdf_editor.tool.select_tip: Sélectionnez et modifiez les blocs de texte existants.
+pdf_editor.tool.text_tip: Cliquez sur la page pour insérer du texte.
+pdf_editor.tool.form_tip: Cliquez sur la page pour ajouter un champ AcroForm.
+pdf_editor.tool.watermark_tip: Ajoute un filigrane diagonal sur toutes les pages.
+pdf_editor.tool.annotate_tip: Cliquez sur la page pour ajouter une note autocollante.
+pdf_editor.toolbar.tools: Outils d’édition
+pdf_editor.toolbar.actions: Actions sur le document
+pdf_editor.action.remove_watermarks: Supprimer les filigranes
+pdf_editor.action.remove_watermarks_tip: Met en file d’attente la suppression des filigranes détectés.
+pdf_editor.action.rotate: Pivoter la page
+pdf_editor.action.rotate_tip: Pivoter la page courante de 90° (enregistré à la validation).
+pdf_editor.action.commit: Enregistrer dans le PDF
+pdf_editor.action.commit_tip: Applique toutes les modifications du brouillon et enregistre le PDF.
+pdf_editor.action.discard: Annuler le brouillon
+pdf_editor.action.discard_tip: Efface les modifications en attente sans enregistrer.
+pdf_editor.action.download: Télécharger
+pdf_editor.action.download_tip: Télécharge le fichier PDF actuel.
+pdf_editor.loading: Chargement de l’aperçu PDF…
+pdf_editor.load_error: Impossible de charger l’aperçu. Vérifiez que le moteur Python est actif.
+pdf_editor.engine.client: Moteur client (embedpdf + pdf-lib)
+pdf_editor.tool.redact: Caviarder
+pdf_editor.tool.redact_tip: Marquer du contenu à caviarder dans le visualiseur (embedpdf).
+pdf_editor.pages.current: Page %page%
+pdf_editor.pending.empty: Aucune modification en attente.
+pdf_editor.pending.remove: Retirer du brouillon
+pdf_editor.draft.op.insert_text: Insérer du texte à la page %page%
+pdf_editor.draft.op.add_watermark: Ajouter filigrane CONFIDENTIAL
+pdf_editor.draft.op.rotate_page: Pivoter la page %page% dans le sens horaire
+pdf_editor.draft.op.remove_watermarks: Supprimer les filigranes détectés
+pdf_editor.draft.op.remove_xobject: Supprimer l’objet de la page %page%
+pdf_editor.draft.op.add_acroform_field: Ajouter un champ de formulaire à la page %page%
+pdf_editor.pages: Pages
+pdf_editor.pages.thumb: Page %page%
+pdf_editor.pages.of: Page %current% sur %total%
+pdf_editor.pages.prev: Page précédente
+pdf_editor.pages.next: Page suivante
+pdf_editor.pages.nav: Navigation des pages
+pdf_editor.pages.current: Page %page%
+pdf_editor.properties: Propriétés
+pdf_editor.properties.empty: Sélectionnez du texte ou choisissez l’outil Texte.
+pdf_editor.properties.text: Texte
+pdf_editor.properties.font_size: Taille de police
+pdf_editor.properties.page: Page %page%
+pdf_editor.properties.apply: Ajouter au brouillon
+pdf_editor.properties.apply_live: Appliquer
+pdf_editor.properties.delete: Supprimer
+pdf_editor.properties.applied: Appliqué
+pdf_editor.properties.deleted: Supprimé
+pdf_editor.properties.font_color: Couleur
+pdf_editor.properties.font_family: Police
+pdf_editor.properties.field_name: Nom du champ
+pdf_editor.properties.value: Valeur
+pdf_editor.properties.kind.form: Champ de formulaire
+pdf_editor.properties.kind.textbox: Zone de texte
+pdf_editor.properties.live_help: Les changements s’appliquent dans le visualiseur. Enregistrez dans le PDF pour les conserver.
+pdf_editor.properties.draft_insert_help: Met en file un tampon texte pdf-lib à l’enregistrement.
+pdf_editor.properties.empty_select: Utilisez Sélectionner pour cliquer une zone de texte ou un champ. Poignées pour déplacer et redimensionner.
+pdf_editor.save.error: Impossible d’enregistrer le PDF. Réessayez.
+pdf_editor.pending.title: Brouillon
+pdf_editor.pending.help: Les modifications restent dans le navigateur jusqu’à l’enregistrement. Symfony envoie alors le lot au moteur Python.
+pdf_editor.pending.queued: Ajouté au brouillon
+pdf_editor.pending.saved: Enregistré dans le PDF

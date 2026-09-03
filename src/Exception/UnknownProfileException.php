@@ -1,0 +1,13 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Nowo\PdfEditorBundle\Exception;
+
+final class UnknownProfileException extends PdfEditorException
+{
+    public static function forProfile(string $name): self
+    {
+        return new self(sprintf('Unknown PDF editor profile "%s".', $name));
+    }
+}

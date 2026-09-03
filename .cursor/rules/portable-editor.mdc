@@ -1,0 +1,53 @@
+---
+description: PdfEditorBundle must embed in any Symfony project or dashboard without host coupling
+globs: PdfEditorBundle/**/*
+alwaysApply: false
+---
+
+# Portable PDF editor
+
+The editor must work as a **drop-in module** in any Symfony app, admin panel, or dashboard — not only in the demo.
+
+## Layout (CKEditor / Tiptap pattern)
+
+Fixed three-zone shell — portable in any host container:
+
+```text
+┌─ Toolbar (tools + save) ─────────────────────────┐
+│ Pages │        Canvas / viewport        │ Props  │
+│ rail  │         (embedpdf)              │+draft  │
+│ paginator                              │        │
+└────────┴───────────────────────────────┴────────┘
+```
+
+- `EditorShell` + `PageRail` + `PropertiesPanel`; host only mounts `#nowo-pdf-editor-react-root`.
+- Height via `config.layout.height` or 100% of parent — never assume demo topbar pixels.
+
+- Mount: `#nowo-pdf-editor-react-root` + JSON `data-config` (see `assets/src/main.tsx`, `workspace.html.twig`).
+- Host provides URLs, CSRF, locale/i18n; the bundle owns toolbar, viewer, draft, save.
+- Override `@PdfEditor/editor/layout.html.twig` for **branding only** — never fork toolbar/save logic into host apps.
+
+## Isolation
+
+- CSS: prefix `nowo-pdf-editor-*` / `nowo-ui-*`; no dependency on host Bootstrap/Tailwind/demo.css.
+- Demo chrome (topbar, nav) stays **outside** the shell; shell fills the container the host allocates.
+- Avoid hardcoded viewport assumptions (e.g. `100vh - 120px`); prefer config-driven height/theme when adding features.
+- Vite `base` must match Symfony assets (`/bundles/pdfeditor/build/`) so lazy chunks and WASM resolve correctly.
+- **Frontend stack:** TypeScript + React in `src/Resources/assets/src`, **pnpm** + **Vite** at bundle root (`make assets`). Demo uses **Pentatrion Vite** (`vite_entry_script_tags('pdf-editor')`); hosts without Pentatrion use pre-built files from `assets:install`.
+
+## Configuration
+
+- Profiles + `engine_mode` via `nowo_pdf_editor.yaml`; no Python required for `client` mode.
+- i18n via Symfony translations passed in `config.i18n` — no strings hardcoded in React for user-facing text.
+
+## API surface for hosts
+
+- Symfony routes: upload, workspace, view, apply, download — host wires auth/firewall only.
+- Future embed modes (iframe, partial dashboard widget): extend `WorkspaceConfig`, do not duplicate React entrypoints.
+
+## Review checklist (every change)
+
+1. Does it work without the demo app?
+2. Can a host mount it in a div of arbitrary size?
+3. Are new styles scoped and independent of host theme?
+4. Is behavior driven by config/i18n, not host-specific code?

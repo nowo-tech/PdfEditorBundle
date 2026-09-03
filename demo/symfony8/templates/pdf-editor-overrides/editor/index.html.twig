@@ -1,0 +1,28 @@
+{% extends '@NowoPdfEditorBundle/editor/layout.html.twig' %}
+
+{% block nowo_pdf_editor_title %}{{ 'pdf_editor.home.title'|trans({}, 'NowoPdfEditorBundle') }}{% endblock %}
+
+{% block nowo_pdf_editor_body %}
+    <div class="demo-upload-shell">
+        <section class="demo-upload-card">
+            <h1>{{ 'pdf_editor.home.heading'|trans({}, 'NowoPdfEditorBundle') }}</h1>
+            <p class="demo-lead">{{ 'pdf_editor.home.lead'|trans({}, 'NowoPdfEditorBundle') }}</p>
+            <div class="demo-upload-drop">
+                <p>Drop a PDF here or choose a file below</p>
+                {{ form_start(form, { attr: { class: 'nowo-ui-form', enctype: 'multipart/form-data' } }) }}
+                    {{ form_row(form.pdf) }}
+                    <button type="submit" class="nowo-ui-btn nowo-ui-btn-primary">{{ 'pdf_editor.home.open'|trans({}, 'NowoPdfEditorBundle') }}</button>
+                {{ form_end(form) }}
+            </div>
+        </section>
+        <aside class="demo-upload-aside">
+            <h2 class="nowo-ui-subtitle">How it works</h2>
+            <ol>
+                <li>Open the workspace with your PDF.</li>
+                <li>Queue text, form, watermark or page edits.</li>
+                <li>Save to PDF — Symfony calls Python/PyMuPDF.</li>
+                <li>Download the result.</li>
+            </ol>
+        </aside>
+    </div>
+{% endblock %}

@@ -1,0 +1,324 @@
+/* Host mount: fill allocated dashboard panel (portable embed). */
+#nowo-pdf-editor-react-root {
+  height: 100%;
+  min-height: 480px;
+  display: flex;
+  flex-direction: column;
+}
+
+.nowo-pdf-editor-shell {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  height: 100%;
+}
+
+.nowo-pdf-editor-body {
+  display: grid;
+  grid-template-columns: 140px minmax(0, 1fr) 280px;
+  flex: 1;
+  min-height: 0;
+}
+
+.nowo-pdf-editor-viewport {
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.nowo-pdf-editor-viewer-wrap {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  background: #cfc4b0;
+}
+
+/* Left page rail (CKEditor-style paginator aside) */
+.nowo-pdf-editor-pages {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: #e7dfd1;
+  border-right: 1px solid #d7cdb8;
+}
+
+.nowo-pdf-editor-pages-title {
+  margin: 0;
+  padding: 12px 10px 8px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #4a4036;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.nowo-pdf-editor-pages-list {
+  flex: 1;
+  overflow: auto;
+  padding: 4px 8px 8px;
+}
+
+.nowo-pdf-editor-page-thumb {
+  display: block;
+  width: 100%;
+  margin-bottom: 8px;
+  padding: 4px;
+  border: 2px solid transparent;
+  border-radius: 4px;
+  background: #fff;
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.nowo-pdf-editor-page-thumb:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.nowo-pdf-editor-page-thumb.is-active {
+  border-color: #0b6e4f;
+  box-shadow: 0 0 0 1px #7dffc3;
+}
+
+.nowo-pdf-editor-page-thumb img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 2px;
+}
+
+.nowo-pdf-editor-page-thumb-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 210 / 297;
+  background: #f4f1ea;
+  color: #6b6258;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.nowo-pdf-editor-page-thumb-label {
+  display: block;
+  margin-top: 4px;
+  font-size: 11px;
+  text-align: center;
+  color: #6b6258;
+}
+
+.nowo-pdf-editor-paginator {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  padding: 8px;
+  border-top: 1px solid #d7cdb8;
+  background: #ddd4c4;
+}
+
+.nowo-pdf-editor-paginator-status {
+  flex: 1;
+  text-align: center;
+  font-size: 11px;
+  color: #4a4036;
+  line-height: 1.2;
+}
+
+.nowo-pdf-editor-paginator-btn {
+  min-width: 28px;
+  height: 28px;
+  padding: 0;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.nowo-pdf-editor-toolbar {
+  flex-shrink: 0;
+}
+
+.nowo-pdf-editor-toolbar-actions {
+  margin-left: auto;
+}
+
+/* Fallback if mergeSchema cannot clear embedpdf chrome */
+.nowo-pdf-editor-viewer-wrap [data-toolbar-id='main-toolbar'],
+.nowo-pdf-editor-viewer-wrap [data-testid='main-toolbar'],
+.nowo-pdf-editor-viewer-wrap [data-sidebar-id='thumbnail-sidebar'] {
+  display: none !important;
+}
+
+.nowo-pdf-editor-badge {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: #7dffc3;
+  color: #1f1b16;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 16px;
+  text-align: center;
+}
+
+.nowo-pdf-editor-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: nowo-pdf-editor-spin 0.8s linear infinite;
+}
+
+@keyframes nowo-pdf-editor-spin {
+  to {
+    transform: rotate(rotate(360deg));
+  }
+}
+
+.nowo-pdf-editor-pending-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.25rem;
+  height: 1.25rem;
+  margin-left: 6px;
+  border-radius: 999px;
+  background: #0b6e4f;
+  color: #fff;
+  font-size: 12px;
+}
+
+.nowo-pdf-editor-tool-hint {
+  margin-top: 12px;
+  font-size: 13px;
+}
+
+.nowo-pdf-editor-props-section {
+  margin-bottom: 16px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 12px;
+}
+
+.nowo-pdf-editor-props-section summary {
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.nowo-pdf-editor-props-section summary::-webkit-details-marker {
+  display: none;
+}
+
+.nowo-pdf-editor-props-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.nowo-pdf-editor-props-meta {
+  margin: 0;
+  font-size: 12px;
+}
+
+.nowo-pdf-editor-save-error {
+  margin: 12px 0 0;
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: #fdecea;
+  color: #a32;
+  font-size: 13px;
+}
+
+.nowo-pdf-editor-skeleton {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  background: #cfc4b0;
+  z-index: 2;
+}
+
+.nowo-pdf-editor-skeleton-page {
+  width: min(480px, 80%);
+  aspect-ratio: 210 / 297;
+  background: linear-gradient(90deg, #e8e2d8 25%, #f5f0e8 50%, #e8e2d8 75%);
+  background-size: 200% 100%;
+  animation: nowo-pdf-editor-shimmer 1.4s ease-in-out infinite;
+  border-radius: 4px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
+}
+
+.nowo-pdf-editor-skeleton-label {
+  margin: 0;
+  color: #6b6258;
+  font-size: 14px;
+}
+
+@keyframes nowo-pdf-editor-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.nowo-pdf-editor-shell .nowo-ui-toast {
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  background: #2b2118;
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: 6px;
+  z-index: 30;
+  margin: 0;
+}
+
+.nowo-ui-btn-icon svg {
+  stroke: currentColor;
+}
+
+@media (max-width: 768px) {
+  .nowo-pdf-editor-body {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto minmax(240px, 1fr) auto;
+  }
+
+  .nowo-pdf-editor-pages {
+    max-height: 120px;
+    border-right: none;
+    border-bottom: 1px solid #d7cdb8;
+  }
+
+  .nowo-pdf-editor-pages-list {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-bottom: 4px;
+  }
+
+  .nowo-pdf-editor-page-thumb {
+    flex: 0 0 72px;
+    margin-bottom: 0;
+  }
+
+  .nowo-pdf-editor-props {
+    max-height: 220px;
+    border-left: none;
+    border-top: 1px solid #d7cdb8;
+  }
+}

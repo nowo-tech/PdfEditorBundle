@@ -1,0 +1,39 @@
+---
+description: Frontend tooling — TypeScript, pnpm, Vite, Pentatrion (demo)
+globs: PdfEditorBundle/{src/Resources/assets/**,vite.config.ts,package.json,demo/**}
+alwaysApply: false
+---
+
+# Frontend (TS + pnpm + Vite + Pentatrion)
+
+## Layout (REQ-ASSETS-001)
+
+- TypeScript/React sources: `src/Resources/assets/src/`
+- Production build output: `src/Resources/public/build/` (for `assets:install`)
+- Root `package.json`, `pnpm-lock.yaml`, `vite.config.ts`, `tsconfig.json`
+
+## Commands
+
+```bash
+# Bundle production build (Packagist / host apps)
+pnpm install && pnpm run build
+# or
+make assets
+
+# Demo (Docker)
+make -C demo/symfony8 up      # composer + assets-install + Pentatrion build
+make -C demo/symfony8 assets  # rebuild Vite after TS changes
+```
+
+## Pentatrion (demo only)
+
+- `pentatrion/vite-bundle` + `vite-plugin-symfony` in `demo/symfony8/`
+- Entry: `demo/symfony8/assets/pdf-editor.ts` → imports `@bundle/src/main.tsx`
+- Twig: `vite_entry_link_tags('pdf-editor')` / `vite_entry_script_tags('pdf-editor')`
+- Portable bundle Twig keeps `asset('build/pdf-editor.js', 'nowo_pdf_editor')` for hosts without Pentatrion
+
+## Do not
+
+- Move frontend back under a loose `assets/` folder at repo root
+- Hardcode demo-only paths in `src/Resources/assets/` (keep portable)
+- Change Vite `base` in root config without updating Symfony asset package path

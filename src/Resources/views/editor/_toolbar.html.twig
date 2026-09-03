@@ -1,0 +1,65 @@
+{# Icon toolbar — labels appear on hover via data-tooltip and title #}
+<div class="nowo-pdf-editor-toolbar-group" role="group" aria-label="{{ 'pdf_editor.toolbar.tools'|trans({}, 'NowoPdfEditorBundle') }}">
+    <button type="button" class="nowo-ui-btn nowo-ui-btn-icon is-active" data-tool="select"
+            title="{{ 'pdf_editor.tool.select_tip'|trans({}, 'NowoPdfEditorBundle') }}"
+            data-tooltip="{{ 'pdf_editor.tool.select_tip'|trans({}, 'NowoPdfEditorBundle') }}"
+            aria-label="{{ 'pdf_editor.tool.select'|trans({}, 'NowoPdfEditorBundle') }}">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4l7 17 2.5-7.5L21 11 4 4z"/></svg>
+    </button>
+    <button type="button" class="nowo-ui-btn nowo-ui-btn-icon" data-tool="text"
+            title="{{ 'pdf_editor.tool.text_tip'|trans({}, 'NowoPdfEditorBundle') }}"
+            data-tooltip="{{ 'pdf_editor.tool.text_tip'|trans({}, 'NowoPdfEditorBundle') }}"
+            aria-label="{{ 'pdf_editor.tool.text'|trans({}, 'NowoPdfEditorBundle') }}">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v3h-5v13h-4V7H5V4z"/></svg>
+    </button>
+    <button type="button" class="nowo-ui-btn nowo-ui-btn-icon" data-tool="form"
+            title="{{ 'pdf_editor.tool.form_tip'|trans({}, 'NowoPdfEditorBundle') }}"
+            data-tooltip="{{ 'pdf_editor.tool.form_tip'|trans({}, 'NowoPdfEditorBundle') }}"
+            aria-label="{{ 'pdf_editor.tool.form'|trans({}, 'NowoPdfEditorBundle') }}">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M7 10h10M7 14h6"/></svg>
+    </button>
+    <button type="button" class="nowo-ui-btn nowo-ui-btn-icon" data-tool="watermark"
+            title="{{ 'pdf_editor.tool.watermark_tip'|trans({}, 'NowoPdfEditorBundle') }}"
+            data-tooltip="{{ 'pdf_editor.tool.watermark_tip'|trans({}, 'NowoPdfEditorBundle') }}"
+            aria-label="{{ 'pdf_editor.tool.watermark'|trans({}, 'NowoPdfEditorBundle') }}">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l8 4v6c0 5-3.5 9.5-8 10-4.5-.5-8-5-8-10V6l8-4z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 14c1.5-2 3-2 4 0s2.5 2 4 0"/></svg>
+    </button>
+    <button type="button" class="nowo-ui-btn nowo-ui-btn-icon" data-tool="annotate"
+            title="{{ 'pdf_editor.tool.annotate_tip'|trans({}, 'NowoPdfEditorBundle') }}"
+            data-tooltip="{{ 'pdf_editor.tool.annotate_tip'|trans({}, 'NowoPdfEditorBundle') }}"
+            aria-label="{{ 'pdf_editor.tool.annotate'|trans({}, 'NowoPdfEditorBundle') }}">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h12v12H4V4zm14 2h2v14H8v2h12V6z" fill="currentColor"/><path d="M7 9h6M7 12h4" stroke="#fff" stroke-width="1.5"/></svg>
+    </button>
+</div>
+<div class="nowo-pdf-editor-toolbar-group" role="group" aria-label="{{ 'pdf_editor.toolbar.actions'|trans({}, 'NowoPdfEditorBundle') }}">
+    <button type="button" class="nowo-ui-btn nowo-ui-btn-icon" data-action="remove-watermarks"
+            title="{{ 'pdf_editor.action.remove_watermarks_tip'|trans({}, 'NowoPdfEditorBundle') }}"
+            data-tooltip="{{ 'pdf_editor.action.remove_watermarks_tip'|trans({}, 'NowoPdfEditorBundle') }}"
+            aria-label="{{ 'pdf_editor.action.remove_watermarks'|trans({}, 'NowoPdfEditorBundle') }}">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-9 9M9 6l9 9" stroke="currentColor" stroke-width="2" fill="none"/><path d="M4 20h16" stroke="currentColor" stroke-width="2"/></svg>
+    </button>
+    <button type="button" class="nowo-ui-btn nowo-ui-btn-icon" data-action="rotate"
+            title="{{ 'pdf_editor.action.rotate_tip'|trans({}, 'NowoPdfEditorBundle') }}"
+            data-tooltip="{{ 'pdf_editor.action.rotate_tip'|trans({}, 'NowoPdfEditorBundle') }}"
+            aria-label="{{ 'pdf_editor.action.rotate'|trans({}, 'NowoPdfEditorBundle') }}">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4V1l4 4-4 4V6a6 6 0 1 0 6 6h2a8 8 0 1 1-8-8z" fill="currentColor"/></svg>
+    </button>
+    <button type="button" class="nowo-ui-btn nowo-ui-btn-icon nowo-ui-btn-primary" data-action="commit" disabled
+            title="{{ 'pdf_editor.action.commit_tip'|trans({}, 'NowoPdfEditorBundle') }}"
+            data-tooltip="{{ 'pdf_editor.action.commit_tip'|trans({}, 'NowoPdfEditorBundle') }}"
+            aria-label="{{ 'pdf_editor.action.commit'|trans({}, 'NowoPdfEditorBundle') }}">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h10l4 4v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M15 4v4h4M9 13l2 2 4-4" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+    </button>
+    <button type="button" class="nowo-ui-btn nowo-ui-btn-icon" data-action="discard" disabled
+            title="{{ 'pdf_editor.action.discard_tip'|trans({}, 'NowoPdfEditorBundle') }}"
+            data-tooltip="{{ 'pdf_editor.action.discard_tip'|trans({}, 'NowoPdfEditorBundle') }}"
+            aria-label="{{ 'pdf_editor.action.discard'|trans({}, 'NowoPdfEditorBundle') }}">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 7h12l-1 14H7L6 7zm3-3h6l1 2H8l1-2z" fill="currentColor"/></svg>
+    </button>
+    <a class="nowo-ui-btn nowo-ui-btn-icon" href="{{ path('nowo_pdf_editor_download', { id: workspace.id }) }}"
+       title="{{ 'pdf_editor.action.download_tip'|trans({}, 'NowoPdfEditorBundle') }}"
+       data-tooltip="{{ 'pdf_editor.action.download_tip'|trans({}, 'NowoPdfEditorBundle') }}"
+       aria-label="{{ 'pdf_editor.action.download'|trans({}, 'NowoPdfEditorBundle') }}">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+    </a>
+</div>

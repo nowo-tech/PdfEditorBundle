@@ -1,0 +1,20 @@
+# FrankenPHP Hot Reload — development only (do not enable in production).
+# Scripts are self-hosted from public/build/hot-reload/ (pnpm + Vite), not jsDelivr.
+nowo_hot_reload:
+    enabled: true
+    auto_inject: true
+    require_frankenphp_env: true
+    allow_production: false
+    idiomorph: true
+    idiomorph_script_url: '/build/hot-reload/idiomorph.js'
+    hot_reload_script_url: '/build/hot-reload/frankenphp-hot-reload.js'
+    preserve_selectors:
+        - '[id^="sfwdt"]'
+        - '.sf-toolbar'
+        - '.sf-minitoolbar'
+        - '#nowo-pdf-editor-root'
+        - '#nowo-pdf-editor-react-root'
+        - '#nowo-pdf-editor-canvas'
+        - '#nowo-pdf-editor-thumbs'
+    preserve_observe: true
+    csp_augment_script_src: false

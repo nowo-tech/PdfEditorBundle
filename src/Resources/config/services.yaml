@@ -1,0 +1,29 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: false
+
+    Nowo\PdfEditorBundle\Engine\SymfonyProcessRunner: ~
+    nowo_pdf_editor.process_runner:
+        alias: Nowo\PdfEditorBundle\Engine\SymfonyProcessRunner
+
+    Nowo\PdfEditorBundle\:
+        resource: '../../*'
+        exclude:
+            - '../../DependencyInjection/'
+            - '../../PdfEditorBundle.php'
+            - '../../Resources/'
+            - '../../Config/'
+            - '../../Exception/'
+            - '../../Document/Workspace.php'
+            - '../../Engine/ProcessOutcome.php'
+            - '../../Operation/EditorOperation.php'
+
+    Nowo\PdfEditorBundle\Operation\OperationDecoder: ~
+    Nowo\PdfEditorBundle\Form\PdfUploadType: ~
+
+    Nowo\PdfEditorBundle\Controller\EditorController:
+        tags: ['controller.service_arguments']
+
+    Nowo\PdfEditorBundle\Command\CheckEngineCommand: ~

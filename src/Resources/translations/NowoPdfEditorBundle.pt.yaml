@@ -1,0 +1,73 @@
+pdf_editor.home.title: Editor PDF
+pdf_editor.home.heading: Editor visual de PDF
+pdf_editor.home.lead: Abra um PDF para editar texto, formulários, marcas de água, páginas e anotações.
+pdf_editor.home.open: Abrir PDF
+pdf_editor.upload.label: Ficheiro PDF
+pdf_editor.upload.not_pdf: Carregue um ficheiro PDF.
+pdf_editor.tool.select: Selecionar
+pdf_editor.tool.text: Texto
+pdf_editor.tool.form: Campo de formulário
+pdf_editor.tool.watermark: Marca de água
+pdf_editor.tool.annotate: Nota
+pdf_editor.tool.select_tip: Selecione e edite caixas de texto existentes na página.
+pdf_editor.tool.text_tip: Clique na página para inserir texto novo.
+pdf_editor.tool.form_tip: Clique na página para adicionar um campo AcroForm de texto.
+pdf_editor.tool.watermark_tip: Adiciona uma marca de água diagonal em todas as páginas.
+pdf_editor.tool.annotate_tip: Clique na página para adicionar uma nota adesiva.
+pdf_editor.toolbar.tools: Ferramentas de edição
+pdf_editor.toolbar.actions: Ações do documento
+pdf_editor.action.remove_watermarks: Remover marcas de água
+pdf_editor.action.remove_watermarks_tip: Enfileira a remoção de marcas de água detetadas.
+pdf_editor.action.rotate: Rodar página
+pdf_editor.action.rotate_tip: Roda a página atual 90° no sentido horário (guardado ao confirmar).
+pdf_editor.action.commit: Guardar no PDF
+pdf_editor.action.commit_tip: Aplica todas as alterações do rascunho e guarda o PDF.
+pdf_editor.action.discard: Descartar rascunho
+pdf_editor.action.discard_tip: Limpa alterações pendentes sem guardar.
+pdf_editor.action.download: Descarregar
+pdf_editor.action.download_tip: Descarrega o ficheiro PDF atual.
+pdf_editor.loading: A carregar pré-visualização do PDF…
+pdf_editor.load_error: Não foi possível carregar a pré-visualização. Verifique se o motor Python está ativo.
+pdf_editor.engine.client: Motor cliente (embedpdf + pdf-lib)
+pdf_editor.tool.redact: Redigir
+pdf_editor.tool.redact_tip: Marque conteúdo para redação no visualizador (embedpdf).
+pdf_editor.pages.current: Página %page%
+pdf_editor.pending.empty: Sem alterações pendentes.
+pdf_editor.pending.remove: Remover do rascunho
+pdf_editor.draft.op.insert_text: Inserir texto na página %page%
+pdf_editor.draft.op.add_watermark: Adicionar marca de água CONFIDENTIAL
+pdf_editor.draft.op.rotate_page: Rodar a página %page% no sentido horário
+pdf_editor.draft.op.remove_watermarks: Remover marcas de água detetadas
+pdf_editor.draft.op.remove_xobject: Remover objeto da página %page%
+pdf_editor.draft.op.add_acroform_field: Adicionar campo de formulário na página %page%
+pdf_editor.pages: Páginas
+pdf_editor.pages.thumb: Página %page%
+pdf_editor.pages.of: Página %current% de %total%
+pdf_editor.pages.prev: Página anterior
+pdf_editor.pages.next: Página seguinte
+pdf_editor.pages.nav: Navegação de páginas
+pdf_editor.pages.current: Página %page%
+pdf_editor.properties: Propriedades
+pdf_editor.properties.empty: Selecione texto na página ou escolha a ferramenta Texto.
+pdf_editor.properties.text: Texto
+pdf_editor.properties.font_size: Tamanho da fonte
+pdf_editor.properties.page: Página %page%
+pdf_editor.properties.apply: Adicionar ao rascunho
+pdf_editor.properties.apply_live: Aplicar
+pdf_editor.properties.delete: Eliminar
+pdf_editor.properties.applied: Aplicado
+pdf_editor.properties.deleted: Eliminado
+pdf_editor.properties.font_color: Cor
+pdf_editor.properties.font_family: Fonte
+pdf_editor.properties.field_name: Nome do campo
+pdf_editor.properties.value: Valor
+pdf_editor.properties.kind.form: Campo de formulário
+pdf_editor.properties.kind.textbox: Caixa de texto
+pdf_editor.properties.live_help: As alterações aplicam-se no visualizador. Guarde no PDF para persistir.
+pdf_editor.properties.draft_insert_help: Enfileira um carimbo de texto pdf-lib ao guardar.
+pdf_editor.properties.empty_select: Use Selecionar para clicar numa caixa de texto ou campo. Arraste as alças para mover e redimensionar.
+pdf_editor.save.error: Não foi possível guardar o PDF. Tente novamente.
+pdf_editor.pending.title: Rascunho
+pdf_editor.pending.help: As alterações ficam no navegador até guardar. Depois o Symfony envia o lote ao motor Python.
+pdf_editor.pending.queued: Adicionado ao rascunho
+pdf_editor.pending.saved: Guardado no PDF

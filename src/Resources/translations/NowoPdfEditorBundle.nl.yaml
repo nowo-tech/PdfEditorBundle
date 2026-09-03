@@ -1,0 +1,73 @@
+pdf_editor.home.title: PDF-editor
+pdf_editor.home.heading: Visuele PDF-editor
+pdf_editor.home.lead: Open een PDF om tekst, formulieren, watermerken, pagina’s en annotaties te bewerken.
+pdf_editor.home.open: PDF openen
+pdf_editor.upload.label: PDF-bestand
+pdf_editor.upload.not_pdf: Upload een PDF-bestand.
+pdf_editor.tool.select: Selecteren
+pdf_editor.tool.text: Tekst
+pdf_editor.tool.form: Formulierveld
+pdf_editor.tool.watermark: Watermerk
+pdf_editor.tool.annotate: Notitie
+pdf_editor.tool.select_tip: Selecteer en bewerk bestaande tekstvakken op de pagina.
+pdf_editor.tool.text_tip: Klik op de pagina om nieuwe tekst in te voegen.
+pdf_editor.tool.form_tip: Klik op de pagina om een AcroForm-tekstveld toe te voegen.
+pdf_editor.tool.watermark_tip: Voeg een diagonaal watermerk toe op elke pagina.
+pdf_editor.tool.annotate_tip: Klik op de pagina om een plaknotitie toe te voegen.
+pdf_editor.toolbar.tools: Bewerkingstools
+pdf_editor.toolbar.actions: Documentacties
+pdf_editor.action.remove_watermarks: Watermerken verwijderen
+pdf_editor.action.remove_watermarks_tip: Zet verwijdering van gedetecteerde watermerken in de wachtrij.
+pdf_editor.action.rotate: Pagina draaien
+pdf_editor.action.rotate_tip: Draai de huidige pagina 90° met de klok mee (opgeslagen bij bevestigen).
+pdf_editor.action.commit: Opslaan in PDF
+pdf_editor.action.commit_tip: Pas alle conceptwijzigingen toe en sla het PDF op.
+pdf_editor.action.discard: Concept verwerpen
+pdf_editor.action.discard_tip: Wis openstaande wijzigingen zonder op te slaan.
+pdf_editor.action.download: Downloaden
+pdf_editor.action.download_tip: Download het huidige PDF-bestand.
+pdf_editor.loading: PDF-voorbeeld laden…
+pdf_editor.load_error: Kon het PDF-voorbeeld niet laden. Controleer of de Python-engine actief is.
+pdf_editor.engine.client: Client-engine (embedpdf + pdf-lib)
+pdf_editor.tool.redact: Redigeren
+pdf_editor.tool.redact_tip: Markeer inhoud voor redactie in de viewer (embedpdf).
+pdf_editor.pages.current: Pagina %page%
+pdf_editor.pending.empty: Geen openstaande wijzigingen.
+pdf_editor.pending.remove: Verwijderen uit concept
+pdf_editor.draft.op.insert_text: Tekst invoegen op pagina %page%
+pdf_editor.draft.op.add_watermark: Watermerk CONFIDENTIAL toevoegen
+pdf_editor.draft.op.rotate_page: Pagina %page% met de klok mee draaien
+pdf_editor.draft.op.remove_watermarks: Gedetecteerde watermerken verwijderen
+pdf_editor.draft.op.remove_xobject: Pagina-object op pagina %page% verwijderen
+pdf_editor.draft.op.add_acroform_field: Formulierveld toevoegen op pagina %page%
+pdf_editor.pages: Pagina’s
+pdf_editor.pages.thumb: Pagina %page%
+pdf_editor.pages.of: Pagina %current% van %total%
+pdf_editor.pages.prev: Vorige pagina
+pdf_editor.pages.next: Volgende pagina
+pdf_editor.pages.nav: Paginanavigatie
+pdf_editor.pages.current: Pagina %page%
+pdf_editor.properties: Eigenschappen
+pdf_editor.properties.empty: Selecteer tekst op de pagina of kies het Tekst-gereedschap.
+pdf_editor.properties.text: Tekst
+pdf_editor.properties.font_size: Lettergrootte
+pdf_editor.properties.page: Pagina %page%
+pdf_editor.properties.apply: Toevoegen aan concept
+pdf_editor.properties.apply_live: Toepassen
+pdf_editor.properties.delete: Verwijderen
+pdf_editor.properties.applied: Toegepast
+pdf_editor.properties.deleted: Verwijderd
+pdf_editor.properties.font_color: Kleur
+pdf_editor.properties.font_family: Lettertype
+pdf_editor.properties.field_name: Veldnaam
+pdf_editor.properties.value: Waarde
+pdf_editor.properties.kind.form: Formulierveld
+pdf_editor.properties.kind.textbox: Tekstvak
+pdf_editor.properties.live_help: Wijzigingen gelden in de viewer. Sla op in PDF om te bewaren.
+pdf_editor.properties.draft_insert_help: Zet een pdf-lib tekststempel in de wachtrij bij opslaan.
+pdf_editor.properties.empty_select: Gebruik Selecteren om een tekstvak of formulierveld te klikken. Sleep handvatten om te verplaatsen en schalen.
+pdf_editor.save.error: Kon het PDF niet opslaan. Probeer opnieuw.
+pdf_editor.pending.title: Concept
+pdf_editor.pending.help: Wijzigingen blijven in de browser tot u opslaat. Daarna stuurt Symfony de batch naar de Python-engine.
+pdf_editor.pending.queued: Toegevoegd aan concept
+pdf_editor.pending.saved: Opgeslagen in PDF

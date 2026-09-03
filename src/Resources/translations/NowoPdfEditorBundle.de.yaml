@@ -1,0 +1,72 @@
+pdf_editor.home.title: PDF-Editor
+pdf_editor.home.heading: Visueller PDF-Editor
+pdf_editor.home.lead: Öffnen Sie ein PDF, um Text, Formulare, Wasserzeichen, Seiten und Anmerkungen zu bearbeiten.
+pdf_editor.home.open: PDF öffnen
+pdf_editor.upload.label: PDF-Datei
+pdf_editor.upload.not_pdf: Bitte laden Sie eine PDF-Datei hoch.
+pdf_editor.tool.select: Auswählen
+pdf_editor.tool.text: Text
+pdf_editor.tool.form: Formularfeld
+pdf_editor.tool.watermark: Wasserzeichen
+pdf_editor.tool.annotate: Notiz
+pdf_editor.tool.select_tip: Vorhandene Textfelder auf der Seite auswählen und bearbeiten.
+pdf_editor.tool.text_tip: Klicken Sie auf die Seite, um neuen Text einzufügen.
+pdf_editor.tool.form_tip: Klicken Sie auf die Seite, um ein AcroForm-Textfeld hinzuzufügen.
+pdf_editor.tool.watermark_tip: Diagonales Wasserzeichen auf allen Seiten hinzufügen.
+pdf_editor.tool.annotate_tip: Klicken Sie auf die Seite, um eine Haftnotiz hinzuzufügen.
+pdf_editor.toolbar.tools: Bearbeitungswerkzeuge
+pdf_editor.toolbar.actions: Dokumentaktionen
+pdf_editor.action.remove_watermarks: Wasserzeichen entfernen
+pdf_editor.action.remove_watermarks_tip: Entfernung erkannter Wasserzeichen in die Warteschlange stellen.
+pdf_editor.action.rotate: Seite drehen
+pdf_editor.action.rotate_tip: Aktuelle Seite um 90° im Uhrzeigersinn drehen (beim Speichern übernommen).
+pdf_editor.action.commit: In PDF speichern
+pdf_editor.action.commit_tip: Alle Entwurfsänderungen anwenden und das PDF speichern.
+pdf_editor.action.discard: Entwurf verwerfen
+pdf_editor.action.discard_tip: Ausstehende Änderungen ohne Speichern löschen.
+pdf_editor.action.download: Herunterladen
+pdf_editor.action.download_tip: Aktuelle PDF-Datei herunterladen.
+pdf_editor.loading: PDF-Vorschau wird geladen…
+pdf_editor.load_error: PDF-Vorschau konnte nicht geladen werden. Prüfen Sie, ob die Python-Engine läuft.
+pdf_editor.engine.client: Client-Engine (embedpdf + pdf-lib)
+pdf_editor.tool.redact: Schwärzen
+pdf_editor.tool.redact_tip: Inhalte im Viewer zum Schwärzen markieren (embedpdf).
+pdf_editor.pages.current: Seite %page%
+pdf_editor.pending.empty: Keine ausstehenden Änderungen.
+pdf_editor.pending.remove: Aus Entwurf entfernen
+pdf_editor.draft.op.insert_text: Text auf Seite %page% einfügen
+pdf_editor.draft.op.add_watermark: Wasserzeichen CONFIDENTIAL hinzufügen
+pdf_editor.draft.op.rotate_page: Seite %page% im Uhrzeigersinn drehen
+pdf_editor.draft.op.remove_watermarks: Erkannte Wasserzeichen entfernen
+pdf_editor.draft.op.remove_xobject: Seitenobjekt auf Seite %page% entfernen
+pdf_editor.draft.op.add_acroform_field: Formularfeld auf Seite %page% hinzufügen
+pdf_editor.pages: Seiten
+pdf_editor.pages.thumb: Seite %page%
+pdf_editor.pages.of: Seite %current% von %total%
+pdf_editor.pages.prev: Vorherige Seite
+pdf_editor.pages.next: Nächste Seite
+pdf_editor.pages.nav: Seitennavigation
+pdf_editor.properties: Eigenschaften
+pdf_editor.properties.empty: Text auf der Seite auswählen oder das Text-Werkzeug wählen.
+pdf_editor.properties.text: Text
+pdf_editor.properties.font_size: Schriftgröße
+pdf_editor.properties.page: Seite %page%
+pdf_editor.properties.apply: Zum Entwurf hinzufügen
+pdf_editor.properties.apply_live: Anwenden
+pdf_editor.properties.delete: Löschen
+pdf_editor.properties.applied: Angewendet
+pdf_editor.properties.deleted: Gelöscht
+pdf_editor.properties.font_color: Farbe
+pdf_editor.properties.font_family: Schriftart
+pdf_editor.properties.field_name: Feldname
+pdf_editor.properties.value: Wert
+pdf_editor.properties.kind.form: Formularfeld
+pdf_editor.properties.kind.textbox: Textfeld
+pdf_editor.properties.live_help: Änderungen gelten im Viewer. Zum Speichern „In PDF speichern“ wählen.
+pdf_editor.properties.draft_insert_help: Textstempel per pdf-lib beim Speichern einreihen.
+pdf_editor.properties.empty_select: Mit „Auswählen“ Textfeld oder Formularfeld anklicken. Anfasser zum Verschieben und Skalieren.
+pdf_editor.save.error: PDF konnte nicht gespeichert werden. Bitte erneut versuchen.
+pdf_editor.pending.title: Entwurf
+pdf_editor.pending.help: Änderungen bleiben im Browser, bis Sie speichern. Dann sendet Symfony den Stapel an die Python-Engine.
+pdf_editor.pending.queued: Zum Entwurf hinzugefügt
+pdf_editor.pending.saved: Im PDF gespeichert

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="{{ app.request.locale|default('en') }}" class="nowo-pdf-editor-html">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block nowo_pdf_editor_title %}PDF Editor{% endblock %}</title>
+    <link rel="stylesheet" href="{{ asset('css/pdf-editor.css', 'nowo_pdf_editor') }}">
+    <link rel="stylesheet" href="{{ asset('build/pdf-editor.css', 'nowo_pdf_editor') }}">
+    <link rel="stylesheet" href="{{ asset('css/demo.css') }}">
+</head>
+<body class="nowo-ui-body nowo-pdf-editor demo-app nowo-pdf-editor-page">
+    <header class="demo-topbar">
+        <a href="{{ path('demo_home') }}" class="demo-brand">PdfEditorBundle</a>
+        <span class="demo-badge">Symfony 8.1 demo</span>
+        <nav class="demo-nav">
+            <a href="{{ path('demo_home') }}">About</a>
+            <a href="{{ path('nowo_pdf_editor_home') }}" class="demo-nav-primary">Open editor</a>
+        </nav>
+    </header>
+    <main class="demo-main demo-main--editor-workspace">
+        {% block nowo_pdf_editor_body %}{% endblock %}
+    </main>
+    {% block nowo_pdf_editor_scripts %}{% endblock %}
+</body>
+</html>

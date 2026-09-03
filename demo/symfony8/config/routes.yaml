@@ -1,0 +1,30 @@
+demo_locale_switch:
+    path: /demo/locale/{locale}
+    controller: App\Controller\DemoLocaleController::switch
+    methods: [GET]
+    requirements:
+        locale: en|es
+
+demo_home:
+    path: /
+    controller: App\Controller\DemoController::home
+    methods: [GET, POST]
+
+demo_scenarios:
+    path: /demo/scenarios
+    controller: App\Controller\DemoScenarioController::hub
+    methods: [GET]
+
+demo_scenario_open:
+    path: /demo/scenarios/{scenario}/open
+    controller: App\Controller\DemoScenarioController::open
+    methods: [GET]
+    requirements:
+        scenario: '[a-z0-9-]+'
+
+when@dev:
+    nowo_twig_inspector:
+        resource: '@NowoTwigInspectorBundle/Resources/config/routes.yaml'
+
+nowo_pdf_editor:
+    resource: '@PdfEditorBundle/Resources/config/routing.yaml'

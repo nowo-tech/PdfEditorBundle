@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="{{ app.request.locale|default('en') }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block nowo_pdf_editor_title %}PDF Editor{% endblock %}</title>
+    <link rel="stylesheet" href="{{ asset('css/pdf-editor.css', 'nowo_pdf_editor') }}">
+</head>
+<body class="nowo-ui-body nowo-pdf-editor">
+    {% block nowo_pdf_editor_body %}{% endblock %}
+    {% block nowo_pdf_editor_scripts %}{% endblock %}
+</body>
+</html>

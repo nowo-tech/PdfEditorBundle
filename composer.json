@@ -1,0 +1,93 @@
+{
+    "name": "nowo-tech/pdf-editor-bundle",
+    "description": "Isolated Symfony PDF editor workspace: edit text, AcroForm fields, watermarks, pages and annotations via a free Python/PyMuPDF engine and a CKEditor-like UI.",
+    "type": "symfony-bundle",
+    "license": "MIT",
+    "keywords": ["symfony", "symfony-bundle", "pdf", "pdf-editor", "acroform", "watermark", "pymupdf", "frankenphp", "worker"],
+    "homepage": "https://github.com/nowo-tech/PdfEditorBundle",
+    "support": {
+        "issues": "https://github.com/nowo-tech/PdfEditorBundle/issues",
+        "source": "https://github.com/nowo-tech/PdfEditorBundle",
+        "docs": "https://github.com/nowo-tech/PdfEditorBundle/tree/main/docs"
+    },
+    "authors": [
+        {
+            "name": "Héctor Franco Aceituno",
+            "email": "hectorfranco@nowo.tech",
+            "homepage": "https://github.com/HecFranco",
+            "role": "Developer"
+        },
+        {
+            "name": "Nowo.tech",
+            "homepage": "https://nowo.tech"
+        }
+    ],
+    "require": {
+        "php": ">=8.2 <8.6",
+        "symfony/config": "^6.4 || ^7.0 || ^8.0",
+        "symfony/dependency-injection": "^6.4 || ^7.0 || ^8.0",
+        "symfony/form": "^6.4 || ^7.0 || ^8.0",
+        "symfony/http-foundation": "^6.4 || ^7.0 || ^8.0",
+        "symfony/http-kernel": "^6.4 || ^7.0 || ^8.0",
+        "symfony/options-resolver": "^6.4 || ^7.0 || ^8.0",
+        "symfony/process": "^6.4 || ^7.0 || ^8.0",
+        "symfony/routing": "^6.4 || ^7.0 || ^8.0",
+        "symfony/security-bundle": "^6.4 || ^7.0 || ^8.0",
+        "symfony/security-core": "^6.4 || ^7.0 || ^8.0",
+        "symfony/security-csrf": "^6.4 || ^7.0 || ^8.0",
+        "symfony/twig-bundle": "^6.4 || ^7.0 || ^8.0",
+        "symfony/yaml": "^6.4 || ^7.0 || ^8.0",
+        "twig/twig": "^3.8"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^3.0",
+        "nowo-tech/phpstan-frankenphp": "^1.0",
+        "phpstan/extension-installer": "^1.4",
+        "phpstan/phpstan": "^2.0",
+        "phpstan/phpstan-phpunit": "^2.0",
+        "phpstan/phpstan-symfony": "^2.0",
+        "phpunit/phpunit": "^10.0 || ^11.0",
+        "rector/rector": "^2.0",
+        "symfony/console": "^6.4 || ^7.0 || ^8.0",
+        "symfony/framework-bundle": "^6.4 || ^7.0 || ^8.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Nowo\\PdfEditorBundle\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Nowo\\PdfEditorBundle\\Tests\\": "tests/"
+        }
+    },
+    "archive": {
+        "exclude": ["/demo", "/.cursor"]
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "phpstan/extension-installer": true
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "scripts": {
+        "test": "phpunit --colors=always",
+        "test-unit": "phpunit --testsuite=Unit",
+        "test-integration": "phpunit --testsuite=Integration",
+        "test-coverage": "phpunit --colors=always --coverage-html coverage --coverage-clover coverage.xml --coverage-text | tee coverage-php.txt && sh .scripts/php-coverage-percent.sh coverage-php.txt",
+        "coverage-check": "phpunit --colors=always --coverage-text=coverage-output.txt --coverage-clover coverage.xml && sh .scripts/coverage-fail-under.sh coverage-output.txt 100",
+        "test-coverage-100": "@coverage-check",
+        "cs-check": "php-cs-fixer fix --dry-run --diff",
+        "cs-fix": "php-cs-fixer fix",
+        "rector": "rector process",
+        "rector-dry": "rector process --dry-run --no-progress-bar",
+        "phpstan": "phpstan analyse --memory-limit=512M",
+        "qa": ["@cs-check", "@test"]
+    },
+    "suggest": {
+        "symfony/flex": "For automatic recipe installation",
+        "symfony/security-bundle": "Role-based editor access when allow_unauthenticated is false"
+    }
+}

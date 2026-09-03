@@ -1,0 +1,40 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'demo.scenarios.title'|trans }} — PdfEditorBundle{% endblock %}
+
+{% block body %}
+    <div class="demo-landing demo-scenarios">
+        <section class="demo-hero">
+            <div>
+                <h1>{{ 'demo.scenarios.title'|trans }}</h1>
+                <p class="demo-lead">{{ 'demo.scenarios.lead'|trans }}</p>
+                <div class="demo-actions">
+                    <a href="{{ path('nowo_pdf_editor_home') }}" class="demo-btn demo-btn-secondary">{{ 'demo.scenarios.upload'|trans }}</a>
+                    <a href="{{ path('demo_home') }}" class="demo-btn demo-btn-secondary">{{ 'demo.nav.about'|trans }}</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="demo-scenario-grid">
+            {% for scenario in scenarios %}
+                <article class="demo-scenario-card">
+                    <h2>{{ ('demo.scenario.' ~ scenario.id ~ '.title')|trans }}</h2>
+                    <p>{{ ('demo.scenario.' ~ scenario.id ~ '.lead')|trans }}</p>
+                    <ul class="demo-scenario-tools">
+                        {% for tool in scenario.tools %}
+                            <li><code>{{ tool }}</code></li>
+                        {% endfor %}
+                    </ul>
+                    <ol class="demo-scenario-checklist">
+                        {% for item in scenario.checklist %}
+                            <li>{{ item }}</li>
+                        {% endfor %}
+                    </ol>
+                    <a href="{{ path('demo_scenario_open', { scenario: scenario.id }) }}" class="demo-btn demo-btn-primary">
+                        {{ 'demo.scenarios.open'|trans }}
+                    </a>
+                </article>
+            {% endfor %}
+        </section>
+    </div>
+{% endblock %}

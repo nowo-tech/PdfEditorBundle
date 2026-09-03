@@ -1,0 +1,72 @@
+pdf_editor.home.title: Editor PDF
+pdf_editor.home.heading: Editor visivo PDF
+pdf_editor.home.lead: Apri un PDF per modificare testo, moduli, filigrane, pagine e annotazioni.
+pdf_editor.home.open: Apri PDF
+pdf_editor.upload.label: File PDF
+pdf_editor.upload.not_pdf: Carica un file PDF.
+pdf_editor.tool.select: Seleziona
+pdf_editor.tool.text: Testo
+pdf_editor.tool.form: Campo modulo
+pdf_editor.tool.watermark: Filigrana
+pdf_editor.tool.annotate: Nota
+pdf_editor.tool.select_tip: Seleziona e modifica le caselle di testo esistenti.
+pdf_editor.tool.text_tip: Clicca sulla pagina per inserire nuovo testo.
+pdf_editor.tool.form_tip: Clicca sulla pagina per aggiungere un campo AcroForm.
+pdf_editor.tool.watermark_tip: Aggiunge una filigrana diagonale su tutte le pagine.
+pdf_editor.tool.annotate_tip: Clicca sulla pagina per aggiungere una nota adesiva.
+pdf_editor.toolbar.tools: Strumenti di modifica
+pdf_editor.toolbar.actions: Azioni documento
+pdf_editor.action.remove_watermarks: Rimuovi filigrane
+pdf_editor.action.remove_watermarks_tip: Accoda la rimozione delle filigrane rilevate.
+pdf_editor.action.rotate: Ruota pagina
+pdf_editor.action.rotate_tip: Ruota la pagina corrente di 90° (salvato alla conferma).
+pdf_editor.action.commit: Salva nel PDF
+pdf_editor.action.commit_tip: Applica tutte le modifiche della bozza e salva il PDF.
+pdf_editor.action.discard: Scarta bozza
+pdf_editor.action.discard_tip: Cancella le modifiche in sospeso senza salvare.
+pdf_editor.action.download: Scarica
+pdf_editor.action.download_tip: Scarica il file PDF corrente.
+pdf_editor.loading: Caricamento anteprima PDF…
+pdf_editor.load_error: Impossibile caricare l’anteprima. Verifica che il motore Python sia attivo.
+pdf_editor.engine.client: Motore client (embedpdf + pdf-lib)
+pdf_editor.tool.redact: Redigere
+pdf_editor.tool.redact_tip: Segna contenuti da redigere nel visualizzatore (embedpdf).
+pdf_editor.pages.current: Pagina %page%
+pdf_editor.pending.empty: Nessuna modifica in sospeso.
+pdf_editor.pending.remove: Rimuovi dalla bozza
+pdf_editor.draft.op.insert_text: Inserisci testo nella pagina %page%
+pdf_editor.draft.op.add_watermark: Aggiungi filigrana CONFIDENTIAL
+pdf_editor.draft.op.rotate_page: Ruota la pagina %page% in senso orario
+pdf_editor.draft.op.remove_watermarks: Rimuovi filigrane rilevate
+pdf_editor.draft.op.remove_xobject: Rimuovi oggetto pagina %page%
+pdf_editor.draft.op.add_acroform_field: Aggiungi campo modulo alla pagina %page%
+pdf_editor.pages: Pagine
+pdf_editor.pages.thumb: Pagina %page%
+pdf_editor.pages.of: Pagina %current% di %total%
+pdf_editor.pages.prev: Pagina precedente
+pdf_editor.pages.next: Pagina successiva
+pdf_editor.pages.nav: Navigazione pagine
+pdf_editor.properties: Proprietà
+pdf_editor.properties.empty: Seleziona testo nella pagina o scegli lo strumento Testo.
+pdf_editor.properties.text: Testo
+pdf_editor.properties.font_size: Dimensione carattere
+pdf_editor.properties.page: Pagina %page%
+pdf_editor.properties.apply: Aggiungi alla bozza
+pdf_editor.properties.apply_live: Applica
+pdf_editor.properties.delete: Elimina
+pdf_editor.properties.applied: Applicato
+pdf_editor.properties.deleted: Eliminato
+pdf_editor.properties.font_color: Colore
+pdf_editor.properties.font_family: Carattere
+pdf_editor.properties.field_name: Nome campo
+pdf_editor.properties.value: Valore
+pdf_editor.properties.kind.form: Campo modulo
+pdf_editor.properties.kind.textbox: Casella di testo
+pdf_editor.properties.live_help: Le modifiche si applicano nel viewer. Salva nel PDF per mantenerle.
+pdf_editor.properties.draft_insert_help: Accoda un timbro testo pdf-lib al salvataggio.
+pdf_editor.properties.empty_select: Usa Seleziona per cliccare una casella di testo o un campo modulo. Trascina le maniglie per spostare e ridimensionare.
+pdf_editor.save.error: Impossibile salvare il PDF. Riprova.
+pdf_editor.pending.title: Bozza
+pdf_editor.pending.help: Le modifiche restano nel browser finché non salvi. Poi Symfony invia il lotto al motore Python.
+pdf_editor.pending.queued: Aggiunto alla bozza
+pdf_editor.pending.saved: Salvato nel PDF

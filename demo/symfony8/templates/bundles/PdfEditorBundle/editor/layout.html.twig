@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="{{ app.request.locale|default('en') }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block nowo_pdf_editor_title %}PDF Editor{% endblock %}</title>
+    <link rel="stylesheet" href="{{ asset('css/pdf-editor.css', 'nowo_pdf_editor') }}">
+    <link rel="stylesheet" href="{{ asset('css/demo.css') }}">
+</head>
+<body class="nowo-ui-body nowo-pdf-editor demo-app">
+    <header class="demo-topbar">
+        <a href="{{ path('demo_home') }}" class="demo-brand">PdfEditorBundle</a>
+        <span class="demo-badge">{{ 'demo.badge'|trans }}</span>
+        <nav class="demo-nav">
+            <a href="{{ path('demo_home') }}">{{ 'demo.nav.about'|trans }}</a>
+            <a href="{{ path('demo_scenarios') }}">{{ 'demo.nav.scenarios'|trans }}</a>
+            {% include 'demo/_locale_switch.html.twig' %}
+            <a href="{{ path('nowo_pdf_editor_home') }}" class="demo-nav-primary">{{ 'demo.nav.editor'|trans }}</a>
+        </nav>
+    </header>
+    <main class="demo-main">
+        {% block nowo_pdf_editor_body %}{% endblock %}
+    </main>
+    {% block nowo_pdf_editor_scripts %}{% endblock %}
+</body>
+</html>

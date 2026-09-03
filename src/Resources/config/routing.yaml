@@ -1,0 +1,47 @@
+nowo_pdf_editor_home:
+    path: /pdf-editor
+    controller: Nowo\PdfEditorBundle\Controller\EditorController::index
+    methods: [GET, POST]
+
+nowo_pdf_editor_workspace:
+    path: /pdf-editor/{id}
+    controller: Nowo\PdfEditorBundle\Controller\EditorController::workspace
+    methods: [GET]
+    requirements:
+        id: '[a-f0-9]{32}'
+
+nowo_pdf_editor_inspect:
+    path: /pdf-editor/{id}/inspect
+    controller: Nowo\PdfEditorBundle\Controller\EditorController::inspect
+    methods: [GET]
+    requirements:
+        id: '[a-f0-9]{32}'
+
+nowo_pdf_editor_page:
+    path: /pdf-editor/{id}/pages/{page}
+    controller: Nowo\PdfEditorBundle\Controller\EditorController::pageImage
+    methods: [GET]
+    requirements:
+        id: '[a-f0-9]{32}'
+        page: '\d+'
+
+nowo_pdf_editor_apply:
+    path: /pdf-editor/{id}/apply
+    controller: Nowo\PdfEditorBundle\Controller\EditorController::apply
+    methods: [POST]
+    requirements:
+        id: '[a-f0-9]{32}'
+
+nowo_pdf_editor_download:
+    path: /pdf-editor/{id}/download
+    controller: Nowo\PdfEditorBundle\Controller\EditorController::download
+    methods: [GET]
+    requirements:
+        id: '[a-f0-9]{32}'
+
+nowo_pdf_editor_view:
+    path: /pdf-editor/{id}/view
+    controller: Nowo\PdfEditorBundle\Controller\EditorController::view
+    methods: [GET]
+    requirements:
+        id: '[a-f0-9]{32}'

@@ -1,0 +1,15 @@
+{# Language switch — persists locale in session (en / es). #}
+<div class="demo-locale-switch" role="navigation" aria-label="{{ 'demo.language'|trans }}">
+    <a
+        href="{{ path('demo_locale_switch', { locale: 'en' }) }}"
+        class="demo-locale-btn{{ app.request.locale == 'en' ? ' is-active' : '' }}"
+        hreflang="en"
+        lang="en"
+    >EN</a>
+    <a
+        href="{{ path('demo_locale_switch', { locale: 'es' }) }}"
+        class="demo-locale-btn{{ app.request.locale == 'es' ? ' is-active' : '' }}"
+        hreflang="es"
+        lang="es"
+    >ES</a>
+</div>

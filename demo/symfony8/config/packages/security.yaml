@@ -1,0 +1,9 @@
+security:
+    providers:
+        users:
+            memory: null
+    firewalls:
+        main:
+            lazy: true
+            stateless: false
+            security: false

@@ -1,0 +1,142 @@
+{% extends '@NowoPdfEditorBundle/editor/workspace.html.twig' %}
+
+{% block nowo_pdf_editor_body %}
+    {% set scenario_id = app.request.query.get('scenario') %}
+    {% set fixtures_dir = app.request.server.get('PDF_EDITOR_FIXTURES_DIR')|default(null) %}
+    {% if scenario_id and fixtures_dir is null %}
+        {% set fixtures_dir = app.request.server.get('DOCUMENT_ROOT') ~ '/../fixtures' %}
+    {% endif %}
+    {% set scenario_meta = scenario_id ? null : null %}
+    {# Scenario metadata injected via data attributes for the React banner #}
+    {% if scenario_id %}
+        {% set scenario_titles = {
+            'full': 'Full playground',
+            'text': 'Text editing',
+            'forms': 'AcroForm fields',
+            'watermarks': 'Watermarks',
+            'pages': 'Page operations',
+            'redact': 'Redaction',
+            'annotate': 'Notes & comments',
+            'images': 'Graphics layer',
+            'blank': 'Blank canvas',
+        } %}
+        {% set scenario_leads = {
+            'full': 'Exercise every tool: text, forms, watermarks, pages, notes and redaction.',
+            'text': 'Native text, FreeText boxes and draft stamps.',
+            'forms': 'Edit widgets or add new AcroForm fields.',
+            'watermarks': 'Remove DRAFT overlay or stamp CONFIDENTIAL.',
+            'pages': 'Rotate, delete, duplicate and insert pages.',
+            'redact': 'Mark regions to redact in the viewer.',
+            'annotate': 'Sticky notes and comments on a blank page.',
+            'images': 'Overlay text and annotations on graphic blocks.',
+            'blank': 'Build a document from an empty page.',
+        } %}
+    {% endif %}
+
+    {% set editor_config = {
+        workspaceId: workspace.id,
+        pdfUrl: path('nowo_pdf_editor_view', { id: workspace.id }),
+        applyUrl: path('nowo_pdf_editor_apply', { id: workspace.id }),
+        downloadUrl: path('nowo_pdf_editor_download', { id: workspace.id }),
+        csrfToken: csrf_token('pdf_editor'),
+        engineMode: engine_mode,
+        layout: { mode: 'embed', height: '100%', minHeight: '0' },
+        scenario: scenario_id ? {
+            id: scenario_id,
+            title: scenario_titles[scenario_id]|default(scenario_id),
+            lead: scenario_leads[scenario_id]|default(''),
+            hubUrl: path('demo_scenarios'),
+        } : null,
+        i18n: {
+            'toolbar.tools': 'pdf_editor.toolbar.tools'|trans({}, 'NowoPdfEditorBundle'),
+            'toolbar.actions': 'pdf_editor.toolbar.actions'|trans({}, 'NowoPdfEditorBundle'),
+            'toolbar.pages': 'pdf_editor.toolbar.pages'|trans({}, 'NowoPdfEditorBundle'),
+            'tool.select_tip': 'pdf_editor.tool.select_tip'|trans({}, 'NowoPdfEditorBundle'),
+            'tool.select': 'pdf_editor.tool.select'|trans({}, 'NowoPdfEditorBundle'),
+            'tool.text_tip': 'pdf_editor.tool.text_tip'|trans({}, 'NowoPdfEditorBundle'),
+            'tool.text': 'pdf_editor.tool.text'|trans({}, 'NowoPdfEditorBundle'),
+            'tool.form_tip': 'pdf_editor.tool.form_tip'|trans({}, 'NowoPdfEditorBundle'),
+            'tool.form': 'pdf_editor.tool.form'|trans({}, 'NowoPdfEditorBundle'),
+            'tool.annotate_tip': 'pdf_editor.tool.annotate_tip'|trans({}, 'NowoPdfEditorBundle'),
+            'tool.annotate': 'pdf_editor.tool.annotate'|trans({}, 'NowoPdfEditorBundle'),
+            'tool.watermark_tip': 'pdf_editor.tool.watermark_tip'|trans({}, 'NowoPdfEditorBundle'),
+            'tool.watermark': 'pdf_editor.tool.watermark'|trans({}, 'NowoPdfEditorBundle'),
+            'tool.redact_tip': 'pdf_editor.tool.redact_tip'|trans({}, 'NowoPdfEditorBundle'),
+            'tool.redact': 'pdf_editor.tool.redact'|trans({}, 'NowoPdfEditorBundle'),
+            'action.remove_watermarks_tip': 'pdf_editor.action.remove_watermarks_tip'|trans({}, 'NowoPdfEditorBundle'),
+            'action.remove_watermarks': 'pdf_editor.action.remove_watermarks'|trans({}, 'NowoPdfEditorBundle'),
+            'action.rotate_tip': 'pdf_editor.action.rotate_tip'|trans({}, 'NowoPdfEditorBundle'),
+            'action.rotate': 'pdf_editor.action.rotate'|trans({}, 'NowoPdfEditorBundle'),
+            'action.delete_page_tip': 'pdf_editor.action.delete_page_tip'|trans({}, 'NowoPdfEditorBundle'),
+            'action.delete_page': 'pdf_editor.action.delete_page'|trans({}, 'NowoPdfEditorBundle'),
+            'action.insert_page_tip': 'pdf_editor.action.insert_page_tip'|trans({}, 'NowoPdfEditorBundle'),
+            'action.insert_page': 'pdf_editor.action.insert_page'|trans({}, 'NowoPdfEditorBundle'),
+            'action.duplicate_page_tip': 'pdf_editor.action.duplicate_page_tip'|trans({}, 'NowoPdfEditorBundle'),
+            'action.duplicate_page': 'pdf_editor.action.duplicate_page'|trans({}, 'NowoPdfEditorBundle'),
+            'action.commit_tip': 'pdf_editor.action.commit_tip'|trans({}, 'NowoPdfEditorBundle'),
+            'action.commit': 'pdf_editor.action.commit'|trans({}, 'NowoPdfEditorBundle'),
+            'action.discard_tip': 'pdf_editor.action.discard_tip'|trans({}, 'NowoPdfEditorBundle'),
+            'action.discard': 'pdf_editor.action.discard'|trans({}, 'NowoPdfEditorBundle'),
+            'action.download_tip': 'pdf_editor.action.download_tip'|trans({}, 'NowoPdfEditorBundle'),
+            'action.download': 'pdf_editor.action.download'|trans({}, 'NowoPdfEditorBundle'),
+            'pending.title': 'pdf_editor.pending.title'|trans({}, 'NowoPdfEditorBundle'),
+            'pending.help': 'pdf_editor.pending.help'|trans({}, 'NowoPdfEditorBundle'),
+            'pending.queued': 'pdf_editor.pending.queued'|trans({}, 'NowoPdfEditorBundle'),
+            'pending.saved': 'pdf_editor.pending.saved'|trans({}, 'NowoPdfEditorBundle'),
+            'pending.empty': 'pdf_editor.pending.empty'|trans({}, 'NowoPdfEditorBundle'),
+            'pending.remove': 'pdf_editor.pending.remove'|trans({}, 'NowoPdfEditorBundle'),
+            'pages.current': 'pdf_editor.pages.current'|trans({}, 'NowoPdfEditorBundle'),
+            'pages': 'pdf_editor.pages'|trans({}, 'NowoPdfEditorBundle'),
+            'pages.thumb': 'pdf_editor.pages.thumb'|trans({}, 'NowoPdfEditorBundle'),
+            'pages.of': 'pdf_editor.pages.of'|trans({}, 'NowoPdfEditorBundle'),
+            'pages.prev': 'pdf_editor.pages.prev'|trans({}, 'NowoPdfEditorBundle'),
+            'pages.next': 'pdf_editor.pages.next'|trans({}, 'NowoPdfEditorBundle'),
+            'pages.nav': 'pdf_editor.pages.nav'|trans({}, 'NowoPdfEditorBundle'),
+            'pages.menu': 'pdf_editor.pages.menu'|trans({}, 'NowoPdfEditorBundle'),
+            'draft.op.insert_text': 'pdf_editor.draft.op.insert_text'|trans({}, 'NowoPdfEditorBundle'),
+            'draft.op.add_watermark': 'pdf_editor.draft.op.add_watermark'|trans({}, 'NowoPdfEditorBundle'),
+            'draft.op.rotate_page': 'pdf_editor.draft.op.rotate_page'|trans({}, 'NowoPdfEditorBundle'),
+            'draft.op.remove_watermarks': 'pdf_editor.draft.op.remove_watermarks'|trans({}, 'NowoPdfEditorBundle'),
+            'draft.op.remove_xobject': 'pdf_editor.draft.op.remove_xobject'|trans({}, 'NowoPdfEditorBundle'),
+            'draft.op.add_acroform_field': 'pdf_editor.draft.op.add_acroform_field'|trans({}, 'NowoPdfEditorBundle'),
+            'draft.op.delete_page': 'pdf_editor.draft.op.delete_page'|trans({}, 'NowoPdfEditorBundle'),
+            'draft.op.insert_blank_page': 'pdf_editor.draft.op.insert_blank_page'|trans({}, 'NowoPdfEditorBundle'),
+            'draft.op.duplicate_page': 'pdf_editor.draft.op.duplicate_page'|trans({}, 'NowoPdfEditorBundle'),
+            'properties': 'pdf_editor.properties'|trans({}, 'NowoPdfEditorBundle'),
+            'properties.empty': 'pdf_editor.properties.empty'|trans({}, 'NowoPdfEditorBundle'),
+            'properties.text': 'pdf_editor.properties.text'|trans({}, 'NowoPdfEditorBundle'),
+            'properties.font_size': 'pdf_editor.properties.font_size'|trans({}, 'NowoPdfEditorBundle'),
+            'properties.page': 'pdf_editor.properties.page'|trans({}, 'NowoPdfEditorBundle'),
+            'properties.apply': 'pdf_editor.properties.apply'|trans({}, 'NowoPdfEditorBundle'),
+            'properties.apply_live': 'pdf_editor.properties.apply_live'|trans({}, 'NowoPdfEditorBundle'),
+            'properties.delete': 'pdf_editor.properties.delete'|trans({}, 'NowoPdfEditorBundle'),
+            'properties.applied': 'pdf_editor.properties.applied'|trans({}, 'NowoPdfEditorBundle'),
+            'properties.deleted': 'pdf_editor.properties.deleted'|trans({}, 'NowoPdfEditorBundle'),
+            'properties.font_color': 'pdf_editor.properties.font_color'|trans({}, 'NowoPdfEditorBundle'),
+            'properties.font_family': 'pdf_editor.properties.font_family'|trans({}, 'NowoPdfEditorBundle'),
+            'properties.field_name': 'pdf_editor.properties.field_name'|trans({}, 'NowoPdfEditorBundle'),
+            'properties.value': 'pdf_editor.properties.value'|trans({}, 'NowoPdfEditorBundle'),
+            'properties.kind.form': 'pdf_editor.properties.kind.form'|trans({}, 'NowoPdfEditorBundle'),
+            'properties.kind.textbox': 'pdf_editor.properties.kind.textbox'|trans({}, 'NowoPdfEditorBundle'),
+            'properties.live_help': 'pdf_editor.properties.live_help'|trans({}, 'NowoPdfEditorBundle'),
+            'properties.draft_insert_help': 'pdf_editor.properties.draft_insert_help'|trans({}, 'NowoPdfEditorBundle'),
+            'properties.empty_select': 'pdf_editor.properties.empty_select'|trans({}, 'NowoPdfEditorBundle'),
+            'scenario.back': 'pdf_editor.scenario.back'|trans({}, 'NowoPdfEditorBundle'),
+            'loading': 'pdf_editor.loading'|trans({}, 'NowoPdfEditorBundle'),
+            'save.error': 'pdf_editor.save.error'|trans({}, 'NowoPdfEditorBundle'),
+            'load_error': 'pdf_editor.load_error'|trans({}, 'NowoPdfEditorBundle'),
+            'viewport.page': 'pdf_editor.viewport.page'|trans({}, 'NowoPdfEditorBundle'),
+            'viewport.zoom': 'pdf_editor.viewport.zoom'|trans({}, 'NowoPdfEditorBundle'),
+            'zoom.in': 'pdf_editor.zoom.in'|trans({}, 'NowoPdfEditorBundle'),
+            'zoom.out': 'pdf_editor.zoom.out'|trans({}, 'NowoPdfEditorBundle'),
+            'zoom.fit': 'pdf_editor.zoom.fit'|trans({}, 'NowoPdfEditorBundle'),
+            'zoom.fit_short': 'pdf_editor.zoom.fit_short'|trans({}, 'NowoPdfEditorBundle'),
+        }
+    } %}
+    <div class="nowo-pdf-editor-workspace">
+        <div
+            id="nowo-pdf-editor-react-root"
+            data-config="{{ editor_config|json_encode|e('html_attr') }}"
+        ></div>
+    </div>
+{% endblock %}

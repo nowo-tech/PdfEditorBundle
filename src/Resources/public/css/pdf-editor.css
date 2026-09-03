@@ -1,0 +1,75 @@
+.nowo-ui-body { margin: 0; font-family: system-ui, sans-serif; background: #f4f1ea; color: #1f1b16; }
+html.nowo-pdf-editor-html,
+body.nowo-pdf-editor-page { height: 100%; }
+body.nowo-pdf-editor-page { display: flex; flex-direction: column; }
+body.nowo-pdf-editor-page #nowo-pdf-editor-react-root,
+body.nowo-pdf-editor-page .nowo-pdf-editor-workspace { flex: 1; min-height: 0; }
+.nowo-pdf-editor-shell { min-height: 100vh; display: flex; flex-direction: column; }
+.nowo-pdf-editor-shell--embed { min-height: calc(100dvh - var(--nowo-pdf-editor-chrome-offset, 0px)); }
+.nowo-pdf-editor-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 16px; background: #2b2118; color: #fff; flex-wrap: wrap; }
+.nowo-pdf-editor-toolbar-group { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.nowo-ui-btn { border: 1px solid #c4b8a5; background: #fff; color: #2b2118; padding: 8px 12px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; border-radius: 6px; font: inherit; }
+.nowo-ui-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.nowo-ui-btn.is-active { outline: 2px solid #7dffc3; background: #f0fff8; }
+.nowo-ui-btn-primary { background: #0b6e4f; color: #fff; border-color: #0b6e4f; }
+.nowo-ui-btn-primary.is-active { background: #0b6e4f; outline-color: #7dffc3; }
+.nowo-ui-btn-tiny { padding: 0 6px; margin-left: 8px; }
+.nowo-ui-btn-icon { width: 40px; height: 40px; padding: 0; position: relative; }
+.nowo-ui-btn-icon svg { width: 20px; height: 20px; fill: currentColor; }
+.nowo-pdf-editor-toolbar .nowo-ui-btn { border-color: #4a4036; background: #3d3429; color: #fff; }
+.nowo-pdf-editor-toolbar .nowo-ui-btn:hover:not(:disabled) { background: #4f4538; }
+.nowo-pdf-editor-toolbar .nowo-ui-btn.is-active { background: #0b6e4f; border-color: #7dffc3; outline: none; }
+.nowo-pdf-editor-toolbar .nowo-ui-btn-primary { background: #0b6e4f; border-color: #0b6e4f; }
+.nowo-pdf-editor-toolbar .nowo-ui-btn-primary:hover:not(:disabled) { background: #0a5d43; }
+.nowo-ui-btn-icon[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1a1510;
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  line-height: 1.3;
+  white-space: nowrap;
+  max-width: 240px;
+  white-space: normal;
+  text-align: center;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.15s ease, visibility 0.15s ease;
+  z-index: 20;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+.nowo-ui-btn-icon[data-tooltip]:hover::after,
+.nowo-ui-btn-icon[data-tooltip]:focus-visible::after {
+  opacity: 1;
+  visibility: visible;
+}
+.nowo-pdf-editor-main { display: grid; grid-template-columns: 140px 1fr 280px; min-height: calc(100vh - 60px); }
+.nowo-pdf-editor-thumbs { background: #e7dfd1; overflow: auto; padding: 8px; }
+.nowo-pdf-editor-thumbs img { width: 100%; border: 2px solid transparent; cursor: pointer; margin-bottom: 8px; border-radius: 2px; box-shadow: 0 1px 4px rgba(0,0,0,0.12); }
+.nowo-pdf-editor-thumbs img.is-active { border-color: #0b6e4f; }
+.nowo-pdf-editor-canvas-wrap { overflow: auto; background: #cfc4b0; padding: 24px; }
+.nowo-pdf-editor-canvas { position: relative; margin: 0 auto; max-width: 900px; min-height: 400px; }
+.nowo-pdf-editor-canvas img { display: block; width: 100%; height: auto; box-shadow: 0 4px 24px rgba(0,0,0,0.2); background: #fff; }
+.nowo-pdf-editor-status { text-align: center; color: #6b6258; padding: 48px 16px; margin: 0; }
+.nowo-pdf-editor-status.is-error { color: #a32; }
+.nowo-pdf-editor-overlay { position: absolute; inset: 0; }
+.nowo-pdf-editor-span { position: absolute; border: 1px dashed transparent; cursor: text; background: transparent; padding: 0; }
+.nowo-pdf-editor-span.is-selected { border-color: #0b6e4f; background: rgba(11, 110, 79, 0.12); }
+.nowo-pdf-editor-ghost { position: absolute; border: 1px dashed #0b6e4f; background: rgba(11, 110, 79, 0.18); color: #0b6e4f; font-size: 11px; overflow: hidden; pointer-events: none; }
+.nowo-pdf-editor-props { background: #fff; padding: 16px; border-left: 1px solid #d7cdb8; overflow: auto; }
+.nowo-pdf-editor-pending { list-style: none; padding: 0; margin: 0; }
+.nowo-pdf-editor-pending li { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding: 6px 0; font-size: 13px; }
+.nowo-ui-card { max-width: 640px; margin: 48px auto; background: #fff; padding: 24px; }
+.nowo-ui-title { margin-top: 0; }
+.nowo-ui-subtitle { font-size: 1rem; margin: 16px 0 8px; }
+.nowo-ui-muted { color: #6b6258; }
+.nowo-ui-toast { position: fixed; bottom: 16px; right: 16px; background: #2b2118; color: #fff; padding: 10px 14px; border-radius: 6px; z-index: 30; }
+.nowo-ui-input, textarea.nowo-ui-input { width: 100%; }
+.nowo-ui-label { display: block; margin-bottom: 6px; }
+.nowo-ui-form textarea { width: 100%; }

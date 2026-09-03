@@ -1,0 +1,4 @@
+PdfEditorBundle registered. Install the free Python engine:
+
+    python3 -m pip install pymupdf
+    php bin/console nowo:pdf-editor:check-engine

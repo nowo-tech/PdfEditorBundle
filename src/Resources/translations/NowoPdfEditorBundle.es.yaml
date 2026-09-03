@@ -1,0 +1,105 @@
+pdf_editor.home.title: Editor PDF
+pdf_editor.home.heading: Editor visual de PDF
+pdf_editor.home.lead: Abre un PDF para editar texto, formularios, marcas de agua, páginas y anotaciones.
+pdf_editor.home.open: Abrir PDF
+pdf_editor.upload.label: Archivo PDF
+pdf_editor.upload.not_pdf: Sube un archivo PDF.
+pdf_editor.tool.select: Seleccionar
+pdf_editor.tool.text: Texto
+pdf_editor.tool.form: Campo de formulario
+pdf_editor.tool.watermark: Marca de agua
+pdf_editor.tool.annotate: Nota
+pdf_editor.tool.select_tip: Selecciona cuadros de texto y campos para mover, redimensionar o eliminar. Doble clic en texto nativo del PDF para seleccionar la línea; mantén Shift para arrastrar.
+pdf_editor.tool.text_tip: Haz clic en la página para insertar texto nuevo.
+pdf_editor.tool.form_tip: Haz clic en la página para añadir un campo AcroForm de texto.
+pdf_editor.tool.watermark_tip: Añade una marca de agua diagonal en todas las páginas.
+pdf_editor.tool.annotate_tip: Haz clic en la página para añadir una nota adhesiva.
+pdf_editor.toolbar.tools: Herramientas de edición
+pdf_editor.toolbar.actions: Acciones del documento
+pdf_editor.action.remove_watermarks: Quitar marcas de agua
+pdf_editor.action.remove_watermarks_tip: Encola la eliminación de marcas de agua detectadas.
+pdf_editor.action.rotate: Girar página
+pdf_editor.action.delete_selection: Eliminar objeto
+pdf_editor.action.delete_selection_tip: Elimina el cuadro de texto, nota o campo seleccionado (Supr).
+pdf_editor.action.delete_selection_empty: Selecciona texto u un objeto en la página (herramienta Seleccionar).
+pdf_editor.action.delete_selection_failed: No se pudo eliminar — vuelve a hacer clic con Seleccionar.
+pdf_editor.pending.text_deleted: Eliminación de texto en cola — guarda en PDF para aplicar.
+pdf_editor.pending.text_redacted: Texto marcado para eliminar — guarda en PDF para aplicar.
+pdf_editor.pending.text_replaced: Reemplazo de texto en cola — guarda en PDF para aplicar.
+pdf_editor.pending.watermarks_removed: Eliminación de marcas de agua en cola — guarda en PDF para aplicar.
+pdf_editor.draft.op.delete_text: Eliminar texto en página %page%
+pdf_editor.draft.op.redact_text: Redactar texto en página %page%
+pdf_editor.properties.delete_text: Eliminar texto seleccionado
+pdf_editor.properties.replace_text: Reemplazar texto
+pdf_editor.properties.native_text_help: Texto nativo del PDF — edítalo abajo y reemplázalo. El texto antiguo se redacta; el nuevo se añade al guardar.
+pdf_editor.properties.native_text_replace_hint: Doble clic en una línea de texto nativo del PDF, o mantén Shift mientras arrastras para seleccionar una zona.
+pdf_editor.properties.kind.note: Nota adhesiva
+pdf_editor.action.delete_page: Eliminar página
+pdf_editor.action.insert_page: Insertar en blanco
+pdf_editor.action.duplicate_page: Duplicar página
+pdf_editor.action.delete_page_tip: Elimina la página actual (se guarda al confirmar).
+pdf_editor.action.insert_page_tip: Inserta una página en blanco después de la actual.
+pdf_editor.action.duplicate_page_tip: Duplica la página actual.
+pdf_editor.action.delete_page_last: No se puede eliminar la única página.
+pdf_editor.scenario.back: Todos los escenarios
+pdf_editor.toolbar.pages: Acciones de página
+pdf_editor.draft.op.delete_page: Eliminar página %page%
+pdf_editor.draft.op.insert_blank_page: Insertar en blanco tras página %page%
+pdf_editor.draft.op.duplicate_page: Duplicar página %page%
+pdf_editor.action.rotate_tip: Gira la página actual 90° en sentido horario (se guarda al confirmar).
+pdf_editor.action.commit: Guardar en el PDF
+pdf_editor.action.commit_tip: Aplica todos los cambios del borrador y guarda el PDF.
+pdf_editor.action.discard: Descartar borrador
+pdf_editor.action.discard_tip: Borra los cambios pendientes sin guardar.
+pdf_editor.action.download: Descargar
+pdf_editor.action.download_tip: Descarga el archivo PDF actual.
+pdf_editor.loading: Cargando vista previa del PDF…
+pdf_editor.load_error: No se pudo cargar la vista previa. Comprueba que el motor Python esté activo.
+pdf_editor.engine.client: Motor cliente (embedpdf + pdf-lib)
+pdf_editor.tool.redact: Redactar
+pdf_editor.tool.redact_tip: Marca contenido para redactar en el visor (embedpdf).
+pdf_editor.pages: Páginas
+pdf_editor.pages.thumb: Página %page%
+pdf_editor.pages.of: Página %current% de %total%
+pdf_editor.pages.prev: Página anterior
+pdf_editor.pages.next: Página siguiente
+pdf_editor.pages.nav: Navegación de páginas
+pdf_editor.pages.current: Página %page%
+pdf_editor.pending.empty: No hay cambios pendientes.
+pdf_editor.pending.remove: Quitar del borrador
+pdf_editor.draft.op.insert_text: Insertar texto en la página %page%
+pdf_editor.draft.op.add_watermark: Añadir marca de agua CONFIDENTIAL
+pdf_editor.draft.op.rotate_page: Girar la página %page% en sentido horario
+pdf_editor.draft.op.remove_watermarks: Quitar marcas de agua detectadas
+pdf_editor.draft.op.remove_xobject: Quitar objeto de la página %page%
+pdf_editor.draft.op.add_acroform_field: Añadir campo de formulario en la página %page%
+pdf_editor.properties: Propiedades
+pdf_editor.properties.empty: Selecciona texto en la página o elige la herramienta Texto.
+pdf_editor.properties.text: Texto
+pdf_editor.properties.font_size: Tamaño de fuente
+pdf_editor.properties.page: Página %page%
+pdf_editor.properties.apply: Añadir al borrador
+pdf_editor.properties.apply_live: Aplicar
+pdf_editor.properties.delete: Eliminar
+pdf_editor.properties.applied: Aplicado
+pdf_editor.properties.deleted: Eliminado
+pdf_editor.properties.font_color: Color
+pdf_editor.properties.font_family: Fuente
+pdf_editor.properties.field_name: Nombre del campo
+pdf_editor.properties.value: Valor
+pdf_editor.properties.kind.form: Campo de formulario
+pdf_editor.properties.kind.textbox: Cuadro de texto
+pdf_editor.properties.live_help: Los cambios se aplican en el visor. Guarda en el PDF para persistirlos.
+pdf_editor.properties.draft_insert_help: Encola un sello de texto pdf-lib al guardar.
+pdf_editor.properties.empty_select: Usa Seleccionar para hacer clic en un cuadro de texto o campo de formulario. Arrastra las asas para mover y redimensionar.
+pdf_editor.zoom.in: Acercar
+pdf_editor.zoom.out: Alejar
+pdf_editor.zoom.fit: Ajustar página a la vista
+pdf_editor.zoom.fit_short: Ajustar
+pdf_editor.viewport.page: Página del documento %current% de %total%
+pdf_editor.viewport.zoom: Zoom
+pdf_editor.save.error: No se pudo guardar el PDF. Inténtalo de nuevo.
+pdf_editor.pending.title: Borrador
+pdf_editor.pending.help: Los cambios se quedan en el navegador hasta que guardes. Symfony guarda el PDF actualizado en el servidor.
+pdf_editor.pending.queued: Añadido al borrador
+pdf_editor.pending.saved: Guardado en el PDF

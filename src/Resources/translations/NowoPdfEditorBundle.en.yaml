@@ -1,0 +1,19 @@
+pdf_editor.home.title: PDF editor
+pdf_editor.home.heading: Visual PDF editor
+pdf_editor.home.lead: Open a PDF to edit text, forms, watermarks, pages and annotations.
+pdf_editor.home.open: Open PDF
+pdf_editor.upload.label: PDF file
+pdf_editor.upload.not_pdf: Please upload a PDF file.
+pdf_editor.tool.select: Select
+pdf_editor.tool.text: Text
+pdf_editor.tool.form: Form field
+pdf_editor.tool.watermark: Watermark
+pdf_editor.tool.annotate: Note
+pdf_editor.action.remove_watermarks: Remove watermarks
+pdf_editor.action.rotate: Rotate page
+pdf_editor.action.download: Download
+pdf_editor.pages: Pages
+pdf_editor.properties: Properties
+pdf_editor.properties.empty: Select a text box on the page.
+pdf_editor.properties.text: Text
+pdf_editor.properties.apply: Apply change

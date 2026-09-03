@@ -1,0 +1,14 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    App\:
+        resource: '../src/'
+        exclude:
+            - '../src/Kernel.php'
+
+    App\Demo\FixturesLocator:
+        arguments:
+            $projectDir: '%kernel.project_dir%'
+            $configuredDir: '%env(default::DEMO_FIXTURES_DIR)%'
