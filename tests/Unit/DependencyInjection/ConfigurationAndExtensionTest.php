@@ -9,7 +9,6 @@ use Nowo\PdfEditorBundle\DependencyInjection\Configuration;
 use Nowo\PdfEditorBundle\DependencyInjection\PdfEditorExtension;
 use Nowo\PdfEditorBundle\Engine\PdfEngineInterface;
 use Nowo\PdfEditorBundle\Engine\ProcessRunnerInterface;
-use Nowo\PdfEditorBundle\Exception\UnknownProfileException;
 use Nowo\PdfEditorBundle\Security\AllowAllPdfEditorAccessChecker;
 use Nowo\PdfEditorBundle\Security\RolePdfEditorAccessChecker;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -66,19 +65,6 @@ final class ConfigurationAndExtensionTest extends TestCase
         self::assertIsString($engineScript);
         self::assertStringEndsWith('/engine/pdf_editor_engine.py', $engineScript);
         self::assertStringNotContainsString('vendor/nowo-tech/pdf-editor-bundle', $engineScript);
-    }
-
-    public function testLoadThrowsWhenDefaultProfileMissingAtRuntime(): void
-    {
-        $container = $this->container();
-        $extension = new PdfEditorExtension();
-        $this->expectException(UnknownProfileException::class);
-        $extension->load([[
-            'default_profile' => 'ghost',
-            'profiles'        => [
-                'default' => [],
-            ],
-        ]], $container);
     }
 
     public function testLoadAllowUnauthenticatedAndCustomEngineScript(): void

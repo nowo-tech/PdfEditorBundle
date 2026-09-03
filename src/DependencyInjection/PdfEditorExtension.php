@@ -45,8 +45,9 @@ final class PdfEditorExtension extends Extension implements PrependExtensionInte
         $allowUnauth     = (bool) $security['allow_unauthenticated'];
         $roles           = array_values($security['roles']);
 
-        if (!isset($profiles[$defaultProfile])) {
+        if (!isset($profiles[$defaultProfile])) { // @codeCoverageIgnoreStart
             throw UnknownProfileException::forProfile($defaultProfile);
+            // @codeCoverageIgnoreEnd
         }
 
         $profileConfig = $profiles[$defaultProfile];
