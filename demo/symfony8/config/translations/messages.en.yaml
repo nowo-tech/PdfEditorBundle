@@ -1,1 +1,69 @@
-
+demo:
+    badge: 'FrankenPHP demo'
+    language: Language
+    nav:
+        about: About
+        scenarios: Scenarios
+        editor: Open editor
+    home:
+        title: 'Edit PDFs inside Symfony'
+        lead: 'Upload a PDF or open a scenario, edit in the browser, then <strong>Save to PDF</strong>.'
+        browse_scenarios: 'Browse scenarios'
+        upload: 'Upload your PDF'
+        runtime: Runtime
+        stack_symfony: Symfony
+        stack_engine: Engine
+        stack_timeout: Timeout
+        stack_dpi: Render DPI
+        stack_fixtures: Fixtures
+        stack_fixtures_value: 'demo/fixtures'
+        card_hub_title: 'Scenario hub'
+        card_hub_text: 'Nine fixtures cover text, forms, watermarks, pages, redaction, notes and more.'
+        card_live_title: 'Client engine'
+        card_live_text: 'embedpdf + pdf-lib run in the browser; Symfony stores the rewritten bytes.'
+        card_portable_title: 'Drop-in bundle'
+        card_portable_text: 'Composer package with Twig UI, security gate and optional PyMuPDF engine.'
+        step1: 'Start from the <strong>scenario hub</strong> or upload a PDF.'
+        step2: 'Queue edits in the draft panel.'
+        step3: 'Click <strong>Save to PDF</strong>.'
+        step4: 'Download the result.'
+    scenarios:
+        title: 'Scenario hub'
+        lead: 'Pick a pre-built PDF and jump straight into the editor.'
+        open: 'Open scenario'
+        upload: 'Upload instead'
+    upload:
+        drop_hint: 'Drop a PDF here or choose a file below'
+        how_it_works: 'How it works'
+        step1: 'Open the workspace with your PDF.'
+        step2: 'Queue text, form, watermark or page edits.'
+        step3: 'Save to PDF — the client engine exports rewritten bytes.'
+        step4: 'Download the result.'
+    scenario:
+        full:
+            title: 'Full playground'
+            lead: 'All capabilities in one document: text, forms, watermark, pages and annotations.'
+        text:
+            title: 'Text editing'
+            lead: 'Native PDF text, FreeText boxes and draft insert_text stamps.'
+        forms:
+            title: 'AcroForm fields'
+            lead: 'Existing text, checkbox and dropdown widgets plus new fields.'
+        watermarks:
+            title: Watermarks
+            lead: 'Diagonal DRAFT overlay plus toolbar watermark stamp.'
+        pages:
+            title: 'Page operations'
+            lead: 'Five pages: rotate, delete, duplicate and insert blank sheets.'
+        redact:
+            title: Redaction
+            lead: 'Mark sensitive regions with embedpdf redact mode.'
+        annotate:
+            title: 'Notes & comments'
+            lead: 'Sticky notes and comment annotations on a blank canvas.'
+        images:
+            title: 'Graphics layer'
+            lead: 'Page with drawn graphic blocks — overlay text and annotations.'
+        blank:
+            title: 'Blank canvas'
+            lead: 'Empty page — build a document from scratch.'

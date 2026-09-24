@@ -31,7 +31,7 @@ final class CheckEngineCommandTest extends TestCase
 
     public function testMissingScript(): void
     {
-        $engine = $this->createMock(PdfEngineInterface::class);
+        $engine  = $this->createMock(PdfEngineInterface::class);
         $command = new CheckEngineCommand($engine, ProfileFactory::create(sys_get_temp_dir(), '/no/engine.py'));
         $this->expectException(EngineException::class);
         (new CommandTester($command))->execute([]);

@@ -1,4 +1,4 @@
-# GoogleTranslatePhpBundle Constitution
+# PdfEditorBundle Constitution
 
 ## Core Principles
 
@@ -9,7 +9,7 @@ Product behavior lives in `specs/001-baseline/spec.md`, `docs/SPEC-DRIVEN-DEVELO
 PHPUnit and PHPStan (and Vitest when frontend exists) are the mechanical proof. Behavioral changes require tests.
 
 ### III. 100% code inventory traceability
-Every production file under `src/` must appear in `specs/001-baseline/code-inventory.md`. New files require spec updates in the same PR.
+Every production file under `src/` must appear in `specs/001-baseline/code-inventory.md`. New files require spec updates in the same change.
 
 ### IV. Cursor + Spec Kit
 GitHub Spec Kit is initialized with **Cursor Agent** (`cursor-agent`). Skills live in `.cursor/skills/speckit-*`.
@@ -17,7 +17,10 @@ GitHub Spec Kit is initialized with **Cursor Agent** (`cursor-agent`). Skills li
 ### V. Symfony compatibility
 Follow declared PHP/Symfony ranges in `composer.json` and README badges.
 
+### VI. FrankenPHP worker safety
+Shared services must remain safe when the kernel is **not** reset between requests (`FRANKENPHP_RESET_KERNEL=false`). Prefer `readonly` / stateless services; document audits in `docs/FRANKENPHP-WORKER-AUDIT.md`.
+
 ## Governance
 Amendments update this file, baseline spec when principles affect behavior, and `CHANGELOG.md` when consumer-visible.
 
-**Version**: 1.0.0 | **Ratified**: 2026-07-07 | **Last Amended**: 2026-07-07
+**Version**: 1.0.1 | **Ratified**: 2026-07-07 | **Last Amended**: 2026-09-24

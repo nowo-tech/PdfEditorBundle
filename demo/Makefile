@@ -118,7 +118,7 @@ release-check: test-coverage-all release-verify
 	@echo "All demos passed release-check."
 
 release-verify:
-	@for demo in $(DEMOS); do \
+	@set -e; for demo in $(DEMOS); do \
 		port=$$(grep '^PORT=' $$demo/.env 2>/dev/null | cut -d= -f2 | tr -d '\r'); \
 		[ -z "$$port" ] && port=8031; \
 		echo "Release verify: $$demo (port $$port)..."; \

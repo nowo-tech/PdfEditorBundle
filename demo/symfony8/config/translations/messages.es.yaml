@@ -1,1 +1,69 @@
-
+demo:
+    badge: 'Demo FrankenPHP'
+    language: Idioma
+    nav:
+        about: Acerca de
+        scenarios: Escenarios
+        editor: Abrir editor
+    home:
+        title: 'Edita PDFs en Symfony'
+        lead: 'Sube un PDF o abre un escenario, edita en el navegador y pulsa <strong>Guardar en PDF</strong>.'
+        browse_scenarios: 'Ver escenarios'
+        upload: 'Subir tu PDF'
+        runtime: Runtime
+        stack_symfony: Symfony
+        stack_engine: Motor
+        stack_timeout: Timeout
+        stack_dpi: DPI de render
+        stack_fixtures: Fixtures
+        stack_fixtures_value: 'demo/fixtures'
+        card_hub_title: 'Hub de escenarios'
+        card_hub_text: 'Nueve fixtures cubren texto, formularios, marcas de agua, páginas, redacción, notas y más.'
+        card_live_title: 'Motor cliente'
+        card_live_text: 'embedpdf + pdf-lib en el navegador; Symfony guarda los bytes reescritos.'
+        card_portable_title: 'Bundle portable'
+        card_portable_text: 'Paquete Composer con UI Twig, seguridad y motor PyMuPDF opcional.'
+        step1: 'Empieza en el <strong>hub de escenarios</strong> o sube un PDF.'
+        step2: 'Encola ediciones en el panel de borrador.'
+        step3: 'Pulsa <strong>Guardar en PDF</strong>.'
+        step4: 'Descarga el resultado.'
+    scenarios:
+        title: 'Hub de escenarios'
+        lead: 'Elige un PDF precargado y salta al editor.'
+        open: 'Abrir escenario'
+        upload: 'Subir en su lugar'
+    upload:
+        drop_hint: 'Suelta un PDF aquí o elige un archivo abajo'
+        how_it_works: 'Cómo funciona'
+        step1: 'Abre el workspace con tu PDF.'
+        step2: 'Encola ediciones de texto, formulario, marca de agua o páginas.'
+        step3: 'Guarda en PDF — el motor cliente exporta los bytes.'
+        step4: 'Descarga el resultado.'
+    scenario:
+        full:
+            title: 'Playground completo'
+            lead: 'Todas las capacidades en un documento: texto, formularios, marca de agua, páginas y anotaciones.'
+        text:
+            title: 'Edición de texto'
+            lead: 'Texto nativo PDF, cajas FreeText y sellos insert_text en borrador.'
+        forms:
+            title: 'Campos AcroForm'
+            lead: 'Widgets de texto, checkbox y desplegable existentes, más campos nuevos.'
+        watermarks:
+            title: 'Marcas de agua'
+            lead: 'Overlay DRAFT diagonal más sello desde la barra de herramientas.'
+        pages:
+            title: 'Operaciones de página'
+            lead: 'Cinco páginas: rotar, borrar, duplicar e insertar hojas en blanco.'
+        redact:
+            title: Redacción
+            lead: 'Marca regiones sensibles con el modo redact de embedpdf.'
+        annotate:
+            title: 'Notas y comentarios'
+            lead: 'Notas adhesivas y comentarios sobre un lienzo en blanco.'
+        images:
+            title: 'Capa gráfica'
+            lead: 'Página con bloques gráficos — superpone texto y anotaciones.'
+        blank:
+            title: 'Lienzo en blanco'
+            lead: 'Página vacía — construye el documento desde cero.'

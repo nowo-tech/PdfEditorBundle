@@ -11,6 +11,8 @@ use Nowo\PdfEditorBundle\Tests\ProfileFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+use function dirname;
+
 #[CoversClass(PythonPdfEngine::class)]
 #[CoversClass(SymfonyProcessRunner::class)]
 final class PythonEngineIntegrationTest extends TestCase
@@ -29,14 +31,14 @@ final class PythonEngineIntegrationTest extends TestCase
 
         $dir = sys_get_temp_dir() . '/pdfed-int-' . bin2hex(random_bytes(4));
         mkdir($dir, 0700, true);
-        $pdf = $dir . '/in.pdf';
-        $make = 'import pymupdf; d=pymupdf.open(); p=d.new_page(); p.insert_text((72,72),"Hello"); d.save(r"' . $pdf . '")';
+        $pdf    = $dir . '/in.pdf';
+        $make   = 'import pymupdf; d=pymupdf.open(); p=d.new_page(); p.insert_text((72,72),"Hello"); d.save(r"' . $pdf . '")';
         $status = 0;
         $output = [];
         exec('python3 -c ' . escapeshellarg($make), $output, $status);
         self::assertSame(0, $status, implode("\n", $output));
 
-        $engine = new PythonPdfEngine(new SymfonyProcessRunner(), ProfileFactory::create($dir, $script));
+        $engine  = new PythonPdfEngine(new SymfonyProcessRunner(), ProfileFactory::create($dir, $script));
         $version = $engine->version();
         self::assertSame('pymupdf', $version['engine']);
         self::assertNotSame('', $version['pymupdf']);
@@ -48,7 +50,7 @@ final class PythonEngineIntegrationTest extends TestCase
         $engine->renderPage($pdf, 1, $png, 72);
         self::assertFileExists($png);
 
-        $out = $dir . '/out.pdf';
+        $out    = $dir . '/out.pdf';
         $result = $engine->apply($pdf, [
             new EditorOperation('insert_text', ['page' => 1, 'x' => 72, 'y' => 120, 'text' => 'Note', 'fontSize' => 12]),
         ], $out);

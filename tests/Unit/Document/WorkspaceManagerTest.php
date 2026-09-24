@@ -13,6 +13,8 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
+use const UPLOAD_ERR_INI_SIZE;
+
 #[CoversClass(WorkspaceManager::class)]
 #[CoversClass(Workspace::class)]
 #[CoversClass(EditorProfile::class)]
@@ -73,7 +75,7 @@ final class WorkspaceManagerTest extends TestCase
         file_put_contents($pdf, 'x');
         $this->expectException(DocumentException::class);
         (new WorkspaceManager(ProfileFactory::create($root)))->createFromUpload(
-            new UploadedFile($pdf, 'x.pdf', 'application/pdf', \UPLOAD_ERR_INI_SIZE, true),
+            new UploadedFile($pdf, 'x.pdf', 'application/pdf', UPLOAD_ERR_INI_SIZE, true),
         );
     }
 
@@ -136,7 +138,7 @@ final class WorkspaceManagerTest extends TestCase
         $id = str_repeat('cd', 16);
         mkdir($root . '/' . $id, 0700, true);
         file_put_contents($root . '/' . $id . '/current.pdf', '%PDF-1.4');
-        $manager = new WorkspaceManager(ProfileFactory::create($root));
+        $manager   = new WorkspaceManager(ProfileFactory::create($root));
         $workspace = $manager->get($id);
         self::assertSame('document.pdf', $workspace->originalName);
 

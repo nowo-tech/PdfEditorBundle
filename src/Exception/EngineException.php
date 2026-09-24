@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Nowo\PdfEditorBundle\Exception;
 
+use function sprintf;
+
 final class EngineException extends PdfEditorException
 {
     public static function missingPython(string $binary): self

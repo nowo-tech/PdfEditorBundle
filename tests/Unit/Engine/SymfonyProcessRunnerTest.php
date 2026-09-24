@@ -8,6 +8,8 @@ use Nowo\PdfEditorBundle\Engine\SymfonyProcessRunner;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+use const PHP_BINARY;
+
 #[CoversClass(SymfonyProcessRunner::class)]
 final class SymfonyProcessRunnerTest extends TestCase
 {

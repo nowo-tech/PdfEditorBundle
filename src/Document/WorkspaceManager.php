@@ -10,7 +10,6 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 use function bin2hex;
 use function copy;
-use function file_exists;
 use function file_put_contents;
 use function is_dir;
 use function is_file;

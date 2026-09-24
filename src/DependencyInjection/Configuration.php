@@ -9,7 +9,6 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 use function array_key_exists;
 use function is_string;
-use function sprintf;
 use function sys_get_temp_dir;
 
 /**

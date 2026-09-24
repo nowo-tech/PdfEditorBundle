@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Nowo\PdfEditorBundle\Engine;
 
+use JsonException;
 use Nowo\PdfEditorBundle\Config\EditorProfile;
 use Nowo\PdfEditorBundle\Exception\EngineException;
 use Nowo\PdfEditorBundle\Operation\EditorOperation;
@@ -109,7 +110,7 @@ final class PythonPdfEngine implements PdfEngineInterface
         $raw = $outcome->stdout !== '' ? $outcome->stdout : $outcome->stderr;
         try {
             $decoded = json_decode($raw, true, 512, JSON_THROW_ON_ERROR);
-        } catch (\JsonException $exception) {
+        } catch (JsonException $exception) {
             if (!$outcome->isSuccessful()) {
                 throw EngineException::failed(trim($outcome->stderr !== '' ? $outcome->stderr : $outcome->stdout) ?: sprintf('exit %d', $outcome->exitCode));
             }

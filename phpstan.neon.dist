@@ -12,4 +12,5 @@ parameters:
 includes:
   - vendor/nowo-tech/phpstan-frankenphp/ruleset-classic.neon
   - vendor/nowo-tech/phpstan-frankenphp/ruleset-worker.neon
+  - vendor/nowo-tech/phpstan-frankenphp/ruleset-hardening.neon
   - phpstan-baseline.neon

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Nowo\PdfEditorBundle\Tests\Unit\Controller;
 
+use Nowo\PdfEditorBundle\Config\EditorProfile;
 use Nowo\PdfEditorBundle\Controller\EditorController;
 use Nowo\PdfEditorBundle\Document\Workspace;
 use Nowo\PdfEditorBundle\Document\WorkspaceManager;
@@ -14,6 +15,7 @@ use Nowo\PdfEditorBundle\Operation\OperationDecoder;
 use Nowo\PdfEditorBundle\Security\PdfEditorAccessCheckerInterface;
 use Nowo\PdfEditorBundle\Tests\ProfileFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
@@ -26,6 +28,8 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Twig\Environment;
+
+use const JSON_THROW_ON_ERROR;
 
 #[CoversClass(EditorController::class)]
 final class EditorControllerTest extends TestCase
@@ -51,17 +55,17 @@ final class EditorControllerTest extends TestCase
     public function testIndexRedirectsWhenPdfUploaded(): void
     {
         $root = $this->workspaceRoot();
-        $pdf = $root . '/in.pdf';
+        $pdf  = $root . '/in.pdf';
         file_put_contents($pdf, '%PDF-1.4');
-        $upload = new UploadedFile($pdf, 'in.pdf', 'application/pdf', null, true);
+        $upload   = new UploadedFile($pdf, 'in.pdf', 'application/pdf', null, true);
         $response = $this->controller(workspaceRoot: $root, submittedPdf: $upload)->index(new Request());
         self::assertSame(302, $response->getStatusCode());
     }
 
     public function testWorkspaceAndInspect(): void
     {
-        $root = $this->workspaceRoot();
-        $ws = $this->seedWorkspace($root);
+        $root       = $this->workspaceRoot();
+        $ws         = $this->seedWorkspace($root);
         $controller = $this->controller(workspaceRoot: $root, inspect: ['pageCount' => 1]);
         self::assertSame(200, $controller->workspace($ws->id)->getStatusCode());
         $json = json_decode((string) $controller->inspect($ws->id)->getContent(), true);
@@ -71,15 +75,15 @@ final class EditorControllerTest extends TestCase
     public function testPageImageRejectsZero(): void
     {
         $root = $this->workspaceRoot();
-        $ws = $this->seedWorkspace($root);
+        $ws   = $this->seedWorkspace($root);
         $this->expectException(PdfEditorException::class);
         $this->controller(workspaceRoot: $root)->pageImage($ws->id, 0);
     }
 
     public function testPageImageOk(): void
     {
-        $root = $this->workspaceRoot();
-        $ws = $this->seedWorkspace($root);
+        $root     = $this->workspaceRoot();
+        $ws       = $this->seedWorkspace($root);
         $response = $this->controller(workspaceRoot: $root, writePageImage: true)->pageImage($ws->id, 1);
         self::assertSame(200, $response->getStatusCode());
     }
@@ -87,8 +91,8 @@ final class EditorControllerTest extends TestCase
     public function testPageImageUsesCachedPreview(): void
     {
         $root = $this->workspaceRoot();
-        $ws = $this->seedWorkspace($root);
-        $png = $ws->directory . '/page-1.png';
+        $ws   = $this->seedWorkspace($root);
+        $png  = $ws->directory . '/page-1.png';
         file_put_contents($png, 'cached-png');
         touch($ws->pdfPath, time() - 10);
         touch($png, time());
@@ -98,14 +102,14 @@ final class EditorControllerTest extends TestCase
         $engine->method('inspect')->willReturn(['pageCount' => 1]);
 
         $controller = $this->controllerWithEngine($root, $engine);
-        $response = $controller->pageImage($ws->id, 1);
+        $response   = $controller->pageImage($ws->id, 1);
         self::assertSame(200, $response->getStatusCode());
     }
 
     public function testPageImageMissingFile(): void
     {
         $root = $this->workspaceRoot();
-        $ws = $this->seedWorkspace($root);
+        $ws   = $this->seedWorkspace($root);
         $this->expectException(PdfEditorException::class);
         $this->controller(workspaceRoot: $root, writePageImage: false)->pageImage($ws->id, 1);
     }
@@ -113,15 +117,15 @@ final class EditorControllerTest extends TestCase
     public function testApplyRequiresCsrf(): void
     {
         $root = $this->workspaceRoot();
-        $ws = $this->seedWorkspace($root);
+        $ws   = $this->seedWorkspace($root);
         $this->expectException(AccessDeniedException::class);
         $this->controller(workspaceRoot: $root, csrf: false)->apply(new Request(), $ws->id);
     }
 
     public function testApplyInvalidJson(): void
     {
-        $root = $this->workspaceRoot();
-        $ws = $this->seedWorkspace($root);
+        $root    = $this->workspaceRoot();
+        $ws      = $this->seedWorkspace($root);
         $request = Request::create('/', 'POST', [], [], [], [], '{}');
         $request->headers->set('X-CSRF-TOKEN', 'token');
         $this->expectException(PdfEditorException::class);
@@ -131,20 +135,22 @@ final class EditorControllerTest extends TestCase
     public function testApplyOk(): void
     {
         $root = $this->workspaceRoot();
-        $ws = $this->seedWorkspace($root);
+        $ws   = $this->seedWorkspace($root);
         file_put_contents($ws->directory . '/page-1.png', 'png');
+        file_put_contents($ws->directory . '/page-1.png.lock', '');
         $request = Request::create('/', 'POST', [], [], [], [], '{"ops":[{"op":"rotate_page","page":1}]}');
         $request->headers->set('X-CSRF-TOKEN', 'token');
         $response = $this->controller(workspaceRoot: $root)->apply($request, $ws->id);
         self::assertSame(200, $response->getStatusCode());
         self::assertFileDoesNotExist($ws->directory . '/page-1.png');
+        self::assertFileDoesNotExist($ws->directory . '/page-1.png.lock');
     }
 
     public function testApplyClientPdfBytes(): void
     {
-        $root = $this->workspaceRoot();
-        $ws = $this->seedWorkspace($root);
-        $pdf = '%PDF-1.4 client-bytes';
+        $root    = $this->workspaceRoot();
+        $ws      = $this->seedWorkspace($root);
+        $pdf     = '%PDF-1.4 client-bytes';
         $request = Request::create('/', 'POST', [], [], [], [], $pdf);
         $request->headers->set('Content-Type', 'application/pdf');
         $request->headers->set('X-CSRF-TOKEN', 'token');
@@ -155,9 +161,9 @@ final class EditorControllerTest extends TestCase
 
     public function testInspectInClientMode(): void
     {
-        $root = $this->workspaceRoot();
-        $ws = $this->seedWorkspace($root);
-        $profile = new \Nowo\PdfEditorBundle\Config\EditorProfile(
+        $root    = $this->workspaceRoot();
+        $ws      = $this->seedWorkspace($root);
+        $profile = new EditorProfile(
             name: 'default',
             pythonBinary: 'python3',
             engineScript: '/tmp/missing-engine.py',
@@ -170,16 +176,16 @@ final class EditorControllerTest extends TestCase
             allowUnauthenticated: true,
             roles: ['ROLE_ADMIN'],
         );
-        $controller = $this->controllerWithProfile($root, $profile);
-        $json = json_decode((string) $controller->inspect($ws->id)->getContent(), true);
+        $controller = $this->controllerWithProfile($profile);
+        $json       = json_decode((string) $controller->inspect($ws->id)->getContent(), true);
         self::assertTrue($json['client']);
         self::assertNull($json['pageCount']);
     }
 
     public function testApplyEmptyPdfBody(): void
     {
-        $root = $this->workspaceRoot();
-        $ws = $this->seedWorkspace($root);
+        $root    = $this->workspaceRoot();
+        $ws      = $this->seedWorkspace($root);
         $request = Request::create('/', 'POST', [], [], [], [], '');
         $request->headers->set('Content-Type', 'application/pdf');
         $request->headers->set('X-CSRF-TOKEN', 'token');
@@ -189,8 +195,8 @@ final class EditorControllerTest extends TestCase
 
     public function testApplyInvalidBase64Pdf(): void
     {
-        $root = $this->workspaceRoot();
-        $ws = $this->seedWorkspace($root);
+        $root    = $this->workspaceRoot();
+        $ws      = $this->seedWorkspace($root);
         $request = Request::create('/', 'POST', [], [], [], [], '{"pdf":"%%%"}');
         $request->headers->set('X-CSRF-TOKEN', 'token');
         $this->expectException(PdfEditorException::class);
@@ -199,9 +205,9 @@ final class EditorControllerTest extends TestCase
 
     public function testApplyBase64PdfOk(): void
     {
-        $root = $this->workspaceRoot();
-        $ws = $this->seedWorkspace($root);
-        $pdf = '%PDF-1.4 from-b64';
+        $root    = $this->workspaceRoot();
+        $ws      = $this->seedWorkspace($root);
+        $pdf     = '%PDF-1.4 from-b64';
         $request = Request::create('/', 'POST', [], [], [], [], json_encode(['pdf' => base64_encode($pdf)], JSON_THROW_ON_ERROR));
         $request->headers->set('X-CSRF-TOKEN', 'token');
         $response = $this->controller(workspaceRoot: $root)->apply($request, $ws->id);
@@ -211,8 +217,8 @@ final class EditorControllerTest extends TestCase
 
     public function testApplyRejectsNonPdfClientPayload(): void
     {
-        $root = $this->workspaceRoot();
-        $ws = $this->seedWorkspace($root);
+        $root    = $this->workspaceRoot();
+        $ws      = $this->seedWorkspace($root);
         $request = Request::create('/', 'POST', [], [], [], [], 'NOT-A-PDF');
         $request->headers->set('Content-Type', 'application/pdf');
         $request->headers->set('X-CSRF-TOKEN', 'token');
@@ -222,8 +228,8 @@ final class EditorControllerTest extends TestCase
 
     public function testViewInline(): void
     {
-        $root = $this->workspaceRoot();
-        $ws = $this->seedWorkspace($root);
+        $root     = $this->workspaceRoot();
+        $ws       = $this->seedWorkspace($root);
         $response = $this->controller(workspaceRoot: $root)->view($ws->id);
         self::assertSame(200, $response->getStatusCode());
         self::assertStringContainsString('inline', (string) $response->headers->get('Content-Disposition'));
@@ -231,8 +237,8 @@ final class EditorControllerTest extends TestCase
 
     public function testDownload(): void
     {
-        $root = $this->workspaceRoot();
-        $ws = $this->seedWorkspace($root);
+        $root     = $this->workspaceRoot();
+        $ws       = $this->seedWorkspace($root);
         $response = $this->controller(workspaceRoot: $root)->download($ws->id);
         self::assertSame(200, $response->getStatusCode());
     }
@@ -250,13 +256,13 @@ final class EditorControllerTest extends TestCase
         bool $submittedEmpty = false,
         bool $withUserObject = false,
     ): EditorController {
-        $root = $workspaceRoot ?? $this->workspaceRoot();
+        $root   = $workspaceRoot ?? $this->workspaceRoot();
         $access = $this->createMock(PdfEditorAccessCheckerInterface::class);
         $access->method('canUseEditor')->willReturn($canUse);
         $workspaces = new WorkspaceManager(ProfileFactory::create($root));
-        $engine = $this->createMock(PdfEngineInterface::class);
+        $engine     = $this->createMock(PdfEngineInterface::class);
         $engine->method('inspect')->willReturn($inspect);
-        $engine->method('apply')->willReturnCallback(static function (string $pdf, array $operations, string $out) {
+        $engine->method('apply')->willReturnCallback(static function (string $pdf, array $operations, string $out): array {
             file_put_contents($out, 'rewritten');
 
             return ['applied' => 1];
@@ -280,7 +286,7 @@ final class EditorControllerTest extends TestCase
         $twig->method('render')->willReturn('<html></html>');
         $tokens = $this->createMock(TokenStorageInterface::class);
         if ($withUserObject) {
-            $user = $this->createMock(UserInterface::class);
+            $user  = $this->createMock(UserInterface::class);
             $token = $this->createMock(TokenInterface::class);
             $token->method('getUser')->willReturn($user);
             $tokens->method('getToken')->willReturn($token);
@@ -306,31 +312,30 @@ final class EditorControllerTest extends TestCase
 
     private function controllerWithEngine(string $root, PdfEngineInterface $engine): EditorController
     {
-        return $this->controllerWithProfile($root, ProfileFactory::create($root), $engine);
+        return $this->controllerWithProfile(ProfileFactory::create($root), $engine);
     }
 
     private function controllerWithProfile(
-        string $root,
-        \Nowo\PdfEditorBundle\Config\EditorProfile $profile,
+        EditorProfile $profile,
         ?PdfEngineInterface $engine = null,
     ): EditorController {
         $access = $this->createMock(PdfEditorAccessCheckerInterface::class);
         $access->method('canUseEditor')->willReturn(true);
         $workspaces = new WorkspaceManager($profile);
-        if ($engine === null) {
+        if (!$engine instanceof PdfEngineInterface) {
             $engine = $this->createMock(PdfEngineInterface::class);
             $engine->method('inspect')->willReturn(['pageCount' => 1]);
         }
         $forms = $this->createMock(FormFactoryInterface::class);
-        $forms->method('create')->willReturnCallback(function () {
+        $forms->method('create')->willReturnCallback(function (): MockObject {
             $form = $this->createMock(FormInterface::class);
             $form->method('createView')->willReturn(new FormView());
 
             return $form;
         });
-        $twig = $this->createMock(Environment::class);
-        $tokens = $this->createMock(TokenStorageInterface::class);
-        $urls = $this->createMock(UrlGeneratorInterface::class);
+        $twig    = $this->createMock(Environment::class);
+        $tokens  = $this->createMock(TokenStorageInterface::class);
+        $urls    = $this->createMock(UrlGeneratorInterface::class);
         $csrfMgr = $this->createMock(CsrfTokenManagerInterface::class);
         $csrfMgr->method('isTokenValid')->willReturn(true);
 
@@ -358,7 +363,7 @@ final class EditorControllerTest extends TestCase
 
     private function seedWorkspace(string $root): Workspace
     {
-        $id = str_repeat('ab', 16);
+        $id  = str_repeat('ab', 16);
         $dir = $root . '/' . $id;
         mkdir($dir, 0700, true);
         file_put_contents($dir . '/current.pdf', '%PDF-1.4');

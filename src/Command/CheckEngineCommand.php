@@ -14,6 +14,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 use function is_file;
+use function sprintf;
 
 #[AsCommand(name: 'nowo:pdf-editor:check-engine', description: 'Verify the Python PDF engine (PyMuPDF) is available')]
 final class CheckEngineCommand extends Command

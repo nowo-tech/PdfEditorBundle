@@ -28,19 +28,23 @@ use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Twig\Environment;
 
+use function fclose;
+use function file_put_contents;
+use function filemtime;
+use function flock;
+use function fopen;
 use function glob;
 use function is_array;
 use function is_file;
 use function is_object;
+use function is_string;
 use function json_decode;
 use function sprintf;
-use function unlink;
-use function filemtime;
-use function flock;
-use function fopen;
-use function fclose;
 use function str_starts_with;
-use function file_put_contents;
+use function unlink;
+
+use const LOCK_EX;
+use const LOCK_UN;
 
 final class EditorController
 {
@@ -109,7 +113,7 @@ final class EditorController
         return new JsonResponse($this->engine->inspect($workspace->pdfPath));
     }
 
-    public function pageImage(string $id, int $page): Response
+    public function pageImage(string $id, int $page): BinaryFileResponse
     {
         $this->assertAccess();
         $workspace = $this->workspaces->get($id);
@@ -138,7 +142,7 @@ final class EditorController
         }
 
         $lockPath = $png . '.lock';
-        $lock = @fopen($lockPath, 'c+');
+        $lock     = @fopen($lockPath, 'c+');
         if ($lock === false) { // @codeCoverageIgnoreStart
             $this->engine->renderPage($workspace->pdfPath, $page, $png, $this->profile->renderDpi);
 
@@ -173,7 +177,7 @@ final class EditorController
         if (!$this->csrfTokenManager->isTokenValid(new CsrfToken('pdf_editor', $csrf))) {
             throw AccessDeniedException::workspace();
         }
-        $workspace = $this->workspaces->get($id);
+        $workspace   = $this->workspaces->get($id);
         $contentType = strtolower((string) $request->headers->get('Content-Type', ''));
 
         if (str_starts_with($contentType, 'application/pdf')) {
@@ -280,6 +284,10 @@ final class EditorController
     {
         foreach (glob($workspace->directory . '/page-*.png') ?: [] as $stale) {
             @unlink($stale);
+        }
+        // Lock files survive PNG deletion; remove them so long-lived workers do not accumulate empties.
+        foreach (glob($workspace->directory . '/page-*.png.lock') ?: [] as $lock) {
+            @unlink($lock);
         }
     }
 }

@@ -9,6 +9,7 @@ use Nowo\PdfEditorBundle\Exception\PdfEditorException;
 use function in_array;
 use function is_array;
 use function is_string;
+use function sprintf;
 
 final class OperationDecoder
 {

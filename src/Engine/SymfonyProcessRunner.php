@@ -26,7 +26,7 @@ final class SymfonyProcessRunner implements ProcessRunnerInterface
             }
 
             return new ProcessOutcome(
-            $process->getExitCode() ?? 124, // @codeCoverageIgnore
+                $process->getExitCode() ?? 124, // @codeCoverageIgnore
                 $process->getOutput(),
                 $process->getErrorOutput(),
                 true,

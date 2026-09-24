@@ -22,7 +22,6 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 
 use function dirname;
-use function sprintf;
 
 /**
  * @author Héctor Franco Aceituno <hectorfranco@nowo.tech>
@@ -35,15 +34,15 @@ final class PdfEditorExtension extends Extension implements PrependExtensionInte
      */
     public function load(array $configs, ContainerBuilder $container): void
     {
-        $loader = new YamlFileLoader($container, new FileLocator(dirname(__DIR__) . '/Resources/config'));
+        $loader = new YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yaml');
 
-        $config          = $this->processConfiguration(new Configuration(), $configs);
-        $defaultProfile  = (string) $config['default_profile'];
-        $profiles        = $config['profiles'];
-        $security        = $config['security'];
-        $allowUnauth     = (bool) $security['allow_unauthenticated'];
-        $roles           = array_values($security['roles']);
+        $config         = $this->processConfiguration(new Configuration(), $configs);
+        $defaultProfile = (string) $config['default_profile'];
+        $profiles       = $config['profiles'];
+        $security       = $config['security'];
+        $allowUnauth    = (bool) $security['allow_unauthenticated'];
+        $roles          = array_values($security['roles']);
 
         if (!isset($profiles[$defaultProfile])) { // @codeCoverageIgnoreStart
             throw UnknownProfileException::forProfile($defaultProfile);
@@ -58,17 +57,17 @@ final class PdfEditorExtension extends Extension implements PrependExtensionInte
         }
 
         $profileDef = new Definition(EditorProfile::class, [
-            '$name'                  => $defaultProfile,
-            '$pythonBinary'          => (string) $profileConfig['python_binary'],
-            '$engineScript'          => $engineScript,
-            '$timeout'               => (float) $profileConfig['timeout'],
-            '$idleTimeout'           => (float) $profileConfig['idle_timeout'],
-            '$maxUploadBytes'        => (int) $profileConfig['max_upload_bytes'],
-            '$renderDpi'             => (int) $profileConfig['render_dpi'],
-            '$workspaceDir'          => (string) $profileConfig['workspace_dir'],
-            '$engineMode'            => (string) $profileConfig['engine_mode'],
-            '$allowUnauthenticated'  => $allowUnauth,
-            '$roles'                 => $roles,
+            '$name'                 => $defaultProfile,
+            '$pythonBinary'         => (string) $profileConfig['python_binary'],
+            '$engineScript'         => $engineScript,
+            '$timeout'              => (float) $profileConfig['timeout'],
+            '$idleTimeout'          => (float) $profileConfig['idle_timeout'],
+            '$maxUploadBytes'       => (int) $profileConfig['max_upload_bytes'],
+            '$renderDpi'            => (int) $profileConfig['render_dpi'],
+            '$workspaceDir'         => (string) $profileConfig['workspace_dir'],
+            '$engineMode'           => (string) $profileConfig['engine_mode'],
+            '$allowUnauthenticated' => $allowUnauth,
+            '$roles'                => $roles,
         ]);
         $container->setDefinition('nowo_pdf_editor.profile', $profileDef);
         $container->setAlias(EditorProfile::class, 'nowo_pdf_editor.profile');
@@ -107,12 +106,12 @@ final class PdfEditorExtension extends Extension implements PrependExtensionInte
     {
         $container->prependExtensionConfig('twig', [
             'paths' => [
-                dirname(__DIR__) . '/Resources/views' => 'NowoPdfEditorBundle',
+                __DIR__ . '/../Resources/views' => 'NowoPdfEditorBundle',
             ],
         ]);
         $container->prependExtensionConfig('framework', [
             'translator' => [
-                'paths' => [dirname(__DIR__) . '/Resources/translations'],
+                'paths' => [__DIR__ . '/../Resources/translations'],
             ],
         ]);
         $container->prependExtensionConfig('framework', [

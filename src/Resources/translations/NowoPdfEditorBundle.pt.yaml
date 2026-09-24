@@ -46,7 +46,6 @@ pdf_editor.pages.of: Página %current% de %total%
 pdf_editor.pages.prev: Página anterior
 pdf_editor.pages.next: Página seguinte
 pdf_editor.pages.nav: Navegação de páginas
-pdf_editor.pages.current: Página %page%
 pdf_editor.properties: Propriedades
 pdf_editor.properties.empty: Selecione texto na página ou escolha a ferramenta Texto.
 pdf_editor.properties.text: Texto

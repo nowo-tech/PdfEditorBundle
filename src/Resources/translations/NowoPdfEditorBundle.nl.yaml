@@ -46,7 +46,6 @@ pdf_editor.pages.of: Pagina %current% van %total%
 pdf_editor.pages.prev: Vorige pagina
 pdf_editor.pages.next: Volgende pagina
 pdf_editor.pages.nav: Paginanavigatie
-pdf_editor.pages.current: Pagina %page%
 pdf_editor.properties: Eigenschappen
 pdf_editor.properties.empty: Selecteer tekst op de pagina of kies het Tekst-gereedschap.
 pdf_editor.properties.text: Tekst

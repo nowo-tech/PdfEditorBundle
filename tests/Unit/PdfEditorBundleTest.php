@@ -14,7 +14,7 @@ final class PdfEditorBundleTest extends TestCase
 {
     public function testGetContainerExtensionReturnsPdfEditorExtension(): void
     {
-        $bundle = new PdfEditorBundle();
+        $bundle    = new PdfEditorBundle();
         $extension = $bundle->getContainerExtension();
 
         self::assertInstanceOf(PdfEditorExtension::class, $extension);

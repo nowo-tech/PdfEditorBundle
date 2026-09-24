@@ -8,8 +8,8 @@ use Nowo\PdfEditorBundle\Security\AllowAllPdfEditorAccessChecker;
 use Nowo\PdfEditorBundle\Security\RolePdfEditorAccessChecker;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use stdClass;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 #[CoversClass(AllowAllPdfEditorAccessChecker::class)]
 #[CoversClass(RolePdfEditorAccessChecker::class)]

@@ -9,9 +9,9 @@
 
 ![FrankenPHP Friendly Worker Mode](docs/images/frankenphp-friendly.png)
 
-This bundle is **FrankenPHP worker mode friendly**.
+This bundle is **FrankenPHP worker mode friendly**, including **`reset_kernel: false`** (long-lived kernel).
 
-**FrankenPHP worker mode:** Supported — the Python engine is executed with Symfony Process wall-clock and idle timeouts; demos ship FrankenPHP with `FRANKENPHP_MODE` (see [Demo with FrankenPHP](docs/DEMO-FRANKENPHP.md)).
+**FrankenPHP worker mode:** Supported at **100%** under scenario B (kernel not rebooted). All shared services are stateless; Process timeouts stop the Python engine on expiry. Demo defaults: `FRANKENPHP_MODE=worker`, `FRANKENPHP_RESET_KERNEL` unset (`false`). See [Demo with FrankenPHP](docs/DEMO-FRANKENPHP.md) and the [worker audit](docs/FRANKENPHP-WORKER-AUDIT.md).
 
 ## Table of contents
 
@@ -80,11 +80,14 @@ See [docs/INSTALLATION.md](docs/INSTALLATION.md).
 - [Usage](docs/USAGE.md)
 - [Architecture decisions (ADR)](docs/adr/README.md)
 - [Demo with FrankenPHP](docs/DEMO-FRANKENPHP.md)
+- [FrankenPHP worker audit (`reset_kernel: false`)](docs/FRANKENPHP-WORKER-AUDIT.md)
+- [Upgrading](docs/UPGRADING.md)
 - [Security](docs/SECURITY.md)
 - [GitHub CI](docs/GITHUB_CI.md)
 - [Testing](docs/TESTING.md)
 - [Changelog](docs/CHANGELOG.md)
 - [Contributing](docs/CONTRIBUTING.md)
+- [Baseline spec](specs/001-baseline/spec.md)
 
 ## License
 
