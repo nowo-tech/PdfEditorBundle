@@ -19,6 +19,7 @@ final class PdfEditorBundle extends Bundle
     public function getContainerExtension(): ExtensionInterface
     {
         if (!$this->extension instanceof PdfEditorExtension) {
+            // @igor-ignore - Boot-time Symfony Bundle extension cache (not request state).
             $this->extension = new PdfEditorExtension();
         }
 

@@ -3,7 +3,17 @@
     "description": "Isolated Symfony PDF editor workspace: edit text, AcroForm fields, watermarks, pages and annotations via a free Python/PyMuPDF engine and a CKEditor-like UI.",
     "type": "symfony-bundle",
     "license": "MIT",
-    "keywords": ["symfony", "symfony-bundle", "pdf", "pdf-editor", "acroform", "watermark", "pymupdf", "frankenphp", "worker"],
+    "keywords": [
+        "symfony",
+        "symfony-bundle",
+        "pdf",
+        "pdf-editor",
+        "acroform",
+        "watermark",
+        "pymupdf",
+        "frankenphp",
+        "worker"
+    ],
     "homepage": "https://github.com/nowo-tech/PdfEditorBundle",
     "support": {
         "issues": "https://github.com/nowo-tech/PdfEditorBundle/issues",
@@ -12,7 +22,7 @@
     },
     "authors": [
         {
-            "name": "Héctor Franco Aceituno",
+            "name": "H\u00e9ctor Franco Aceituno",
             "email": "hectorfranco@nowo.tech",
             "homepage": "https://github.com/HecFranco",
             "role": "Developer"
@@ -41,6 +51,7 @@
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.0",
+        "igor-php/igor-php": "^0.9.7",
         "nowo-tech/phpstan-frankenphp": "^1.0",
         "phpstan/extension-installer": "^1.4",
         "phpstan/phpstan": "^2.0",
@@ -62,7 +73,10 @@
         }
     },
     "archive": {
-        "exclude": ["/demo", "/.cursor"]
+        "exclude": [
+            "/demo",
+            "/.cursor"
+        ]
     },
     "config": {
         "sort-packages": true,
@@ -84,10 +98,17 @@
         "rector": "rector process",
         "rector-dry": "rector process --dry-run --no-progress-bar",
         "phpstan": "phpstan analyse --memory-limit=512M",
-        "qa": ["@cs-check", "@test"]
+        "qa": [
+            "@cs-check",
+            "@test"
+        ],
+        "igor": "igor-php --no-agent ."
     },
     "suggest": {
         "symfony/flex": "For automatic recipe installation",
         "symfony/security-bundle": "Role-based editor access when allow_unauthenticated is false"
+    },
+    "scripts-descriptions": {
+        "igor": "Run Igor FrankenPHP worker-state audit (REQ-CS-008)"
     }
 }
