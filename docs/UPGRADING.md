@@ -3,6 +3,18 @@
 
 ## Unreleased
 
+## To 1.0.4
+
+From **1.0.3** — upload size + workspace-bound images.
+
+```bash
+composer update nowo-tech/pdf-editor-bundle
+php bin/console cache:clear
+```
+
+- Client apply PDF bodies must stay under `max_upload_bytes`.
+- `add_image` paths must be workspace-relative (no absolute paths, URIs, or `..`). Update any callers that passed absolute paths.
+
 ## To 1.0.3
 
 From **1.0.2** — REQ-CS-008 Igor FrankenPHP worker audit (igor-php require-dev, igor.json, make igor).

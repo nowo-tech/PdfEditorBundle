@@ -47,6 +47,21 @@ WIDGET_TYPES = {
 WATERMARK_TOKENS = ("draft", "copy", "confidential", "sample", "watermark", "preview")
 
 
+def _resolve_add_image_path(image_path: str, pdf_path: str) -> str:
+    """Resolve add_image path under the PDF's parent directory (workspace)."""
+    workspace = os.path.realpath(os.path.dirname(pdf_path))
+    if not os.path.isabs(image_path):
+        image_path = os.path.join(workspace, image_path)
+    resolved = os.path.realpath(image_path)
+    try:
+        common = os.path.commonpath([workspace, resolved])
+    except ValueError as exc:
+        raise ValueError("add_image path escapes the PDF workspace") from exc
+    if common != workspace:
+        raise ValueError("add_image path escapes the PDF workspace")
+    return resolved
+
+
 def emit_ok(payload: dict[str, Any]) -> None:
     print(json.dumps({"ok": True, **payload}, ensure_ascii=False))
 
@@ -252,7 +267,8 @@ def apply_ops(pdf_path: str, ops: list[dict[str, Any]], out_path: str) -> dict[s
                 page.apply_redactions(images=fitz.PDF_REDACT_IMAGE_NONE)
             elif op == "add_image":
                 page = load_page(doc, int(raw["page"]))
-                page.insert_image(as_rect(list(raw["bbox"])), filename=str(raw["path"]))
+                image_path = _resolve_add_image_path(str(raw["path"]), pdf_path)
+                page.insert_image(as_rect(list(raw["bbox"])), filename=image_path)
             elif op == "delete_image":
                 page = load_page(doc, int(raw["page"]))
                 page.delete_image(int(raw["xref"]))

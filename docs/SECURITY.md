@@ -53,7 +53,7 @@ This bundle provides:
 - **Python engine**
   - Argv-only `Process` with `timeout` / `idle_timeout` (defaults 60s / 30s).
   - Never pass unsanitized shell strings.
-  - Residual: when `engine_mode: python`, `add_image.path` can read arbitrary readable files — restrict to workspace-local paths or keep client mode.
+  - Residual: host must authorize workspace IDs (session/owner binding) so clients cannot guess another tenant’s workspace.
 - **XSS / output**
   - Twig escapes config JSON for HTML attributes; prefer `textContent` in legacy JS.
 - **Secrets**
@@ -81,6 +81,6 @@ Before tagging a release, confirm:
 | **Process / engine** | Argv-only Process; timeouts set; Python mode residuals documented. |
 | **Permissions / exposure** | Editor firewall + access checker; `workspace_dir` not web-exposed. |
 | **Limits / DoS** | `max_upload_bytes` on create; host body-size limits for client apply. |
-| **REQ-SEC-004 (AI audit)** | Pass (conditional) — Medium residual (python `add_image` path, client-apply size, workspace IDOR); see monorepo `BUNDLES_SECURITY_ANALYSIS.md` (audit **2026-09-04**). |
+| **REQ-SEC-004 (AI audit)** | Pass (good) — Low after `max_upload_bytes` + relative `add_image`; residual host workspace authz; see monorepo `BUNDLES_SECURITY_ANALYSIS.md` (re-audit **2026-09-28**). |
 
 Record confirmation in the release PR or tag notes.

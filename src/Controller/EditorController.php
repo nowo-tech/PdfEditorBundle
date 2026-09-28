@@ -41,6 +41,7 @@ use function is_string;
 use function json_decode;
 use function sprintf;
 use function str_starts_with;
+use function strlen;
 use function unlink;
 
 use const LOCK_EX;
@@ -204,6 +205,7 @@ final class EditorController
         /** @var list<mixed> $rawOps */
         $rawOps = $payload['ops'];
         $ops    = $this->decoder->decode($rawOps);
+        $ops    = $this->decoder->bindAddImagePathsToWorkspace($ops, $workspace->directory);
         $target = $workspace->directory . '/next.pdf';
         $result = $this->engine->apply($workspace->pdfPath, $ops, $target);
         $this->workspaces->replacePdf($workspace, $target);
@@ -264,6 +266,14 @@ final class EditorController
 
     private function storeClientPdf(Workspace $workspace, string $bytes): JsonResponse
     {
+        $max = $this->profile->maxUploadBytes;
+        if ($max > 0 && strlen($bytes) > $max) {
+            throw new PdfEditorException(sprintf(
+                'PDF exceeds max_upload_bytes (%d).',
+                $max,
+            ));
+        }
+
         if (!str_starts_with($bytes, '%PDF')) {
             throw new PdfEditorException('Uploaded content is not a PDF file.');
         }
