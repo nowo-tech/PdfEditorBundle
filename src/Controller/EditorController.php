@@ -268,10 +268,7 @@ final class EditorController
     {
         $max = $this->profile->maxUploadBytes;
         if ($max > 0 && strlen($bytes) > $max) {
-            throw new PdfEditorException(sprintf(
-                'PDF exceeds max_upload_bytes (%d).',
-                $max,
-            ));
+            throw new PdfEditorException(sprintf('PDF exceeds max_upload_bytes (%d).', $max));
         }
 
         if (!str_starts_with($bytes, '%PDF')) {
