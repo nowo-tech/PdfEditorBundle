@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.5] - 2026-10-09
+
+### Dependencies
+
+- Bundle lockfile: Symfony 7.4.20, `twig/twig` 3.30.0; dev `phpstan/phpstan` 2.3.1, `phpstan/phpstan-symfony` 2.1.0, `nowo-tech/phpstan-frankenphp` 1.2.3, `rector/rector` 2.7.0, `friendsofphp/php-cs-fixer` 3.95.27 (style pass on `EditorController`).
+- Demo (`demo/symfony8`): Symfony 8.1.8, `twig/twig` 3.30.0; regenerated `config/reference.php`.
+
 ## [1.0.4] - 2026-09-28
 
 ### Security
@@ -24,6 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Worker safety (Igor):** justified `// @igor-ignore` annotations and/or `ResetInterface` / request-scoped fixes so `make igor` passes on package `src/`.
 
+[1.0.5]: https://github.com/nowo-tech/PdfEditorBundle/releases/tag/v1.0.5
 [1.0.4]: https://github.com/nowo-tech/PdfEditorBundle/releases/tag/v1.0.4
 [1.0.3]: https://github.com/nowo-tech/PdfEditorBundle/releases/tag/v1.0.3
 

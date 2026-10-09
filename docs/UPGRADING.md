@@ -3,6 +3,16 @@
 
 ## Unreleased
 
+## To 1.0.5
+
+From **1.0.4** — dependency updates only.
+
+```bash
+composer update nowo-tech/pdf-editor-bundle
+```
+
+No breaking changes. **No application upgrade steps.**
+
 ## To 1.0.4
 
 From **1.0.3** — upload size + workspace-bound images.
@@ -28,6 +38,7 @@ php bin/console cache:clear
 
 ## Table of contents
 
+- [To 1.0.5](#to-105)
 - [From 1.0.1 to 1.0.2](#from-101-to-102)
 - [From 1.0.0 to 1.0.1](#from-100-to-101)
 - [From nothing → 1.0.0](#from-nothing--100)
