@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## To 1.2.0
+
+From **1.1.0** — workspace purge command, unused profiles deprecated, full test coverage.
+
+```bash
+composer update nowo-tech/pdf-editor-bundle
+```
+
 - **Single profile:** only `default_profile` is used. If your config defines more than one entry under `nowo_pdf_editor.profiles`, remove the unused ones (they never had an effect and now trigger a deprecation).
 - **Workspace cleanup:** schedule `php bin/console nowo:pdf-editor:purge --older-than=24h` (cron or Symfony Scheduler). Existing workspaces older than the given age are deleted the first time it runs; try `--dry-run` first.
 
@@ -53,6 +61,7 @@ php bin/console cache:clear
 
 ## Table of contents
 
+- [To 1.2.0](#to-120)
 - [To 1.1.0](#to-110)
 - [To 1.0.5](#to-105)
 - [From 1.0.1 to 1.0.2](#from-101-to-102)

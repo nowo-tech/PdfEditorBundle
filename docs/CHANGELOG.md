@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-10-13
+
 ### Added
 
 - `nowo:pdf-editor:purge --older-than=<age> [--dry-run]` deletes workspaces not modified for the given age (default 24h; seconds or `s`/`m`/`h`/`d`/`w`), so abandoned uploads no longer pile up in `workspace_dir`. Backed by `WorkspaceManager::purgeOlderThan()`.
@@ -67,6 +69,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Worker safety (Igor):** justified `// @igor-ignore` annotations and/or `ResetInterface` / request-scoped fixes so `make igor` passes on package `src/`.
 
+[1.2.0]: https://github.com/nowo-tech/PdfEditorBundle/releases/tag/v1.2.0
 [1.1.0]: https://github.com/nowo-tech/PdfEditorBundle/releases/tag/v1.1.0
 [1.0.5]: https://github.com/nowo-tech/PdfEditorBundle/releases/tag/v1.0.5
 [1.0.4]: https://github.com/nowo-tech/PdfEditorBundle/releases/tag/v1.0.4
