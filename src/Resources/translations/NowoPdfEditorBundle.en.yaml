@@ -9,11 +9,97 @@ pdf_editor.tool.text: Text
 pdf_editor.tool.form: Form field
 pdf_editor.tool.watermark: Watermark
 pdf_editor.tool.annotate: Note
+pdf_editor.tool.select_tip: Select text boxes and fields to move, resize or delete them. Double-click native PDF text to select the line; hold Shift to drag.
+pdf_editor.tool.text_tip: Click on the page to insert new text.
+pdf_editor.tool.form_tip: Click on the page to add an AcroForm text field.
+pdf_editor.tool.watermark_tip: Add a diagonal watermark to every page.
+pdf_editor.tool.annotate_tip: Click on the page to add a sticky note.
+pdf_editor.toolbar.tools: Editing tools
+pdf_editor.toolbar.actions: Document actions
 pdf_editor.action.remove_watermarks: Remove watermarks
+pdf_editor.action.remove_watermarks_tip: Queue removal of detected watermarks.
 pdf_editor.action.rotate: Rotate page
+pdf_editor.action.delete_selection: Delete object
+pdf_editor.action.delete_selection_tip: Delete the selected text box, note or field (Del).
+pdf_editor.action.delete_selection_empty: Select text or an object on the page (Select tool).
+pdf_editor.action.delete_selection_failed: Could not delete — click it again with the Select tool.
+pdf_editor.pending.text_deleted: Text deletion queued — save to PDF to apply.
+pdf_editor.pending.text_redacted: Text marked for removal — save to PDF to apply.
+pdf_editor.pending.text_replaced: Text replacement queued — save to PDF to apply.
+pdf_editor.pending.watermarks_removed: Watermark removal queued — save to PDF to apply.
+pdf_editor.draft.op.delete_text: Delete text on page %page%
+pdf_editor.draft.op.redact_text: Redact text on page %page%
+pdf_editor.properties.delete_text: Delete selected text
+pdf_editor.properties.replace_text: Replace text
+pdf_editor.properties.native_text_help: Native PDF text — edit it below and replace it. The old text is redacted; the new text is added when you save.
+pdf_editor.properties.native_text_replace_hint: Double-click a line of native PDF text, or hold Shift while dragging to select an area.
+pdf_editor.properties.kind.note: Sticky note
+pdf_editor.action.delete_page: Delete page
+pdf_editor.action.insert_page: Insert blank
+pdf_editor.action.duplicate_page: Duplicate page
+pdf_editor.action.delete_page_tip: Delete the current page (applied when you save).
+pdf_editor.action.insert_page_tip: Insert a blank page after the current one.
+pdf_editor.action.duplicate_page_tip: Duplicate the current page.
+pdf_editor.action.delete_page_last: The only page cannot be deleted.
+pdf_editor.scenario.back: All scenarios
+pdf_editor.toolbar.pages: Page actions
+pdf_editor.draft.op.delete_page: Delete page %page%
+pdf_editor.draft.op.insert_blank_page: Insert blank page after page %page%
+pdf_editor.draft.op.duplicate_page: Duplicate page %page%
+pdf_editor.action.rotate_tip: Rotate the current page 90° clockwise (applied when you save).
+pdf_editor.action.commit: Save to PDF
+pdf_editor.action.commit_tip: Apply all draft changes and save the PDF.
+pdf_editor.action.discard: Discard draft
+pdf_editor.action.discard_tip: Clear pending changes without saving.
 pdf_editor.action.download: Download
+pdf_editor.action.download_tip: Download the current PDF file.
+pdf_editor.loading: Loading PDF preview…
+pdf_editor.load_error: The preview could not be loaded. Check that the Python engine is running.
+pdf_editor.engine.client: Client engine (embedpdf + pdf-lib)
+pdf_editor.tool.redact: Redact
+pdf_editor.tool.redact_tip: Mark content for redaction in the viewer (embedpdf).
 pdf_editor.pages: Pages
+pdf_editor.pages.thumb: Page %page%
+pdf_editor.pages.of: Page %current% of %total%
+pdf_editor.pages.prev: Previous page
+pdf_editor.pages.next: Next page
+pdf_editor.pages.nav: Page navigation
+pdf_editor.pages.current: Page %page%
+pdf_editor.pending.empty: No pending changes.
+pdf_editor.pending.remove: Remove from draft
+pdf_editor.draft.op.insert_text: Insert text on page %page%
+pdf_editor.draft.op.add_watermark: Add CONFIDENTIAL watermark
+pdf_editor.draft.op.rotate_page: Rotate page %page% clockwise
+pdf_editor.draft.op.remove_watermarks: Remove detected watermarks
+pdf_editor.draft.op.remove_xobject: Remove object from page %page%
+pdf_editor.draft.op.add_acroform_field: Add form field on page %page%
 pdf_editor.properties: Properties
-pdf_editor.properties.empty: Select a text box on the page.
+pdf_editor.properties.empty: Select text on the page or choose the Text tool.
 pdf_editor.properties.text: Text
-pdf_editor.properties.apply: Apply change
+pdf_editor.properties.font_size: Font size
+pdf_editor.properties.page: Page %page%
+pdf_editor.properties.apply: Add to draft
+pdf_editor.properties.apply_live: Apply
+pdf_editor.properties.delete: Delete
+pdf_editor.properties.applied: Applied
+pdf_editor.properties.deleted: Deleted
+pdf_editor.properties.font_color: Color
+pdf_editor.properties.font_family: Font
+pdf_editor.properties.field_name: Field name
+pdf_editor.properties.value: Value
+pdf_editor.properties.kind.form: Form field
+pdf_editor.properties.kind.textbox: Text box
+pdf_editor.properties.live_help: Changes apply in the viewer. Save to PDF to keep them.
+pdf_editor.properties.draft_insert_help: Queues a pdf-lib text stamp when you save.
+pdf_editor.properties.empty_select: Use Select to click a text box or form field. Drag the handles to move and resize.
+pdf_editor.zoom.in: Zoom in
+pdf_editor.zoom.out: Zoom out
+pdf_editor.zoom.fit: Fit page to view
+pdf_editor.zoom.fit_short: Fit
+pdf_editor.viewport.page: Document page %current% of %total%
+pdf_editor.viewport.zoom: Zoom
+pdf_editor.save.error: The PDF could not be saved. Please try again.
+pdf_editor.pending.title: Draft
+pdf_editor.pending.help: Changes stay in your browser until you save. Symfony then stores the updated PDF on the server.
+pdf_editor.pending.queued: Added to draft
+pdf_editor.pending.saved: Saved to PDF

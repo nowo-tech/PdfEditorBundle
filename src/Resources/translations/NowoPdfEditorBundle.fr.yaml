@@ -19,6 +19,33 @@ pdf_editor.toolbar.actions: Actions sur le document
 pdf_editor.action.remove_watermarks: Supprimer les filigranes
 pdf_editor.action.remove_watermarks_tip: Met en file d’attente la suppression des filigranes détectés.
 pdf_editor.action.rotate: Pivoter la page
+pdf_editor.action.delete_selection: "Supprimer l'objet"
+pdf_editor.action.delete_selection_tip: Supprime la zone de texte, la note ou le champ sélectionné (Suppr).
+pdf_editor.action.delete_selection_empty: Sélectionnez du texte ou un objet sur la page (outil Sélectionner).
+pdf_editor.action.delete_selection_failed: "Suppression impossible — cliquez à nouveau avec l'outil Sélectionner."
+pdf_editor.pending.text_deleted: Suppression de texte en file — enregistrez dans le PDF pour appliquer.
+pdf_editor.pending.text_redacted: Texte marqué pour suppression — enregistrez dans le PDF pour appliquer.
+pdf_editor.pending.text_replaced: Remplacement de texte en file — enregistrez dans le PDF pour appliquer.
+pdf_editor.pending.watermarks_removed: Suppression des filigranes en file — enregistrez dans le PDF pour appliquer.
+pdf_editor.draft.op.delete_text: Supprimer du texte page %page%
+pdf_editor.draft.op.redact_text: Caviarder du texte page %page%
+pdf_editor.properties.delete_text: Supprimer le texte sélectionné
+pdf_editor.properties.replace_text: Remplacer le texte
+pdf_editor.properties.native_text_help: "Texte natif du PDF — modifiez-le ci-dessous et remplacez-le. L'ancien texte est caviardé ; le nouveau est ajouté à l'enregistrement."
+pdf_editor.properties.native_text_replace_hint: Double-cliquez sur une ligne de texte natif du PDF, ou maintenez Maj en faisant glisser pour sélectionner une zone.
+pdf_editor.properties.kind.note: Note adhésive
+pdf_editor.action.delete_page: Supprimer la page
+pdf_editor.action.insert_page: Insérer une page vierge
+pdf_editor.action.duplicate_page: Dupliquer la page
+pdf_editor.action.delete_page_tip: "Supprime la page actuelle (appliqué à l'enregistrement)."
+pdf_editor.action.insert_page_tip: Insère une page vierge après la page actuelle.
+pdf_editor.action.duplicate_page_tip: Duplique la page actuelle.
+pdf_editor.action.delete_page_last: "Impossible de supprimer l'unique page."
+pdf_editor.scenario.back: Tous les scénarios
+pdf_editor.toolbar.pages: Actions sur les pages
+pdf_editor.draft.op.delete_page: Supprimer la page %page%
+pdf_editor.draft.op.insert_blank_page: Insérer une page vierge après la page %page%
+pdf_editor.draft.op.duplicate_page: Dupliquer la page %page%
 pdf_editor.action.rotate_tip: Pivoter la page courante de 90° (enregistré à la validation).
 pdf_editor.action.commit: Enregistrer dans le PDF
 pdf_editor.action.commit_tip: Applique toutes les modifications du brouillon et enregistre le PDF.
@@ -31,6 +58,12 @@ pdf_editor.load_error: Impossible de charger l’aperçu. Vérifiez que le moteu
 pdf_editor.engine.client: Moteur client (embedpdf + pdf-lib)
 pdf_editor.tool.redact: Caviarder
 pdf_editor.tool.redact_tip: Marquer du contenu à caviarder dans le visualiseur (embedpdf).
+pdf_editor.pages: Pages
+pdf_editor.pages.thumb: Page %page%
+pdf_editor.pages.of: Page %current% sur %total%
+pdf_editor.pages.prev: Page précédente
+pdf_editor.pages.next: Page suivante
+pdf_editor.pages.nav: Navigation des pages
 pdf_editor.pages.current: Page %page%
 pdf_editor.pending.empty: Aucune modification en attente.
 pdf_editor.pending.remove: Retirer du brouillon
@@ -40,12 +73,6 @@ pdf_editor.draft.op.rotate_page: Pivoter la page %page% dans le sens horaire
 pdf_editor.draft.op.remove_watermarks: Supprimer les filigranes détectés
 pdf_editor.draft.op.remove_xobject: Supprimer l’objet de la page %page%
 pdf_editor.draft.op.add_acroform_field: Ajouter un champ de formulaire à la page %page%
-pdf_editor.pages: Pages
-pdf_editor.pages.thumb: Page %page%
-pdf_editor.pages.of: Page %current% sur %total%
-pdf_editor.pages.prev: Page précédente
-pdf_editor.pages.next: Page suivante
-pdf_editor.pages.nav: Navigation des pages
 pdf_editor.properties: Propriétés
 pdf_editor.properties.empty: Sélectionnez du texte ou choisissez l’outil Texte.
 pdf_editor.properties.text: Texte
@@ -65,6 +92,12 @@ pdf_editor.properties.kind.textbox: Zone de texte
 pdf_editor.properties.live_help: Les changements s’appliquent dans le visualiseur. Enregistrez dans le PDF pour les conserver.
 pdf_editor.properties.draft_insert_help: Met en file un tampon texte pdf-lib à l’enregistrement.
 pdf_editor.properties.empty_select: Utilisez Sélectionner pour cliquer une zone de texte ou un champ. Poignées pour déplacer et redimensionner.
+pdf_editor.zoom.in: Zoom avant
+pdf_editor.zoom.out: Zoom arrière
+pdf_editor.zoom.fit: Ajuster la page à la vue
+pdf_editor.zoom.fit_short: Ajuster
+pdf_editor.viewport.page: Page du document %current% sur %total%
+pdf_editor.viewport.zoom: Zoom
 pdf_editor.save.error: Impossible d’enregistrer le PDF. Réessayez.
 pdf_editor.pending.title: Brouillon
 pdf_editor.pending.help: Les modifications restent dans le navigateur jusqu’à l’enregistrement. Symfony envoie alors le lot au moteur Python.

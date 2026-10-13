@@ -19,6 +19,33 @@ pdf_editor.toolbar.actions: Documentacties
 pdf_editor.action.remove_watermarks: Watermerken verwijderen
 pdf_editor.action.remove_watermarks_tip: Zet verwijdering van gedetecteerde watermerken in de wachtrij.
 pdf_editor.action.rotate: Pagina draaien
+pdf_editor.action.delete_selection: Object verwijderen
+pdf_editor.action.delete_selection_tip: Verwijdert het geselecteerde tekstvak, de notitie of het veld (Del).
+pdf_editor.action.delete_selection_empty: Selecteer tekst of een object op de pagina (gereedschap Selecteren).
+pdf_editor.action.delete_selection_failed: Verwijderen mislukt — klik opnieuw met Selecteren.
+pdf_editor.pending.text_deleted: Tekstverwijdering in wachtrij — sla op in PDF om toe te passen.
+pdf_editor.pending.text_redacted: Tekst gemarkeerd voor verwijdering — sla op in PDF om toe te passen.
+pdf_editor.pending.text_replaced: Tekstvervanging in wachtrij — sla op in PDF om toe te passen.
+pdf_editor.pending.watermarks_removed: Verwijdering van watermerken in wachtrij — sla op in PDF om toe te passen.
+pdf_editor.draft.op.delete_text: Tekst op pagina %page% verwijderen
+pdf_editor.draft.op.redact_text: Tekst op pagina %page% onleesbaar maken
+pdf_editor.properties.delete_text: Geselecteerde tekst verwijderen
+pdf_editor.properties.replace_text: Tekst vervangen
+pdf_editor.properties.native_text_help: Eigen PDF-tekst — bewerk hieronder en vervang. De oude tekst wordt onleesbaar gemaakt; de nieuwe wordt bij opslaan toegevoegd.
+pdf_editor.properties.native_text_replace_hint: Dubbelklik op een regel eigen PDF-tekst, of houd Shift ingedrukt tijdens het slepen om een gebied te selecteren.
+pdf_editor.properties.kind.note: Plaknotitie
+pdf_editor.action.delete_page: Pagina verwijderen
+pdf_editor.action.insert_page: Lege pagina invoegen
+pdf_editor.action.duplicate_page: Pagina dupliceren
+pdf_editor.action.delete_page_tip: Verwijdert de huidige pagina (toegepast bij opslaan).
+pdf_editor.action.insert_page_tip: Voegt een lege pagina in na de huidige.
+pdf_editor.action.duplicate_page_tip: Dupliceert de huidige pagina.
+pdf_editor.action.delete_page_last: De enige pagina kan niet worden verwijderd.
+pdf_editor.scenario.back: "Alle scenario's"
+pdf_editor.toolbar.pages: Pagina-acties
+pdf_editor.draft.op.delete_page: Pagina %page% verwijderen
+pdf_editor.draft.op.insert_blank_page: Lege pagina invoegen na pagina %page%
+pdf_editor.draft.op.duplicate_page: Pagina %page% dupliceren
 pdf_editor.action.rotate_tip: Draai de huidige pagina 90° met de klok mee (opgeslagen bij bevestigen).
 pdf_editor.action.commit: Opslaan in PDF
 pdf_editor.action.commit_tip: Pas alle conceptwijzigingen toe en sla het PDF op.
@@ -31,6 +58,12 @@ pdf_editor.load_error: Kon het PDF-voorbeeld niet laden. Controleer of de Python
 pdf_editor.engine.client: Client-engine (embedpdf + pdf-lib)
 pdf_editor.tool.redact: Redigeren
 pdf_editor.tool.redact_tip: Markeer inhoud voor redactie in de viewer (embedpdf).
+pdf_editor.pages: Pagina’s
+pdf_editor.pages.thumb: Pagina %page%
+pdf_editor.pages.of: Pagina %current% van %total%
+pdf_editor.pages.prev: Vorige pagina
+pdf_editor.pages.next: Volgende pagina
+pdf_editor.pages.nav: Paginanavigatie
 pdf_editor.pages.current: Pagina %page%
 pdf_editor.pending.empty: Geen openstaande wijzigingen.
 pdf_editor.pending.remove: Verwijderen uit concept
@@ -40,12 +73,6 @@ pdf_editor.draft.op.rotate_page: Pagina %page% met de klok mee draaien
 pdf_editor.draft.op.remove_watermarks: Gedetecteerde watermerken verwijderen
 pdf_editor.draft.op.remove_xobject: Pagina-object op pagina %page% verwijderen
 pdf_editor.draft.op.add_acroform_field: Formulierveld toevoegen op pagina %page%
-pdf_editor.pages: Pagina’s
-pdf_editor.pages.thumb: Pagina %page%
-pdf_editor.pages.of: Pagina %current% van %total%
-pdf_editor.pages.prev: Vorige pagina
-pdf_editor.pages.next: Volgende pagina
-pdf_editor.pages.nav: Paginanavigatie
 pdf_editor.properties: Eigenschappen
 pdf_editor.properties.empty: Selecteer tekst op de pagina of kies het Tekst-gereedschap.
 pdf_editor.properties.text: Tekst
@@ -65,6 +92,12 @@ pdf_editor.properties.kind.textbox: Tekstvak
 pdf_editor.properties.live_help: Wijzigingen gelden in de viewer. Sla op in PDF om te bewaren.
 pdf_editor.properties.draft_insert_help: Zet een pdf-lib tekststempel in de wachtrij bij opslaan.
 pdf_editor.properties.empty_select: Gebruik Selecteren om een tekstvak of formulierveld te klikken. Sleep handvatten om te verplaatsen en schalen.
+pdf_editor.zoom.in: Inzoomen
+pdf_editor.zoom.out: Uitzoomen
+pdf_editor.zoom.fit: Pagina aan weergave aanpassen
+pdf_editor.zoom.fit_short: Aanpassen
+pdf_editor.viewport.page: Documentpagina %current% van %total%
+pdf_editor.viewport.zoom: Zoom
 pdf_editor.save.error: Kon het PDF niet opslaan. Probeer opnieuw.
 pdf_editor.pending.title: Concept
 pdf_editor.pending.help: Wijzigingen blijven in de browser tot u opslaat. Daarna stuurt Symfony de batch naar de Python-engine.

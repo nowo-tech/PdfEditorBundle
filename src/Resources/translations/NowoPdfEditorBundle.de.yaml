@@ -19,6 +19,33 @@ pdf_editor.toolbar.actions: Dokumentaktionen
 pdf_editor.action.remove_watermarks: Wasserzeichen entfernen
 pdf_editor.action.remove_watermarks_tip: Entfernung erkannter Wasserzeichen in die Warteschlange stellen.
 pdf_editor.action.rotate: Seite drehen
+pdf_editor.action.delete_selection: Objekt löschen
+pdf_editor.action.delete_selection_tip: Ausgewähltes Textfeld, Notiz oder Feld löschen (Entf).
+pdf_editor.action.delete_selection_empty: Text oder ein Objekt auf der Seite auswählen (Werkzeug „Auswählen“).
+pdf_editor.action.delete_selection_failed: Löschen fehlgeschlagen — erneut mit „Auswählen“ anklicken.
+pdf_editor.pending.text_deleted: Textlöschung eingereiht — zum Anwenden in PDF speichern.
+pdf_editor.pending.text_redacted: Text zum Entfernen markiert — zum Anwenden in PDF speichern.
+pdf_editor.pending.text_replaced: Textersetzung eingereiht — zum Anwenden in PDF speichern.
+pdf_editor.pending.watermarks_removed: Wasserzeichenentfernung eingereiht — zum Anwenden in PDF speichern.
+pdf_editor.draft.op.delete_text: Text auf Seite %page% löschen
+pdf_editor.draft.op.redact_text: Text auf Seite %page% schwärzen
+pdf_editor.properties.delete_text: Ausgewählten Text löschen
+pdf_editor.properties.replace_text: Text ersetzen
+pdf_editor.properties.native_text_help: Nativer PDF-Text — unten bearbeiten und ersetzen. Der alte Text wird geschwärzt, der neue beim Speichern hinzugefügt.
+pdf_editor.properties.native_text_replace_hint: Doppelklick auf eine Zeile nativen PDF-Texts oder beim Ziehen Umschalt gedrückt halten, um einen Bereich auszuwählen.
+pdf_editor.properties.kind.note: Haftnotiz
+pdf_editor.action.delete_page: Seite löschen
+pdf_editor.action.insert_page: Leere Seite einfügen
+pdf_editor.action.duplicate_page: Seite duplizieren
+pdf_editor.action.delete_page_tip: Aktuelle Seite löschen (beim Speichern übernommen).
+pdf_editor.action.insert_page_tip: Leere Seite nach der aktuellen Seite einfügen.
+pdf_editor.action.duplicate_page_tip: Aktuelle Seite duplizieren.
+pdf_editor.action.delete_page_last: Die einzige Seite kann nicht gelöscht werden.
+pdf_editor.scenario.back: Alle Szenarien
+pdf_editor.toolbar.pages: Seitenaktionen
+pdf_editor.draft.op.delete_page: Seite %page% löschen
+pdf_editor.draft.op.insert_blank_page: Leere Seite nach Seite %page% einfügen
+pdf_editor.draft.op.duplicate_page: Seite %page% duplizieren
 pdf_editor.action.rotate_tip: Aktuelle Seite um 90° im Uhrzeigersinn drehen (beim Speichern übernommen).
 pdf_editor.action.commit: In PDF speichern
 pdf_editor.action.commit_tip: Alle Entwurfsänderungen anwenden und das PDF speichern.
@@ -31,6 +58,12 @@ pdf_editor.load_error: PDF-Vorschau konnte nicht geladen werden. Prüfen Sie, ob
 pdf_editor.engine.client: Client-Engine (embedpdf + pdf-lib)
 pdf_editor.tool.redact: Schwärzen
 pdf_editor.tool.redact_tip: Inhalte im Viewer zum Schwärzen markieren (embedpdf).
+pdf_editor.pages: Seiten
+pdf_editor.pages.thumb: Seite %page%
+pdf_editor.pages.of: Seite %current% von %total%
+pdf_editor.pages.prev: Vorherige Seite
+pdf_editor.pages.next: Nächste Seite
+pdf_editor.pages.nav: Seitennavigation
 pdf_editor.pages.current: Seite %page%
 pdf_editor.pending.empty: Keine ausstehenden Änderungen.
 pdf_editor.pending.remove: Aus Entwurf entfernen
@@ -40,12 +73,6 @@ pdf_editor.draft.op.rotate_page: Seite %page% im Uhrzeigersinn drehen
 pdf_editor.draft.op.remove_watermarks: Erkannte Wasserzeichen entfernen
 pdf_editor.draft.op.remove_xobject: Seitenobjekt auf Seite %page% entfernen
 pdf_editor.draft.op.add_acroform_field: Formularfeld auf Seite %page% hinzufügen
-pdf_editor.pages: Seiten
-pdf_editor.pages.thumb: Seite %page%
-pdf_editor.pages.of: Seite %current% von %total%
-pdf_editor.pages.prev: Vorherige Seite
-pdf_editor.pages.next: Nächste Seite
-pdf_editor.pages.nav: Seitennavigation
 pdf_editor.properties: Eigenschaften
 pdf_editor.properties.empty: Text auf der Seite auswählen oder das Text-Werkzeug wählen.
 pdf_editor.properties.text: Text
@@ -65,6 +92,12 @@ pdf_editor.properties.kind.textbox: Textfeld
 pdf_editor.properties.live_help: Änderungen gelten im Viewer. Zum Speichern „In PDF speichern“ wählen.
 pdf_editor.properties.draft_insert_help: Textstempel per pdf-lib beim Speichern einreihen.
 pdf_editor.properties.empty_select: Mit „Auswählen“ Textfeld oder Formularfeld anklicken. Anfasser zum Verschieben und Skalieren.
+pdf_editor.zoom.in: Vergrößern
+pdf_editor.zoom.out: Verkleinern
+pdf_editor.zoom.fit: Seite an Ansicht anpassen
+pdf_editor.zoom.fit_short: Anpassen
+pdf_editor.viewport.page: Dokumentseite %current% von %total%
+pdf_editor.viewport.zoom: Zoom
 pdf_editor.save.error: PDF konnte nicht gespeichert werden. Bitte erneut versuchen.
 pdf_editor.pending.title: Entwurf
 pdf_editor.pending.help: Änderungen bleiben im Browser, bis Sie speichern. Dann sendet Symfony den Stapel an die Python-Engine.

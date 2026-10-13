@@ -19,6 +19,33 @@ pdf_editor.toolbar.actions: Ações do documento
 pdf_editor.action.remove_watermarks: Remover marcas de água
 pdf_editor.action.remove_watermarks_tip: Enfileira a remoção de marcas de água detetadas.
 pdf_editor.action.rotate: Rodar página
+pdf_editor.action.delete_selection: Eliminar objeto
+pdf_editor.action.delete_selection_tip: Elimina a caixa de texto, nota ou campo selecionado (Del).
+pdf_editor.action.delete_selection_empty: Selecione texto ou um objeto na página (ferramenta Selecionar).
+pdf_editor.action.delete_selection_failed: Não foi possível eliminar — clique novamente com Selecionar.
+pdf_editor.pending.text_deleted: Eliminação de texto em fila — guarde no PDF para aplicar.
+pdf_editor.pending.text_redacted: Texto marcado para remoção — guarde no PDF para aplicar.
+pdf_editor.pending.text_replaced: Substituição de texto em fila — guarde no PDF para aplicar.
+pdf_editor.pending.watermarks_removed: "Remoção de marcas d'água em fila — guarde no PDF para aplicar."
+pdf_editor.draft.op.delete_text: Eliminar texto na página %page%
+pdf_editor.draft.op.redact_text: Ocultar texto na página %page%
+pdf_editor.properties.delete_text: Eliminar texto selecionado
+pdf_editor.properties.replace_text: Substituir texto
+pdf_editor.properties.native_text_help: Texto nativo do PDF — edite-o abaixo e substitua-o. O texto antigo é ocultado; o novo é adicionado ao guardar.
+pdf_editor.properties.native_text_replace_hint: Faça duplo clique numa linha de texto nativo do PDF, ou mantenha Shift premido ao arrastar para selecionar uma área.
+pdf_editor.properties.kind.note: Nota adesiva
+pdf_editor.action.delete_page: Eliminar página
+pdf_editor.action.insert_page: Inserir página em branco
+pdf_editor.action.duplicate_page: Duplicar página
+pdf_editor.action.delete_page_tip: Elimina a página atual (aplicado ao guardar).
+pdf_editor.action.insert_page_tip: Insere uma página em branco após a atual.
+pdf_editor.action.duplicate_page_tip: Duplica a página atual.
+pdf_editor.action.delete_page_last: Não é possível eliminar a única página.
+pdf_editor.scenario.back: Todos os cenários
+pdf_editor.toolbar.pages: Ações de página
+pdf_editor.draft.op.delete_page: Eliminar página %page%
+pdf_editor.draft.op.insert_blank_page: Inserir página em branco após a página %page%
+pdf_editor.draft.op.duplicate_page: Duplicar página %page%
 pdf_editor.action.rotate_tip: Roda a página atual 90° no sentido horário (guardado ao confirmar).
 pdf_editor.action.commit: Guardar no PDF
 pdf_editor.action.commit_tip: Aplica todas as alterações do rascunho e guarda o PDF.
@@ -31,6 +58,12 @@ pdf_editor.load_error: Não foi possível carregar a pré-visualização. Verifi
 pdf_editor.engine.client: Motor cliente (embedpdf + pdf-lib)
 pdf_editor.tool.redact: Redigir
 pdf_editor.tool.redact_tip: Marque conteúdo para redação no visualizador (embedpdf).
+pdf_editor.pages: Páginas
+pdf_editor.pages.thumb: Página %page%
+pdf_editor.pages.of: Página %current% de %total%
+pdf_editor.pages.prev: Página anterior
+pdf_editor.pages.next: Página seguinte
+pdf_editor.pages.nav: Navegação de páginas
 pdf_editor.pages.current: Página %page%
 pdf_editor.pending.empty: Sem alterações pendentes.
 pdf_editor.pending.remove: Remover do rascunho
@@ -40,12 +73,6 @@ pdf_editor.draft.op.rotate_page: Rodar a página %page% no sentido horário
 pdf_editor.draft.op.remove_watermarks: Remover marcas de água detetadas
 pdf_editor.draft.op.remove_xobject: Remover objeto da página %page%
 pdf_editor.draft.op.add_acroform_field: Adicionar campo de formulário na página %page%
-pdf_editor.pages: Páginas
-pdf_editor.pages.thumb: Página %page%
-pdf_editor.pages.of: Página %current% de %total%
-pdf_editor.pages.prev: Página anterior
-pdf_editor.pages.next: Página seguinte
-pdf_editor.pages.nav: Navegação de páginas
 pdf_editor.properties: Propriedades
 pdf_editor.properties.empty: Selecione texto na página ou escolha a ferramenta Texto.
 pdf_editor.properties.text: Texto
@@ -65,6 +92,12 @@ pdf_editor.properties.kind.textbox: Caixa de texto
 pdf_editor.properties.live_help: As alterações aplicam-se no visualizador. Guarde no PDF para persistir.
 pdf_editor.properties.draft_insert_help: Enfileira um carimbo de texto pdf-lib ao guardar.
 pdf_editor.properties.empty_select: Use Selecionar para clicar numa caixa de texto ou campo. Arraste as alças para mover e redimensionar.
+pdf_editor.zoom.in: Ampliar
+pdf_editor.zoom.out: Reduzir
+pdf_editor.zoom.fit: Ajustar página à vista
+pdf_editor.zoom.fit_short: Ajustar
+pdf_editor.viewport.page: Página do documento %current% de %total%
+pdf_editor.viewport.zoom: Zoom
 pdf_editor.save.error: Não foi possível guardar o PDF. Tente novamente.
 pdf_editor.pending.title: Rascunho
 pdf_editor.pending.help: As alterações ficam no navegador até guardar. Depois o Symfony envia o lote ao motor Python.
