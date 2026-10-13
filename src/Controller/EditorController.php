@@ -9,6 +9,7 @@ use Nowo\PdfEditorBundle\Document\Workspace;
 use Nowo\PdfEditorBundle\Document\WorkspaceManager;
 use Nowo\PdfEditorBundle\Engine\PdfEngineInterface;
 use Nowo\PdfEditorBundle\Exception\AccessDeniedException;
+use Nowo\PdfEditorBundle\Exception\DocumentException;
 use Nowo\PdfEditorBundle\Exception\PdfEditorException;
 use Nowo\PdfEditorBundle\Form\EditorTextType;
 use Nowo\PdfEditorBundle\Form\PdfUploadType;
@@ -22,6 +23,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Csrf\CsrfToken;
@@ -87,7 +89,7 @@ final class EditorController
     public function workspace(string $id): Response
     {
         $this->assertAccess();
-        $workspace = $this->workspaces->get($id);
+        $workspace = $this->ownedWorkspace($id);
 
         $textForm = $this->formFactory->create(EditorTextType::class);
 
@@ -101,7 +103,7 @@ final class EditorController
     public function inspect(string $id): JsonResponse
     {
         $this->assertAccess();
-        $workspace = $this->workspaces->get($id);
+        $workspace = $this->ownedWorkspace($id);
 
         if ($this->profile->engineMode === 'client') {
             return new JsonResponse([
@@ -117,7 +119,7 @@ final class EditorController
     public function pageImage(string $id, int $page): BinaryFileResponse
     {
         $this->assertAccess();
-        $workspace = $this->workspaces->get($id);
+        $workspace = $this->ownedWorkspace($id);
         if ($page < 1) {
             throw new PdfEditorException('Page number must be 1 or greater.');
         }
@@ -178,7 +180,7 @@ final class EditorController
         if (!$this->csrfTokenManager->isTokenValid(new CsrfToken('pdf_editor', $csrf))) {
             throw AccessDeniedException::workspace();
         }
-        $workspace   = $this->workspaces->get($id);
+        $workspace   = $this->ownedWorkspace($id);
         $contentType = strtolower((string) $request->headers->get('Content-Type', ''));
 
         if (str_starts_with($contentType, 'application/pdf')) {
@@ -217,9 +219,13 @@ final class EditorController
     public function view(string $id): BinaryFileResponse
     {
         $this->assertAccess();
-        $workspace = $this->workspaces->get($id);
+        $workspace = $this->ownedWorkspace($id);
         $response  = new BinaryFileResponse($workspace->pdfPath);
         $response->headers->set('Content-Type', 'application/pdf');
+        // Served inline from the app origin: never sniff, and sandbox it so a crafted PDF/HTML polyglot
+        // opened directly cannot run script with the application's origin.
+        $response->headers->set('X-Content-Type-Options', 'nosniff');
+        $response->headers->set('Content-Security-Policy', 'sandbox');
         $response->setContentDisposition(ResponseHeaderBag::DISPOSITION_INLINE, $workspace->originalName);
 
         return $response;
@@ -228,11 +234,24 @@ final class EditorController
     public function download(string $id): BinaryFileResponse
     {
         $this->assertAccess();
-        $workspace = $this->workspaces->get($id);
+        $workspace = $this->ownedWorkspace($id);
         $response  = new BinaryFileResponse($workspace->pdfPath);
+        $response->headers->set('X-Content-Type-Options', 'nosniff');
         $response->setContentDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $workspace->originalName);
 
         return $response;
+    }
+
+    /**
+     * Unknown ids and workspaces owned by another user / session are both a plain 404 (no existence oracle).
+     */
+    private function ownedWorkspace(string $id): Workspace
+    {
+        try {
+            return $this->workspaces->get($id);
+        } catch (DocumentException $e) {
+            throw new NotFoundHttpException('PDF workspace not found.', $e);
+        }
     }
 
     private function assertAccess(): void

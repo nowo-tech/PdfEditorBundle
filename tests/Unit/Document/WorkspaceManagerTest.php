@@ -8,11 +8,13 @@ use Nowo\PdfEditorBundle\Config\EditorProfile;
 use Nowo\PdfEditorBundle\Document\Workspace;
 use Nowo\PdfEditorBundle\Document\WorkspaceManager;
 use Nowo\PdfEditorBundle\Exception\DocumentException;
+use Nowo\PdfEditorBundle\Security\WorkspaceOwnerResolverInterface;
 use Nowo\PdfEditorBundle\Tests\ProfileFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
+use const GLOB_ONLYDIR;
 use const UPLOAD_ERR_INI_SIZE;
 
 #[CoversClass(WorkspaceManager::class)]
@@ -113,6 +115,92 @@ final class WorkspaceManagerTest extends TestCase
         );
     }
 
+    public function testRejectsPdfExtensionWithoutPdfSignature(): void
+    {
+        $root = sys_get_temp_dir() . '/pdfed-' . bin2hex(random_bytes(4));
+        mkdir($root, 0700, true);
+        $fake = $root . '/fake.pdf';
+        file_put_contents($fake, '<html><script>alert(document.domain)</script></html>');
+        $manager = new WorkspaceManager(ProfileFactory::create($root));
+
+        try {
+            $manager->createFromUpload(new UploadedFile($fake, 'invoice.pdf', 'application/pdf', null, true));
+            self::fail('expected non-PDF content to be rejected');
+        } catch (DocumentException $e) {
+            self::assertStringContainsString('not a PDF', $e->getMessage());
+        }
+
+        self::assertSame([], glob($root . '/*/current.pdf') ?: [], 'Rejected upload must not leave a workspace behind.');
+        self::assertSame([], glob($root . '/*', GLOB_ONLYDIR) ?: []);
+    }
+
+    public function testWorkspaceIsBoundToItsOwner(): void
+    {
+        $root = sys_get_temp_dir() . '/pdfed-' . bin2hex(random_bytes(4));
+        mkdir($root, 0700, true);
+        $owner   = new MutableOwnerResolver('user:alice');
+        $manager = new WorkspaceManager(ProfileFactory::create($root), $owner);
+
+        $pdf = $root . '/in.pdf';
+        file_put_contents($pdf, '%PDF-1.4 test');
+        $workspace = $manager->createFromUpload(new UploadedFile($pdf, 'a.pdf', 'application/pdf', null, true));
+        self::assertSame($workspace->id, $manager->get($workspace->id)->id);
+
+        // Another user guessing / leaking the id gets "not found".
+        $owner->owner = 'user:mallory';
+        $this->assertNotFound($manager, $workspace->id);
+
+        // Caller without any identity cannot open an owned workspace either.
+        $owner->owner = null;
+        $this->assertNotFound($manager, $workspace->id);
+
+        $owner->owner = 'user:alice';
+        self::assertSame($workspace->id, $manager->get($workspace->id)->id);
+    }
+
+    public function testWorkspaceFromPathIsBoundToOwner(): void
+    {
+        $root = sys_get_temp_dir() . '/pdfed-' . bin2hex(random_bytes(4));
+        mkdir($root, 0700, true);
+        $owner   = new MutableOwnerResolver('session:abc');
+        $manager = new WorkspaceManager(ProfileFactory::create($root), $owner);
+        $fixture = $root . '/fixture.pdf';
+        file_put_contents($fixture, '%PDF-1.4 fixture');
+
+        $workspace = $manager->createFromPath($fixture);
+        self::assertStringEqualsFile($workspace->directory . '/owner.txt', 'session:abc');
+
+        $owner->owner = 'session:other';
+        $this->assertNotFound($manager, $workspace->id);
+    }
+
+    public function testUnownedWorkspaceOnlyReachableWithoutIdentity(): void
+    {
+        $root = sys_get_temp_dir() . '/pdfed-' . bin2hex(random_bytes(4));
+        mkdir($root, 0700, true);
+        $owner   = new MutableOwnerResolver(null);
+        $manager = new WorkspaceManager(ProfileFactory::create($root), $owner);
+        $fixture = $root . '/fixture.pdf';
+        file_put_contents($fixture, '%PDF-1.4 fixture');
+
+        $workspace = $manager->createFromPath($fixture);
+        self::assertFileDoesNotExist($workspace->directory . '/owner.txt');
+        self::assertSame($workspace->id, $manager->get($workspace->id)->id);
+
+        $owner->owner = 'user:alice';
+        $this->assertNotFound($manager, $workspace->id);
+    }
+
+    private function assertNotFound(WorkspaceManager $manager, string $id): void
+    {
+        try {
+            $manager->get($id);
+            self::fail('expected workspace to be hidden from this caller');
+        } catch (DocumentException $e) {
+            self::assertStringContainsString('was not found', $e->getMessage());
+        }
+    }
+
     public function testGetMissingAndReplaceMissing(): void
     {
         $root = sys_get_temp_dir() . '/pdfed-' . bin2hex(random_bytes(4));
@@ -144,5 +232,21 @@ final class WorkspaceManagerTest extends TestCase
 
         $this->expectException(DocumentException::class);
         $manager->get('');
+    }
+}
+
+/**
+ * @internal
+ */
+final class MutableOwnerResolver implements WorkspaceOwnerResolverInterface
+{
+    public function __construct(
+        public ?string $owner,
+    ) {
+    }
+
+    public function currentOwner(): ?string
+    {
+        return $this->owner;
     }
 }

@@ -20,6 +20,9 @@ services:
             - '../../Engine/ProcessOutcome.php'
             - '../../Operation/EditorOperation.php'
 
+    Nowo\PdfEditorBundle\Security\WorkspaceOwnerResolverInterface:
+        alias: Nowo\PdfEditorBundle\Security\WorkspaceOwnerResolver
+
     Nowo\PdfEditorBundle\Operation\OperationDecoder: ~
     Nowo\PdfEditorBundle\Form\PdfUploadType: ~
 

@@ -45,15 +45,16 @@ This bundle provides:
   - Symfony form CSRF on upload POST.
 - **Workspaces**
   - Random 32-hex ids; reject empty id, `/`, `\`, and `..`.
-  - Residual shared-admin IDOR if a principal learns another workspace id.
+  - Each workspace is bound to its creator (`owner.txt`: SHA-256 of the user identifier, or of a random token stored in the anonymous session). Every `{id}` route returns **404** for other users/sessions (`WorkspaceOwnerResolverInterface`, overridable).
+  - Residual: with no authenticated user **and** no session (stateless firewall), workspaces cannot be bound and stay reachable by id.
   - Keep `workspace_dir` outside the web root and off public file servers.
 - **Uploads & client apply**
-  - Extension must be `.pdf`; create path enforces `max_upload_bytes` (default 25 MiB).
+  - Extension must be `.pdf` **and** the stored file must start with the `%PDF-` signature; create path enforces `max_upload_bytes` (default 25 MiB).
+  - `/view` serves the PDF inline with `X-Content-Type-Options: nosniff` and `Content-Security-Policy: sandbox`; `/download` sends `nosniff`.
   - Client apply checks `%PDF` magic; residual: apply body size is not capped by the bundle — set host PHP/`client_max_body_size` limits and virus-scan if needed.
 - **Python engine**
   - Argv-only `Process` with `timeout` / `idle_timeout` (defaults 60s / 30s).
   - Never pass unsanitized shell strings.
-  - Residual: host must authorize workspace IDs (session/owner binding) so clients cannot guess another tenant’s workspace.
 - **XSS / output**
   - Twig escapes config JSON for HTML attributes; prefer `textContent` in legacy JS.
 - **Secrets**

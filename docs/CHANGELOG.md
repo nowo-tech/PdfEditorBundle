@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Security
+
+- Workspaces are bound to the user (or anonymous session) that created them; every `/pdf-editor/{id}` route now returns **404** to anyone else instead of serving, editing or downloading the PDF. New `WorkspaceOwnerResolverInterface` (default `WorkspaceOwnerResolver`) can be overridden.
+- Uploads must start with the `%PDF-` signature after being stored; files that only carry a `.pdf` extension are rejected and removed.
+- `/view` sends `X-Content-Type-Options: nosniff` and `Content-Security-Policy: sandbox`; `/download` sends `nosniff`.
+
+### Fixed
+
+- Unknown workspace ids now produce a 404 instead of a 500.
+- English catalogue completed (86 missing keys — the English UI showed raw `pdf_editor.*` ids); de/fr/it/nl/pt gained the 33 keys only Spanish had. A parity test keeps all locales in sync with English.
+- `prepend()` only configures Twig / FrameworkBundle when those extensions are registered.
+
+### Changed
+
+- `symfony/framework-bundle` (was require-dev) and `symfony/asset` are now runtime requirements.
+
+### Documentation
+
+- `docs/CONFIGURATION.md` documents `engine_mode`, workspace ownership and runtime requirements.
+
 ## [1.0.5] - 2026-10-09
 
 ### Dependencies

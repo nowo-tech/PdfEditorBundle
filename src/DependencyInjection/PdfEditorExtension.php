@@ -13,6 +13,8 @@ use Nowo\PdfEditorBundle\Exception\UnknownProfileException;
 use Nowo\PdfEditorBundle\Security\AllowAllPdfEditorAccessChecker;
 use Nowo\PdfEditorBundle\Security\PdfEditorAccessCheckerInterface;
 use Nowo\PdfEditorBundle\Security\RolePdfEditorAccessChecker;
+use Nowo\PdfEditorBundle\Security\WorkspaceOwnerResolverInterface;
+use Symfony\Component\Asset\Package;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -21,6 +23,7 @@ use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 
+use function class_exists;
 use function dirname;
 
 /**
@@ -83,6 +86,7 @@ final class PdfEditorExtension extends Extension implements PrependExtensionInte
 
         $workspace = new Definition(WorkspaceManager::class, [
             '$profile' => new Reference('nowo_pdf_editor.profile'),
+            '$owners'  => new Reference(WorkspaceOwnerResolverInterface::class),
         ]);
         $container->setDefinition('nowo_pdf_editor.workspace_manager', $workspace);
         $container->setAlias(WorkspaceManager::class, 'nowo_pdf_editor.workspace_manager');
@@ -104,16 +108,30 @@ final class PdfEditorExtension extends Extension implements PrependExtensionInte
 
     public function prepend(ContainerBuilder $container): void
     {
-        $container->prependExtensionConfig('twig', [
-            'paths' => [
-                __DIR__ . '/../Resources/views' => 'NowoPdfEditorBundle',
-            ],
-        ]);
+        if ($container->hasExtension('twig')) {
+            $container->prependExtensionConfig('twig', [
+                'paths' => [
+                    __DIR__ . '/../Resources/views' => 'NowoPdfEditorBundle',
+                ],
+            ]);
+        }
+
+        if (!$container->hasExtension('framework')) {
+            return;
+        }
+
         $container->prependExtensionConfig('framework', [
             'translator' => [
                 'paths' => [__DIR__ . '/../Resources/translations'],
             ],
         ]);
+
+        // framework.assets fails to boot without symfony/asset (it is a hard requirement, but stay defensive).
+        if (!class_exists(Package::class)) { // @codeCoverageIgnoreStart
+            return;
+            // @codeCoverageIgnoreEnd
+        }
+
         $container->prependExtensionConfig('framework', [
             'assets' => [
                 'packages' => [

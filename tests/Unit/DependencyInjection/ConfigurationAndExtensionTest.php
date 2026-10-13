@@ -11,11 +11,14 @@ use Nowo\PdfEditorBundle\Engine\PdfEngineInterface;
 use Nowo\PdfEditorBundle\Engine\ProcessRunnerInterface;
 use Nowo\PdfEditorBundle\Security\AllowAllPdfEditorAccessChecker;
 use Nowo\PdfEditorBundle\Security\RolePdfEditorAccessChecker;
+use Nowo\PdfEditorBundle\Security\WorkspaceOwnerResolverInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Extension\Extension;
+use Symfony\Component\DependencyInjection\Reference;
 
 #[CoversClass(Configuration::class)]
 #[CoversClass(PdfEditorExtension::class)]
@@ -91,6 +94,8 @@ final class ConfigurationAndExtensionTest extends TestCase
     public function testPrepend(): void
     {
         $container = $this->container();
+        $container->registerExtension(new StubExtension('twig'));
+        $container->registerExtension(new StubExtension('framework'));
         $extension = new PdfEditorExtension();
         $extension->prepend($container);
         $twig = $container->getExtensionConfig('twig');
@@ -100,11 +105,61 @@ final class ConfigurationAndExtensionTest extends TestCase
         self::assertCount(2, $framework);
     }
 
+    public function testPrependSkipsMissingTwigAndFramework(): void
+    {
+        $container = $this->container();
+        (new PdfEditorExtension())->prepend($container);
+
+        self::assertSame([], $container->getExtensionConfig('twig'));
+        self::assertSame([], $container->getExtensionConfig('framework'));
+    }
+
+    public function testPrependFrameworkWithoutTwig(): void
+    {
+        $container = $this->container();
+        $container->registerExtension(new StubExtension('framework'));
+        (new PdfEditorExtension())->prepend($container);
+
+        self::assertSame([], $container->getExtensionConfig('twig'));
+        self::assertCount(2, $container->getExtensionConfig('framework'));
+    }
+
+    public function testWorkspaceManagerIsBoundToOwnerResolver(): void
+    {
+        $container = $this->container();
+        (new PdfEditorExtension())->load([], $container);
+
+        $owners = $container->getDefinition('nowo_pdf_editor.workspace_manager')->getArgument('$owners');
+        self::assertInstanceOf(Reference::class, $owners);
+        self::assertSame(WorkspaceOwnerResolverInterface::class, (string) $owners);
+        self::assertTrue($container->hasAlias(WorkspaceOwnerResolverInterface::class));
+    }
+
     private function container(): ContainerBuilder
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.project_dir', '/tmp/project');
 
         return $container;
+    }
+}
+
+/**
+ * @internal
+ */
+final class StubExtension extends Extension
+{
+    public function __construct(
+        private readonly string $alias,
+    ) {
+    }
+
+    public function load(array $configs, ContainerBuilder $container): void
+    {
+    }
+
+    public function getAlias(): string
+    {
+        return $this->alias;
     }
 }

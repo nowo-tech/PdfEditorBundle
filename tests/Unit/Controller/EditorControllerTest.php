@@ -13,6 +13,7 @@ use Nowo\PdfEditorBundle\Exception\AccessDeniedException;
 use Nowo\PdfEditorBundle\Exception\PdfEditorException;
 use Nowo\PdfEditorBundle\Operation\OperationDecoder;
 use Nowo\PdfEditorBundle\Security\PdfEditorAccessCheckerInterface;
+use Nowo\PdfEditorBundle\Security\WorkspaceOwnerResolver;
 use Nowo\PdfEditorBundle\Tests\ProfileFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -22,6 +23,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -233,6 +235,8 @@ final class EditorControllerTest extends TestCase
         $response = $this->controller(workspaceRoot: $root)->view($ws->id);
         self::assertSame(200, $response->getStatusCode());
         self::assertStringContainsString('inline', (string) $response->headers->get('Content-Disposition'));
+        self::assertSame('nosniff', $response->headers->get('X-Content-Type-Options'));
+        self::assertSame('sandbox', $response->headers->get('Content-Security-Policy'));
     }
 
     public function testDownload(): void
@@ -241,6 +245,23 @@ final class EditorControllerTest extends TestCase
         $ws       = $this->seedWorkspace($root);
         $response = $this->controller(workspaceRoot: $root)->download($ws->id);
         self::assertSame(200, $response->getStatusCode());
+        self::assertSame('nosniff', $response->headers->get('X-Content-Type-Options'));
+    }
+
+    public function testUnknownWorkspaceIs404(): void
+    {
+        $this->expectException(NotFoundHttpException::class);
+        $this->controller()->view(str_repeat('ef', 16));
+    }
+
+    public function testWorkspaceOfAnotherOwnerIs404(): void
+    {
+        $root = $this->workspaceRoot();
+        $ws   = $this->seedWorkspace($root);
+        file_put_contents($ws->directory . '/owner.txt', 'user:' . hash('sha256', 'alice'));
+
+        $this->expectException(NotFoundHttpException::class);
+        $this->controller(workspaceRoot: $root, withUserObject: true)->download($ws->id);
     }
 
     /**
@@ -259,7 +280,15 @@ final class EditorControllerTest extends TestCase
         $root   = $workspaceRoot ?? $this->workspaceRoot();
         $access = $this->createMock(PdfEditorAccessCheckerInterface::class);
         $access->method('canUseEditor')->willReturn($canUse);
-        $workspaces = new WorkspaceManager(ProfileFactory::create($root));
+        $tokens = $this->createMock(TokenStorageInterface::class);
+        if ($withUserObject) {
+            $user = $this->createMock(UserInterface::class);
+            $user->method('getUserIdentifier')->willReturn('bob');
+            $token = $this->createMock(TokenInterface::class);
+            $token->method('getUser')->willReturn($user);
+            $tokens->method('getToken')->willReturn($token);
+        }
+        $workspaces = new WorkspaceManager(ProfileFactory::create($root), new WorkspaceOwnerResolver($tokens));
         $engine     = $this->createMock(PdfEngineInterface::class);
         $engine->method('inspect')->willReturn($inspect);
         $engine->method('apply')->willReturnCallback(static function (string $pdf, array $operations, string $out): array {
@@ -284,13 +313,6 @@ final class EditorControllerTest extends TestCase
         $forms->method('create')->willReturn($form);
         $twig = $this->createMock(Environment::class);
         $twig->method('render')->willReturn('<html></html>');
-        $tokens = $this->createMock(TokenStorageInterface::class);
-        if ($withUserObject) {
-            $user  = $this->createMock(UserInterface::class);
-            $token = $this->createMock(TokenInterface::class);
-            $token->method('getUser')->willReturn($user);
-            $tokens->method('getToken')->willReturn($token);
-        }
         $urls = $this->createMock(UrlGeneratorInterface::class);
         $urls->method('generate')->willReturn('/pdf-editor/x');
         $csrfMgr = $this->createMock(CsrfTokenManagerInterface::class);
