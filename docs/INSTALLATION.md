@@ -40,4 +40,10 @@ php bin/console nowo:pdf-editor:check-engine
 
 Point `engine_script` at the script inside the Composer package or copy `engine/pdf_editor_engine.py` into the project.
 
+Schedule the workspace cleanup (uploads are otherwise kept forever in `workspace_dir`):
+
+```bash
+php bin/console nowo:pdf-editor:purge --older-than=24h
+```
+
 See [CONFIGURATION.md](CONFIGURATION.md).

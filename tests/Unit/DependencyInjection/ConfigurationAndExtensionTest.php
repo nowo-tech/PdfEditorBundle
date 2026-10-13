@@ -42,6 +42,18 @@ final class ConfigurationAndExtensionTest extends TestCase
         ]]);
     }
 
+    public function testExtraProfilesAreDeprecated(): void
+    {
+        $this->expectUserDeprecationMessage('Since nowo-tech/pdf-editor-bundle 1.2: Defining profiles other than "nowo_pdf_editor.default_profile" is deprecated: only the default profile is used, so "fast", "slow" has no effect. Keep a single profile; support for several profiles will be removed in 2.0.');
+
+        $config = (new Processor())->processConfiguration(new Configuration(), [[
+            'default_profile' => 'main',
+            'profiles'        => ['main' => [], 'fast' => ['timeout' => 5.0], 'slow' => []],
+        ]]);
+
+        self::assertSame('main', $config['default_profile']);
+    }
+
     public function testTimeoutMinimum(): void
     {
         $this->expectException(InvalidConfigurationException::class);

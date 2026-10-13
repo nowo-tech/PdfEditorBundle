@@ -30,3 +30,4 @@ services:
         tags: ['controller.service_arguments']
 
     Nowo\PdfEditorBundle\Command\CheckEngineCommand: ~
+    Nowo\PdfEditorBundle\Command\PurgeWorkspacesCommand: ~

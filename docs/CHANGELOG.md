@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `nowo:pdf-editor:purge --older-than=<age> [--dry-run]` deletes workspaces not modified for the given age (default 24h; seconds or `s`/`m`/`h`/`d`/`w`), so abandoned uploads no longer pile up in `workspace_dir`. Backed by `WorkspaceManager::purgeOlderThan()`.
+
+### Deprecated
+
+- Defining profiles other than `default_profile` under `nowo_pdf_editor.profiles`: they were validated but never used. A deprecation now names them; support is removed in 2.0.
+- `Nowo\PdfEditorBundle\Exception\UnknownProfileException`: never thrown (the configuration rejects an unknown `default_profile`); removed in 2.0.
+
+### Changed
+
+- `symfony/deprecation-contracts` is now an explicit requirement (it was already installed through Symfony).
+- `OperationDecoder::bindAddImagePathsToWorkspace()`: removed an unreachable duplicate "escapes the workspace" check; the decoder and `EditorController::apply()` error paths are now covered by tests (coverage gate back to 100%).
+
 ## [1.1.0] - 2026-10-13
 
 ### Security

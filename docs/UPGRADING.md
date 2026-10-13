@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- **Single profile:** only `default_profile` is used. If your config defines more than one entry under `nowo_pdf_editor.profiles`, remove the unused ones (they never had an effect and now trigger a deprecation).
+- **Workspace cleanup:** schedule `php bin/console nowo:pdf-editor:purge --older-than=24h` (cron or Symfony Scheduler). Existing workspaces older than the given age are deleted the first time it runs; try `--dry-run` first.
+
 ## To 1.1.0
 
 From **1.0.5** — security - workspaces bound to their owner, PDF magic check, safe view headers, complete translations.

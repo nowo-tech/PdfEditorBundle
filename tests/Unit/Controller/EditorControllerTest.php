@@ -264,6 +264,68 @@ final class EditorControllerTest extends TestCase
         $this->controller(workspaceRoot: $root, withUserObject: true)->download($ws->id);
     }
 
+    public function testApplyRejectsBodyThatIsNeitherJsonNorPdf(): void
+    {
+        $root    = $this->workspaceRoot();
+        $ws      = $this->seedWorkspace($root);
+        $request = Request::create('/', 'POST', [], [], [], [], 'not json');
+        $request->headers->set('X-CSRF-TOKEN', 'token');
+        $this->expectException(PdfEditorException::class);
+        $this->expectExceptionMessage('Request body must be JSON {"ops": [...]} or application/pdf.');
+        $this->controller(workspaceRoot: $root)->apply($request, $ws->id);
+    }
+
+    public function testApplyOpsAreRejectedInClientMode(): void
+    {
+        $root    = $this->workspaceRoot();
+        $ws      = $this->seedWorkspace($root);
+        $request = Request::create('/', 'POST', [], [], [], [], '{"ops":[{"op":"rotate_page","page":1}]}');
+        $request->headers->set('X-CSRF-TOKEN', 'token');
+        $engine = $this->createMock(PdfEngineInterface::class);
+        $engine->expects(self::never())->method('apply');
+        $controller = $this->controllerWithProfile($this->clientProfile($root, 1024 * 1024), $engine);
+
+        $this->expectException(PdfEditorException::class);
+        $this->expectExceptionMessage('Client engine expects application/pdf');
+        $controller->apply($request, $ws->id);
+    }
+
+    public function testApplyRejectsClientPdfAboveMaxUploadBytes(): void
+    {
+        $root    = $this->workspaceRoot();
+        $ws      = $this->seedWorkspace($root);
+        $request = Request::create('/', 'POST', [], [], [], [], '%PDF-1.4 ' . str_repeat('x', 2048));
+        $request->headers->set('Content-Type', 'application/pdf');
+        $request->headers->set('X-CSRF-TOKEN', 'token');
+        $controller = $this->controllerWithProfile($this->clientProfile($root, 1024));
+
+        try {
+            $controller->apply($request, $ws->id);
+            self::fail('Expected an oversized PDF to be rejected.');
+        } catch (PdfEditorException $e) {
+            self::assertSame('PDF exceeds max_upload_bytes (1024).', $e->getMessage());
+        }
+        self::assertSame('%PDF-1.4', (string) file_get_contents($ws->pdfPath));
+        self::assertFileDoesNotExist($ws->directory . '/next.pdf');
+    }
+
+    private function clientProfile(string $root, int $maxUploadBytes): EditorProfile
+    {
+        return new EditorProfile(
+            name: 'default',
+            pythonBinary: 'python3',
+            engineScript: '/tmp/missing-engine.py',
+            timeout: 5.0,
+            idleTimeout: 2.0,
+            maxUploadBytes: $maxUploadBytes,
+            renderDpi: 72,
+            workspaceDir: $root,
+            engineMode: 'client',
+            allowUnauthenticated: true,
+            roles: ['ROLE_ADMIN'],
+        );
+    }
+
     /**
      * @param array<string, mixed> $inspect
      */

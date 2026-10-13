@@ -9,7 +9,6 @@ use Nowo\PdfEditorBundle\Document\WorkspaceManager;
 use Nowo\PdfEditorBundle\Engine\PdfEngineInterface;
 use Nowo\PdfEditorBundle\Engine\ProcessRunnerInterface;
 use Nowo\PdfEditorBundle\Engine\PythonPdfEngine;
-use Nowo\PdfEditorBundle\Exception\UnknownProfileException;
 use Nowo\PdfEditorBundle\Security\AllowAllPdfEditorAccessChecker;
 use Nowo\PdfEditorBundle\Security\PdfEditorAccessCheckerInterface;
 use Nowo\PdfEditorBundle\Security\RolePdfEditorAccessChecker;
@@ -47,11 +46,7 @@ final class PdfEditorExtension extends Extension implements PrependExtensionInte
         $allowUnauth    = (bool) $security['allow_unauthenticated'];
         $roles          = array_values($security['roles']);
 
-        if (!isset($profiles[$defaultProfile])) { // @codeCoverageIgnoreStart
-            throw UnknownProfileException::forProfile($defaultProfile);
-            // @codeCoverageIgnoreEnd
-        }
-
+        // Configuration guarantees that default_profile exists under profiles.
         $profileConfig = $profiles[$defaultProfile];
         $engineScript  = (string) $profileConfig['engine_script'];
         $bundleEngine  = dirname(__DIR__, 2) . '/engine/pdf_editor_engine.py';

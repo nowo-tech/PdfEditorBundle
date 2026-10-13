@@ -112,10 +112,8 @@ final class OperationDecoder
                 if ($dirReal === false || ($dirReal !== $root && !str_starts_with($dirReal, $rootPrefix))) {
                     throw new PdfEditorException('add_image path escapes the workspace.');
                 }
+                // $dirReal is the root or below it, so the joined path is always inside the workspace.
                 $absolute = $dirReal . DIRECTORY_SEPARATOR . basename($candidate);
-                if ($absolute !== $root && !str_starts_with($absolute, $rootPrefix)) {
-                    throw new PdfEditorException('add_image path escapes the workspace.');
-                }
             }
 
             $payload         = $op->payload;

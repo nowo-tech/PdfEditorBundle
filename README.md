@@ -48,7 +48,8 @@ A PDF is not a word-processor file: scanned pages without text need OCR (out of 
 - Isolated admin UI (`/pdf-editor`) following REQ-UI-001 / REQ-UI-002
 - Draft-then-save: the React client queues edits, exports via embedpdf/pdf-lib, then Symfony persists the PDF
 - Default `engine_mode: client` (no Python required); optional `python` profile for PyMuPDF
-- Named profiles (`default_profile` + `profiles`) — REQ-CFG-001
+- Editor profile (`default_profile` + `profiles`) — REQ-CFG-001; only the default profile is used (extra profiles are deprecated)
+- Workspace TTL: `nowo:pdf-editor:purge --older-than=24h` deletes abandoned workspaces
 - Process timeouts and stop-on-expiry — REQ-RUNTIME-001
 - Twig forms only (`form_start` / `form_row` / `form_end`)
 - Translations: `en`, `es`, `it`, `fr`, `pt`, `de`, `nl`

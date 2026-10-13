@@ -20,6 +20,19 @@ nowo_pdf_editor:
 
 `default_profile` must exist under `profiles` (REQ-CFG-001).
 
+Only the profile named by `default_profile` is used: the engine, the workspace manager and the controller are wired once per application, and there is no route or option that selects another profile. Defining more than one profile is **deprecated since 1.2** (a deprecation is triggered naming the unused profiles; support is removed in 2.0). Keep a single profile and change its values per environment instead (`config/packages/<env>/nowo_pdf_editor.yaml`).
+
+## Workspace cleanup (TTL)
+
+Each upload creates a directory under `workspace_dir` (PDF, previews, metadata). Nothing deletes them during requests, so schedule the purge command:
+
+```bash
+php bin/console nowo:pdf-editor:purge --older-than=24h   # default 24h; seconds or s/m/h/d/w suffix (90m, 7d, 2w)
+php bin/console nowo:pdf-editor:purge --older-than=7d --dry-run   # list only
+```
+
+A workspace's age is the newest modification time of the directory or any file in it, so a document still being edited (new apply or preview) is kept. Only directories named like a workspace id (32 hex characters) are considered; symbolic links are removed, never followed. Example cron entry: `0 * * * * php /app/bin/console nowo:pdf-editor:purge --older-than=24h`.
+
 Timeouts apply to every engine process (REQ-RUNTIME-001). Keep PHP `max_execution_time` and the Caddy write timeout **above** `timeout`.
 
 ## `engine_mode`

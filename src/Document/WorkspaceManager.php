@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Nowo\PdfEditorBundle\Document;
 
+use InvalidArgumentException;
 use Nowo\PdfEditorBundle\Config\EditorProfile;
 use Nowo\PdfEditorBundle\Exception\DocumentException;
 use Nowo\PdfEditorBundle\Security\WorkspaceOwnerResolverInterface;
@@ -14,19 +15,27 @@ use function copy;
 use function fclose;
 use function file_get_contents;
 use function file_put_contents;
+use function filemtime;
 use function fopen;
 use function fread;
 use function hash_equals;
 use function is_dir;
 use function is_file;
+use function is_link;
+use function is_string;
+use function lstat;
+use function max;
 use function mkdir;
+use function preg_match;
 use function preg_replace;
 use function random_bytes;
 use function rename;
 use function rmdir;
+use function scandir;
 use function sprintf;
 use function str_contains;
 use function strtolower;
+use function time;
 use function unlink;
 
 final class WorkspaceManager
@@ -194,6 +203,78 @@ final class WorkspaceManager
         fclose($handle);
 
         return $head === '%PDF-';
+    }
+
+    /**
+     * Deletes workspaces whose newest file is older than $maxAgeSeconds (workspace TTL).
+     *
+     * Only directories named like a workspace id (32 hex characters) directly under the workspace root are considered;
+     * symbolic links are removed, never followed. Ownership is not checked: this is a maintenance operation.
+     *
+     * @return list<string> ids of the purged (or, with $dryRun, purgeable) workspaces
+     */
+    public function purgeOlderThan(int $maxAgeSeconds, bool $dryRun = false, ?int $now = null): array
+    {
+        if ($maxAgeSeconds < 1) {
+            throw new InvalidArgumentException('The maximum workspace age must be at least one second.');
+        }
+
+        $root = $this->profile->workspaceDir;
+        if (!is_dir($root)) {
+            return [];
+        }
+
+        $cutoff = ($now ?? time()) - $maxAgeSeconds;
+        $purged = [];
+        foreach ((array) scandir($root) as $entry) {
+            $directory = $root . '/' . $entry;
+            if (!is_string($entry) || preg_match('/^[0-9a-f]{32}$/', $entry) !== 1 || is_link($directory) || !is_dir($directory)) {
+                continue;
+            }
+            if (self::lastModified($directory) > $cutoff) {
+                continue;
+            }
+            if (!$dryRun) {
+                self::removeTree($directory);
+            }
+            $purged[] = $entry;
+        }
+
+        return $purged;
+    }
+
+    private static function lastModified(string $directory): int
+    {
+        $latest = (int) filemtime($directory);
+        foreach ((array) scandir($directory) as $entry) {
+            if (!is_string($entry) || $entry === '.' || $entry === '..') {
+                continue;
+            }
+            $path   = $directory . '/' . $entry;
+            $mtime  = is_link($path) ? (int) (lstat($path)['mtime'] ?? 0) : (int) filemtime($path);
+            $latest = max($latest, $mtime);
+            if (!is_link($path) && is_dir($path)) {
+                $latest = max($latest, self::lastModified($path));
+            }
+        }
+
+        return $latest;
+    }
+
+    private static function removeTree(string $directory): void
+    {
+        foreach ((array) scandir($directory) as $entry) {
+            if (!is_string($entry) || $entry === '.' || $entry === '..') {
+                continue;
+            }
+            $path = $directory . '/' . $entry;
+            if (!is_link($path) && is_dir($path)) {
+                self::removeTree($path);
+            } else {
+                @unlink($path);
+            }
+        }
+        @rmdir($directory);
     }
 
     public function ensureWorkspaceDir(): void

@@ -7,7 +7,10 @@ namespace Nowo\PdfEditorBundle\DependencyInjection;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
+use function array_diff;
 use function array_key_exists;
+use function array_keys;
+use function implode;
 use function is_string;
 use function sys_get_temp_dir;
 
@@ -30,7 +33,7 @@ final class Configuration implements ConfigurationInterface
                     ->cannotBeEmpty()
                 ->end()
                 ->arrayNode('profiles')
-                    ->info('Named editor profiles')
+                    ->info('Named editor profiles. Only the one named by default_profile is used; defining others is deprecated since 1.2.')
                     ->useAttributeAsKey('name')
                     ->arrayPrototype()
                         ->children()
@@ -106,6 +109,22 @@ final class Configuration implements ConfigurationInterface
                     return !is_string($default) || $default === '' || !array_key_exists($default, $v['profiles'] ?? []);
                 })
                 ->thenInvalid('nowo_pdf_editor.default_profile must exist as a key under nowo_pdf_editor.profiles (REQ-CFG-001).')
+            ->end()
+            ->validate()
+                ->always(static function (array $v): array {
+                    // Only default_profile is wired (one engine, workspace manager and controller per app); other profiles are dead.
+                    $unused = array_diff(array_keys($v['profiles'] ?? []), [$v['default_profile'] ?? null]);
+                    if ($unused !== []) {
+                        trigger_deprecation(
+                            'nowo-tech/pdf-editor-bundle',
+                            '1.2',
+                            'Defining profiles other than "nowo_pdf_editor.default_profile" is deprecated: only the default profile is used, so "%s" has no effect. Keep a single profile; support for several profiles will be removed in 2.0.',
+                            implode('", "', $unused),
+                        );
+                    }
+
+                    return $v;
+                })
             ->end();
 
         return $treeBuilder;

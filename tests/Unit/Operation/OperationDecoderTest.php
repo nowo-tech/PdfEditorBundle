@@ -96,4 +96,84 @@ final class OperationDecoderTest extends TestCase
         $this->expectExceptionMessage('escapes the workspace');
         $decoder->bindAddImagePathsToWorkspace($ops, $workspace);
     }
+
+    public function testRejectsAddImageWithoutPath(): void
+    {
+        $this->expectException(PdfEditorException::class);
+        $this->expectExceptionMessage('non-empty "path"');
+        (new OperationDecoder())->decode([['op' => 'add_image', 'page' => 1]]);
+    }
+
+    public function testBindFailsWhenWorkspaceDirectoryIsMissing(): void
+    {
+        $this->expectException(PdfEditorException::class);
+        $this->expectExceptionMessage('Workspace directory does not exist.');
+        (new OperationDecoder())->bindAddImagePathsToWorkspace([], sys_get_temp_dir() . '/pdf-editor-missing-' . uniqid('', true));
+    }
+
+    public function testBindKeepsNonImageOperationsUntouched(): void
+    {
+        $workspace = $this->workspace();
+        $rotate    = new EditorOperation('rotate_page', ['page' => 1]);
+
+        self::assertSame([$rotate], (new OperationDecoder())->bindAddImagePathsToWorkspace([$rotate], $workspace));
+    }
+
+    public function testBindRejectsUnvalidatedOperationWithoutPath(): void
+    {
+        $this->expectException(PdfEditorException::class);
+        $this->expectExceptionMessage('non-empty "path"');
+        (new OperationDecoder())->bindAddImagePathsToWorkspace([new EditorOperation('add_image', ['path' => ''])], $this->workspace());
+    }
+
+    public function testBindRejectsUnvalidatedTraversalPath(): void
+    {
+        $this->expectException(PdfEditorException::class);
+        $this->expectExceptionMessage('..');
+        (new OperationDecoder())->bindAddImagePathsToWorkspace([new EditorOperation('add_image', ['path' => 'a/../../etc/passwd'])], $this->workspace());
+    }
+
+    public function testBindResolvesNotYetExistingFileInsideWorkspace(): void
+    {
+        $workspace = $this->workspace();
+        mkdir($workspace . '/assets');
+        $decoder = new OperationDecoder();
+        $ops     = $decoder->decode([['op' => 'add_image', 'path' => 'assets/new.png', 'page' => 1, 'bbox' => [0, 0, 1, 1]]]);
+
+        $bound = $decoder->bindAddImagePathsToWorkspace($ops, $workspace);
+
+        self::assertSame(realpath($workspace) . '/assets/new.png', $bound[0]->payload['path']);
+        self::assertSame(1, $bound[0]->payload['page']);
+    }
+
+    public function testBindRejectsNotYetExistingFileInSymlinkedDirectoryOutsideWorkspace(): void
+    {
+        $workspace = $this->workspace();
+        $outside   = $this->workspace();
+        symlink($outside, $workspace . '/linked');
+        $decoder = new OperationDecoder();
+        $ops     = $decoder->decode([['op' => 'add_image', 'path' => 'linked/new.png', 'page' => 1, 'bbox' => [0, 0, 1, 1]]]);
+
+        $this->expectException(PdfEditorException::class);
+        $this->expectExceptionMessage('escapes the workspace');
+        $decoder->bindAddImagePathsToWorkspace($ops, $workspace);
+    }
+
+    public function testBindRejectsFileInMissingDirectory(): void
+    {
+        $decoder = new OperationDecoder();
+        $ops     = $decoder->decode([['op' => 'add_image', 'path' => 'nope/new.png', 'page' => 1, 'bbox' => [0, 0, 1, 1]]]);
+
+        $this->expectException(PdfEditorException::class);
+        $this->expectExceptionMessage('escapes the workspace');
+        $decoder->bindAddImagePathsToWorkspace($ops, $this->workspace());
+    }
+
+    private function workspace(): string
+    {
+        $dir = sys_get_temp_dir() . '/pdf-editor-bind-' . uniqid('', true);
+        mkdir($dir, 0777, true);
+
+        return $dir;
+    }
 }
