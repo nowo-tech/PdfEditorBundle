@@ -19,6 +19,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- The upload form no longer renders `enctype="multipart/form-data"` twice on its `<form>` tag: the templates passed it in `form_start()` attrs although Symfony already adds it for the `FileType` field (bundle template and demo overrides).
+
 ## [1.2.0] - 2026-10-13
 
 ### Added

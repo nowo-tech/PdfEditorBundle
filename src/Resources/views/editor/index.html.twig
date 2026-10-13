@@ -6,7 +6,7 @@
     <section class="nowo-ui-card nowo-pdf-editor-upload">
         <h1 class="nowo-ui-title">{{ 'pdf_editor.home.heading'|trans({}, 'NowoPdfEditorBundle') }}</h1>
         <p class="nowo-ui-lead">{{ 'pdf_editor.home.lead'|trans({}, 'NowoPdfEditorBundle') }}</p>
-        {{ form_start(form, { attr: { class: 'nowo-ui-form', enctype: 'multipart/form-data' } }) }}
+        {{ form_start(form, { attr: { class: 'nowo-ui-form' } }) }}
             {{ form_row(form.pdf) }}
             <button type="submit" class="nowo-ui-btn nowo-ui-btn-primary">{{ 'pdf_editor.home.open'|trans({}, 'NowoPdfEditorBundle') }}</button>
         {{ form_end(form) }}
