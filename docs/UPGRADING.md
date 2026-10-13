@@ -1,7 +1,19 @@
 # Upgrading
 
-
 ## Unreleased
+
+## To 1.1.0
+
+From **1.0.5** — security - workspaces bound to their owner, PDF magic check, safe view headers, complete translations.
+
+```bash
+composer update nowo-tech/pdf-editor-bundle
+```
+
+- A workspace can only be opened by the user/session that created it; others get 404. Workspaces created before the upgrade (or from the CLI) have no owner and are only reachable by callers with no identity.
+- Uploads must start with the `%PDF-` signature (a `.pdf` extension is not enough).
+- `/view` now sends `X-Content-Type-Options: nosniff` and `Content-Security-Policy: sandbox`.
+- `symfony/framework-bundle` and `symfony/asset` are now runtime requirements.
 
 ## To 1.0.5
 
@@ -38,6 +50,7 @@ php bin/console cache:clear
 
 ## Table of contents
 
+- [To 1.1.0](#to-110)
 - [To 1.0.5](#to-105)
 - [From 1.0.1 to 1.0.2](#from-101-to-102)
 - [From 1.0.0 to 1.0.1](#from-100-to-101)
