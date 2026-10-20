@@ -1,5 +1,5 @@
 ---
-name: "Bug report"
+name: "🐞 Bug report"
 about: Something is broken?
 title: ''
 labels: bug
@@ -8,7 +8,7 @@ assignees: ''
 ---
 
 <!--
-- Please do not report an issue for a version of `pdf-editor-bundle` that is no longer supported. See [Version policy](https://github.com/nowo-tech/PdfEditorBundle#version-policy) and [Supported versions](https://github.com/nowo-tech/PdfEditorBundle/security/policy#supported-versions) in the repository.
+- Please do not report an issue for a version of `pdf-editor-bundle` that is no longer supported. Currently supported versions are listed here: https://github.com/nowo-tech/PdfEditorBundle#version-information
 - Please fill in this template according to your issue.
 - Please keep the table shown below at the top of your issue.
 - You can retrieve `pdf-editor-bundle` version by running `composer info | grep "pdf-editor-bundle"`.
@@ -21,7 +21,7 @@ assignees: ''
 | ----------------------------| -----------------------
 | `PdfEditorBundle` version        | x.y.z
 | PHP version                 | x.y.z
-| Symfony version             | x.y.z
+| Database                    | MySQL / PostgreSQL / SQLite / Other
 
 #### Summary
 

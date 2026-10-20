@@ -1,15 +1,16 @@
 # PDF Editor Bundle
 
-[![CI](https://github.com/nowo-tech/PdfEditorBundle/actions/workflows/ci.yml/badge.svg)](https://github.com/nowo-tech/PdfEditorBundle/actions/workflows/ci.yml)
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![PHP](https://img.shields.io/badge/PHP-8.2%2B-777BB4?logo=php)](https://php.net)
-[![Symfony](https://img.shields.io/badge/Symfony-6.4%2B%20%7C%207%20%7C%208-000000?logo=symfony)](https://symfony.com)
+[![CI](https://github.com/nowo-tech/PdfEditorBundle/actions/workflows/ci.yml/badge.svg)](https://github.com/nowo-tech/PdfEditorBundle/actions/workflows/ci.yml) [![Packagist Version](https://img.shields.io/packagist/v/nowo-tech/pdf-editor-bundle.svg?style=flat)](https://packagist.org/packages/nowo-tech/pdf-editor-bundle) [![Packagist Downloads](https://img.shields.io/packagist/dt/nowo-tech/pdf-editor-bundle.svg)](https://packagist.org/packages/nowo-tech/pdf-editor-bundle) [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE) [![PHP](https://img.shields.io/badge/PHP-8.2%2B-777BB4?logo=php)](https://php.net) [![Symfony](https://img.shields.io/badge/Symfony-6.4%20%7C%207.4%20%7C%208.0%20%7C%208.1%2B-000000?logo=symfony)](https://symfony.com) [![GitHub stars](https://img.shields.io/github/stars/nowo-tech/pdf-editor-bundle.svg?style=social&label=Star)](https://github.com/nowo-tech/PdfEditorBundle) [![Coverage](https://img.shields.io/badge/Coverage-100%25-brightgreen)](#tests-and-coverage)
 
 > ⭐ **Found this useful?** Give it a star on [GitHub](https://github.com/nowo-tech/PdfEditorBundle).
 
+Standalone Symfony **PDF editor**: upload a PDF, edit it in a React editor (embedpdf + pdf-lib) and save the rewritten file — text, form fields, pages, notes and watermarks.
+
 ![FrankenPHP Friendly Worker Mode](docs/images/frankenphp-friendly.png)
 
-This bundle is **FrankenPHP worker mode friendly**, including **`reset_kernel: false`** (long-lived kernel).
+This bundle is **FrankenPHP worker mode friendly**.
+
+This includes **`reset_kernel: false`** (long-lived kernel).
 
 **FrankenPHP worker mode:** Supported at **100%** under scenario B (kernel not rebooted). All shared services are stateless; Process timeouts stop the Python engine on expiry. Demo defaults: `FRANKENPHP_MODE=worker`, `FRANKENPHP_RESET_KERNEL` unset (`false`). See [Demo with FrankenPHP](docs/DEMO-FRANKENPHP.md) and the [worker audit](docs/FRANKENPHP-WORKER-AUDIT.md).
 
@@ -20,6 +21,7 @@ This bundle is **FrankenPHP worker mode friendly**, including **`reset_kernel: f
 - [Requirements](#requirements)
 - [Installation](#installation)
 - [Documentation](#documentation)
+- [Tests and coverage](#tests-and-coverage)
 - [License](#license)
 
 ## What is this?
@@ -79,16 +81,36 @@ See [docs/INSTALLATION.md](docs/INSTALLATION.md).
 - [Installation](docs/INSTALLATION.md)
 - [Configuration](docs/CONFIGURATION.md)
 - [Usage](docs/USAGE.md)
+- [Contributing](docs/CONTRIBUTING.md)
+- [Code of Conduct](CODE_OF_CONDUCT.md)
+- [Changelog](docs/CHANGELOG.md)
+- [Upgrading](docs/UPGRADING.md)
+- [Release](docs/RELEASE.md)
+- [Security](docs/SECURITY.md)
+- [Engram](docs/ENGRAM.md)
+- [Spec-driven development](docs/SPEC-DRIVEN-DEVELOPMENT.md)
+- [GitHub Spec Kit](docs/SPEC-KIT.md)
+
+### Additional documentation
+
 - [Architecture decisions (ADR)](docs/adr/README.md)
 - [Demo with FrankenPHP](docs/DEMO-FRANKENPHP.md)
 - [FrankenPHP worker audit (`reset_kernel: false`)](docs/FRANKENPHP-WORKER-AUDIT.md)
-- [Upgrading](docs/UPGRADING.md)
-- [Security](docs/SECURITY.md)
 - [GitHub CI](docs/GITHUB_CI.md)
+- [PSR evaluation (REQ-CS-007)](docs/PSR.md)
 - [Testing](docs/TESTING.md)
-- [Changelog](docs/CHANGELOG.md)
-- [Contributing](docs/CONTRIBUTING.md)
 - [Baseline spec](specs/001-baseline/spec.md)
+
+## Tests and coverage
+
+- Tests: PHPUnit (`Unit`, `Integration` suites); see [docs/TESTING.md](docs/TESTING.md).
+- PHP: 100% line coverage of `src/` (`composer coverage-check` / `composer test-coverage-100` fails below 100%).
+
+```bash
+make test
+make test-coverage
+make release-check
+```
 
 ## License
 

@@ -5,6 +5,26 @@
 - **Deciders:** PdfEditorBundle maintainers  
 - **Related:** Client engine (`engine_mode: client`), `assets/` React app, embedpdf + pdf-lib + vensas XObject helpers  
 
+## Table of contents
+
+- [Context](#context)
+  - [Constraints](#constraints)
+- [Decision](#decision)
+  - [1. One toolbar, one source of truth](#1-one-toolbar-one-source-of-truth)
+  - [2. Visual design system](#2-visual-design-system)
+  - [3. Properties panel (right rail)](#3-properties-panel-right-rail)
+  - [4. Page rail (left)](#4-page-rail-left)
+  - [5. Feedback & states](#5-feedback--states)
+  - [6. embedpdf integration mode](#6-embedpdf-integration-mode)
+  - [7. Theming & host apps](#7-theming--host-apps)
+- [UX principles (normative)](#ux-principles-normative)
+- [Consequences](#consequences)
+  - [Positive](#positive)
+  - [Negative](#negative)
+  - [Follow-up tasks](#follow-up-tasks)
+- [Implementation notes](#implementation-notes)
+- [References](#references)
+
 ## Context
 
 The bundle moved from a vanilla-JS canvas (PNG previews via Python) to a **browser-first** stack:

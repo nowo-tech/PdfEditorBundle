@@ -12,3 +12,5 @@ Short facts for AI assistants and maintainers.
 - FrankenPHP: **worker + `reset_kernel: false` supported** — all shared services are stateless; see [FRANKENPHP-WORKER-AUDIT.md](FRANKENPHP-WORKER-AUDIT.md)
 - Frontend: React editor under `src/Resources/assets` → `make assets`
 - Specs: `specs/001-baseline/spec.md` + `code-inventory.md`
+
+Repository-local **product spec** and **`REQ-*`** traceability (Makefiles, demos) are described in [Spec-driven development](SPEC-DRIVEN-DEVELOPMENT.md); Engram does not replace it.

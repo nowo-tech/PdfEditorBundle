@@ -8,6 +8,18 @@
 | Method | Manual review of every PHP file under `src/` (controller, services, command, forms, DI extension, configuration, `Resources/config/services.yaml`); PHPStan classic + worker + hardening |
 | **Verdict** | ✅ **100% compatible** with FrankenPHP worker mode and **`reset_kernel: false`** (scenario B below) |
 
+## Table of contents
+
+- [Execution model assumed](#execution-model-assumed)
+- [Summary](#summary)
+- [Services reviewed](#services-reviewed)
+- [Findings](#findings)
+  - [W-01 — Python engine calls block a worker thread for up to the configured timeout (Low)](#w-01--python-engine-calls-block-a-worker-thread-for-up-to-the-configured-timeout-low)
+  - [W-02 — Workspaces are never removed (Low)](#w-02--workspaces-are-never-removed-low)
+  - [W-03 — Workspace isolation is by unguessable id, not by owner (Info)](#w-03--workspace-isolation-is-by-unguessable-id-not-by-owner-info)
+- [Usage recommendations in worker mode](#usage-recommendations-in-worker-mode)
+- [Re-audit triggers](#re-audit-triggers)
+
 ## Execution model assumed
 
 FrankenPHP worker mode boots the Symfony kernel once per worker and serves many requests with the same container. This audit assumes the **strict** variant: the kernel is **not** rebooted between requests, so every shared service, static property and PHP global survives from one request to the next. Two scenarios are evaluated:

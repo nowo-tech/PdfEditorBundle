@@ -22,6 +22,13 @@ nowo_pdf_editor:
 
 Only the profile named by `default_profile` is used: the engine, the workspace manager and the controller are wired once per application, and there is no route or option that selects another profile. Defining more than one profile is **deprecated since 1.2** (a deprecation is triggered naming the unused profiles; support is removed in 2.0). Keep a single profile and change its values per environment instead (`config/packages/<env>/nowo_pdf_editor.yaml`).
 
+## Table of contents
+
+- [Workspace cleanup (TTL)](#workspace-cleanup-ttl)
+- [`engine_mode`](#engine_mode)
+- [Workspace ownership](#workspace-ownership)
+- [Requirements](#requirements)
+
 ## Workspace cleanup (TTL)
 
 Each upload creates a directory under `workspace_dir` (PDF, previews, metadata). Nothing deletes them during requests, so schedule the purge command:

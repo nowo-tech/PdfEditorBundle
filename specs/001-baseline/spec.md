@@ -11,7 +11,7 @@
 
 ## Summary
 
-Standalone Symfony **PDF editor workspace**: upload a PDF, edit in a CKEditor-like React UI (embedpdf + pdf-lib), save rewritten bytes. Optional legacy Python/PyMuPDF engine. Safe under FrankenPHP worker with kernel not reset between requests.
+Standalone Symfony **PDF editor workspace**: upload a PDF, edit in a CKEditor-like React UI (embedpdf + pdf-lib), save rewritten bytes. Optional Python/PyMuPDF engine (`engine_mode: python`). Safe under FrankenPHP worker with kernel not reset between requests.
 
 ---
 
@@ -62,13 +62,19 @@ Standalone Symfony **PDF editor workspace**: upload a PDF, edit in a CKEditor-li
 ### Security & CLI
 
 - **FR-SEC-001**: `PdfEditorAccessCheckerInterface`, `RolePdfEditorAccessChecker`, `AllowAllPdfEditorAccessChecker`.
+- **FR-SEC-002**: `WorkspaceOwnerResolverInterface` / `WorkspaceOwnerResolver` bind each workspace to its owner (user identifier when authenticated, a random token kept in the session for anonymous callers) so one user cannot open another's workspace.
 - **FR-CLI-001**: `nowo:pdf-editor:check-engine`.
+- **FR-CLI-002**: `nowo:pdf-editor:purge` deletes workspaces (uploaded PDF, previews, metadata) not touched for a given age; hosts schedule it (cron, Symfony Scheduler).
 
 ### Twig / i18n / frontend
 
 - **FR-TWIG-001**: Editor Twig templates under `Resources/views`.
 - **FR-I18N-001**: Translation domains `NowoPdfEditorBundle` (`en`, `es`, `it`, `fr`, `pt`, `de`, `nl`).
-- **FR-FE-001**: React assets under `Resources/assets` built to `Resources/public/build`.
+- **FR-FE-001**: React editor (`main.tsx`, `PdfEditorApp.tsx`, `components/*`, `styles/editor.css`, `types.ts`, `op-labels.ts`) under `Resources/assets/src`.
+- **FR-FE-002**: Client engine (`engines/client-engine.ts`, default `engine_mode: client`) rewrites the PDF in the browser with pdf-lib; `engines/vensas/*` hold the content-stream / XObject helpers adapted from vensas/pdf-editor (MIT).
+- **FR-FE-003**: embedpdf bridges (`embedpdf-bridge.ts`, `selection-bridge.ts`, `object-selection-bridge.ts`, `redaction-bridge.ts`) connect the viewer plugins to the editor state.
+- **FR-FE-004**: `Resources/public/css/pdf-editor.css` (layout styles loaded by `editor/layout.html.twig`) and the legacy `Resources/public/js/pdf-editor.js` shim ship as static assets.
+- **FR-BUILD-001**: `Resources/public/build/**` (`pdf-editor.js`, `pdf-editor.css`, `pdf-editor.wasm`, `chunks/*`) is the committed Vite build output of `Resources/assets/src/main.tsx` (`vite.config.ts`), never edited by hand.
 
 ### DI
 
@@ -82,7 +88,7 @@ Standalone Symfony **PDF editor workspace**: upload a PDF, edit in a CKEditor-li
 
 ## Success Criteria
 
-- **SC-001**: Every production PHP/YAML under `src/` (excluding built frontend chunks) mapped in the inventory.
+- **SC-001**: **69/69** tracked files under `src/` mapped in [`code-inventory.md`](code-inventory.md) (build outputs as FR-BUILD-001 rows).
 - **SC-002**: Config matches `docs/CONFIGURATION.md`.
 - **SC-003**: QA/CI green; PHPStan classic + worker + hardening clean.
 - **SC-004**: Worker audit verdict remains 100% compatible under scenario B.
@@ -92,7 +98,7 @@ Standalone Symfony **PDF editor workspace**: upload a PDF, edit in a CKEditor-li
 ## Explicit non-goals
 
 - OCR for scanned pages.
-- Built-in workspace TTL purge CLI (host cron / volume policy).
+- Scheduling the workspace purge: `nowo:pdf-editor:purge` exists, the host decides when to run it (cron, Symfony Scheduler).
 - Demo trees as stable API.
 
 ---

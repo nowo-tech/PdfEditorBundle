@@ -20,6 +20,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Documentation: wave-1 REQ compliance — README standard badges, product blurb, canonical FrankenPHP claim with the committed banner image, full documentation list and Tests and coverage section; CONTRIBUTING Cursor Agent settings and post-release-commit trailer check; issue template renamed to `---feature-request.md`; `.cursor/mcp.json` (Engram) and versioned Spec Kit Cursor skills; full SPEC-KIT manual and SPEC-DRIVEN-DEVELOPMENT; DEMO-FRANKENPHP development / production / troubleshooting; doc TOCs; Spec Kit inventory rebuilt (69/69).
+
 ## [1.2.1] - 2026-10-13
 
 ### Fixed
