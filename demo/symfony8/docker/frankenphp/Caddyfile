@@ -1,6 +1,18 @@
 {
 	order mercure after encode
 	skip_install_trust
+	# Timeout hierarchy (REQ-RUNTIME-001): engine timeout 60 s < PHP max_execution_time 90 s
+	# < Caddy write timeout 100 s; max_wait_time caps the wait for a free PHP thread.
+	servers {
+		timeouts {
+			write 100s
+		}
+	}
+	frankenphp {
+		php_ini max_execution_time 90
+		php_ini max_input_time 90
+		max_wait_time 30s
+	}
 }
 
 :80 {

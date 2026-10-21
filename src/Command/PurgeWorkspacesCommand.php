@@ -44,7 +44,7 @@ final class PurgeWorkspacesCommand extends Command
     {
         $io     = new SymfonyStyle($input, $output);
         $raw    = $input->getOption('older-than');
-        $maxAge = is_string($raw) ? self::parseDuration($raw) : null;
+        $maxAge = is_string($raw) ? $this->parseDuration($raw) : null;
         $dryRun = (bool) $input->getOption('dry-run');
 
         if ($maxAge === null) {
@@ -67,7 +67,7 @@ final class PurgeWorkspacesCommand extends Command
         return Command::SUCCESS;
     }
 
-    private static function parseDuration(string $value): ?int
+    private function parseDuration(string $value): ?int
     {
         if (preg_match('/^(\d+)\s*([smhdw]?)$/', strtolower(trim($value)), $m) !== 1) {
             return null;

@@ -25,4 +25,5 @@ COPY docker/entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 ENTRYPOINT ["docker-entrypoint.sh"]
-RUN pip3 install --break-system-packages pymupdf
+# PyMuPDF 2.x has no musllinux wheel yet: stay on the 1.x line from engine/requirements.txt (binary wheels only).
+RUN pip3 install --break-system-packages --only-binary=:all: "pymupdf>=1.24.0,<2"

@@ -70,7 +70,7 @@ Standalone Symfony **PDF editor workspace**: upload a PDF, edit in a CKEditor-li
 
 - **FR-TWIG-001**: Editor Twig templates under `Resources/views`.
 - **FR-I18N-001**: Translation domains `NowoPdfEditorBundle` (`en`, `es`, `it`, `fr`, `pt`, `de`, `nl`).
-- **FR-FE-001**: React editor (`main.tsx`, `PdfEditorApp.tsx`, `components/*`, `styles/editor.css`, `types.ts`, `op-labels.ts`) under `Resources/assets/src`.
+- **FR-FE-001**: React editor (`main.tsx`, `pdf-editor-app.tsx`, `components/*`, `styles/editor.css`, `types.ts`, `op-labels.ts`) under `Resources/assets/src`.
 - **FR-FE-002**: Client engine (`engines/client-engine.ts`, default `engine_mode: client`) rewrites the PDF in the browser with pdf-lib; `engines/vensas/*` hold the content-stream / XObject helpers adapted from vensas/pdf-editor (MIT).
 - **FR-FE-003**: embedpdf bridges (`embedpdf-bridge.ts`, `selection-bridge.ts`, `object-selection-bridge.ts`, `redaction-bridge.ts`) connect the viewer plugins to the editor state.
 - **FR-FE-004**: `Resources/public/css/pdf-editor.css` (layout styles loaded by `editor/layout.html.twig`) and the legacy `Resources/public/js/pdf-editor.js` shim ship as static assets.

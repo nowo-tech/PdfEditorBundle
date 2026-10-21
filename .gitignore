@@ -1,16 +1,29 @@
+# Dependencies
 /vendor
 /node_modules
 /.pnpm-store
+
+# Environment (never commit secrets)
 .env
 .env.local
 .env.*.local
+
+# Test coverage (PHP + Python)
 /coverage
 /coverage.xml
 /coverage-php.txt
 /coverage-output.txt
+/coverage-python.txt
+/.coverage
+/.pytest_cache/
+__pycache__/
+
+# Tool caches
 /.php-cs-fixer.cache
 /.phpunit.cache
 /.phpunit.result.cache
+
+# Archives / compressed
 *.zip
 *.tar
 *.tar.gz
@@ -19,4 +32,7 @@
 *.bz2
 *.rar
 *.7z
+
+# Cursor (local sandbox settings)
 .cursor/sandbox.json
+/.venv/

@@ -105,6 +105,8 @@ See [docs/INSTALLATION.md](docs/INSTALLATION.md).
 
 - Tests: PHPUnit (`Unit`, `Integration` suites); see [docs/TESTING.md](docs/TESTING.md).
 - PHP: 100% line coverage of `src/` (`composer coverage-check` / `composer test-coverage-100` fails below 100%).
+- TS/JS: N/A — no unit tests yet; the React editor is type-checked (`make test-ts`) and built in CI.
+- Python: 98.46% lines of `engine/pdf_editor_engine.py` (`make test-python`, pytest-cov, fails below 90%).
 
 ```bash
 make test

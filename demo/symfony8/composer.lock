@@ -8,14 +8,16 @@
     "packages": [
         {
             "name": "nowo-tech/pdf-editor-bundle",
-            "version": "dev-main",
+            "version": "dev-chore/req-wave2",
             "dist": {
                 "type": "path",
                 "url": "/var/pdf-editor-bundle",
-                "reference": "a2db4ad53bb943b487e7bd5f0d666e0a912712d0"
+                "reference": "3601778a1f65b8672aa50bd351465c68020e97e0"
             },
             "require": {
                 "php": ">=8.2 <8.6",
+                "psr/clock": "^1.0",
+                "psr/log": "^1.1 || ^2.0 || ^3.0",
                 "symfony/asset": "^6.4 || ^7.0 || ^8.0",
                 "symfony/config": "^6.4 || ^7.0 || ^8.0",
                 "symfony/dependency-injection": "^6.4 || ^7.0 || ^8.0",
@@ -32,6 +34,8 @@
                 "symfony/security-csrf": "^6.4 || ^7.0 || ^8.0",
                 "symfony/twig-bundle": "^6.4 || ^7.0 || ^8.0",
                 "symfony/yaml": "^6.4 || ^7.0 || ^8.0",
+                "twig/extra-bundle": "^3.12",
+                "twig/string-extra": "^3.12",
                 "twig/twig": "^3.8"
             },
             "require-dev": {

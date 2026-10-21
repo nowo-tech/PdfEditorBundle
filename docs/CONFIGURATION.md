@@ -24,10 +24,34 @@ Only the profile named by `default_profile` is used: the engine, the workspace m
 
 ## Table of contents
 
+- [Profiles](#profiles)
+- [Translations](#translations)
 - [Workspace cleanup (TTL)](#workspace-cleanup-ttl)
 - [`engine_mode`](#engine_mode)
 - [Workspace ownership](#workspace-ownership)
 - [Requirements](#requirements)
+
+## Profiles
+
+| Item | Behaviour |
+| --- | --- |
+| Canonical keys | `default_profile` + `profiles.<name>` (`python_binary`, `engine_script`, `workspace_dir`, `timeout`, `idle_timeout`, `max_upload_bytes`, `render_dpi`, `engine_mode`) |
+| Legacy synonyms | None: the bundle was created with the profiles shape (no `default_config` / `configs` keys) |
+| Validation | Container build fails when `default_profile` is not a key of `profiles` |
+| Runtime selection | Always `default_profile`: one engine, workspace manager and controller per application; no request, route or option selects another profile |
+| Extra profiles | Deprecated since 1.2 (a deprecation names the unused profiles); removed in 2.0 — use per-environment config files instead |
+
+## Translations
+
+UI strings use the `NowoPdfEditorBundle` domain, shipped in `en`, `es`, `it`, `fr`, `pt`, `de` and `nl` (`src/Resources/translations/NowoPdfEditorBundle.<locale>.yaml`, key parity checked by `make validate-translations`). To override them (REQ-I18N-001):
+
+1. Use the same domain, `NowoPdfEditorBundle`.
+2. Create `translations/NowoPdfEditorBundle.<locale>.yaml` in the application.
+3. Redefine only the keys you need; missing keys fall back to the bundle catalogue (application translations win).
+
+```yaml
+# translations/NowoPdfEditorBundle.en.yaml — copy the keys you need from the bundle's NowoPdfEditorBundle.en.yaml
+```
 
 ## Workspace cleanup (TTL)
 

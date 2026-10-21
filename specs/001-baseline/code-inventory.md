@@ -106,14 +106,14 @@ Paths are relative to `src/`. Every tracked file is listed; Vite outputs under `
 
 | Source file | Spec section | Requirement IDs |
 | --- | --- | --- |
-| `Resources/assets/src/PdfEditorApp.tsx` | Editor app root | FR-FE-001 |
-| `Resources/assets/src/components/EditorShell.tsx` | UI component EditorShell.tsx | FR-FE-001 |
-| `Resources/assets/src/components/EditorToolbar.tsx` | UI component EditorToolbar.tsx | FR-FE-001 |
-| `Resources/assets/src/components/PageRail.tsx` | UI component PageRail.tsx | FR-FE-001 |
-| `Resources/assets/src/components/PropertiesPanel.tsx` | UI component PropertiesPanel.tsx | FR-FE-001 |
-| `Resources/assets/src/components/ScenarioBanner.tsx` | UI component ScenarioBanner.tsx | FR-FE-001 |
-| `Resources/assets/src/components/ViewerSkeleton.tsx` | UI component ViewerSkeleton.tsx | FR-FE-001 |
-| `Resources/assets/src/components/ViewportChrome.tsx` | UI component ViewportChrome.tsx | FR-FE-001 |
+| `Resources/assets/src/pdf-editor-app.tsx` | Editor app root | FR-FE-001 |
+| `Resources/assets/src/components/editor-shell.tsx` | UI component editor-shell.tsx | FR-FE-001 |
+| `Resources/assets/src/components/editor-toolbar.tsx` | UI component editor-toolbar.tsx | FR-FE-001 |
+| `Resources/assets/src/components/page-rail.tsx` | UI component page-rail.tsx | FR-FE-001 |
+| `Resources/assets/src/components/properties-panel.tsx` | UI component properties-panel.tsx | FR-FE-001 |
+| `Resources/assets/src/components/scenario-banner.tsx` | UI component scenario-banner.tsx | FR-FE-001 |
+| `Resources/assets/src/components/viewer-skeleton.tsx` | UI component viewer-skeleton.tsx | FR-FE-001 |
+| `Resources/assets/src/components/viewport-chrome.tsx` | UI component viewport-chrome.tsx | FR-FE-001 |
 | `Resources/assets/src/components/icons.tsx` | UI component icons.tsx | FR-FE-001 |
 | `Resources/assets/src/embedpdf-bridge.ts` | embedpdf bridge | FR-FE-003 |
 | `Resources/assets/src/engines/client-engine.ts` | Client PDF engine | FR-FE-002 |

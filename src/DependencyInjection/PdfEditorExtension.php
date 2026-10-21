@@ -13,9 +13,11 @@ use Nowo\PdfEditorBundle\Security\AllowAllPdfEditorAccessChecker;
 use Nowo\PdfEditorBundle\Security\PdfEditorAccessCheckerInterface;
 use Nowo\PdfEditorBundle\Security\RolePdfEditorAccessChecker;
 use Nowo\PdfEditorBundle\Security\WorkspaceOwnerResolverInterface;
+use Psr\Clock\ClockInterface;
 use Symfony\Component\Asset\Package;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
@@ -73,6 +75,7 @@ final class PdfEditorExtension extends Extension implements PrependExtensionInte
         $engine = new Definition(PythonPdfEngine::class, [
             '$processRunner' => new Reference('nowo_pdf_editor.process_runner'),
             '$profile'       => new Reference('nowo_pdf_editor.profile'),
+            '$logger'        => new Reference('logger', ContainerInterface::IGNORE_ON_INVALID_REFERENCE),
         ]);
         $container->setDefinition('nowo_pdf_editor.engine', $engine);
         $container->setAlias(PdfEngineInterface::class, 'nowo_pdf_editor.engine');
@@ -82,6 +85,8 @@ final class PdfEditorExtension extends Extension implements PrependExtensionInte
         $workspace = new Definition(WorkspaceManager::class, [
             '$profile' => new Reference('nowo_pdf_editor.profile'),
             '$owners'  => new Reference(WorkspaceOwnerResolverInterface::class),
+            '$clock'   => new Reference(ClockInterface::class, ContainerInterface::IGNORE_ON_INVALID_REFERENCE),
+            '$logger'  => new Reference('logger', ContainerInterface::IGNORE_ON_INVALID_REFERENCE),
         ]);
         $container->setDefinition('nowo_pdf_editor.workspace_manager', $workspace);
         $container->setAlias(WorkspaceManager::class, 'nowo_pdf_editor.workspace_manager');

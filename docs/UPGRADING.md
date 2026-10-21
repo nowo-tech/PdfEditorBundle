@@ -17,6 +17,10 @@
 
 ## Unreleased
 
+- Run `composer update nowo-tech/pdf-editor-bundle -W`: `twig/extra-bundle` and `twig/string-extra` are now required. Register `Twig\Extra\TwigExtraBundle\TwigExtraBundle` in `config/bundles.php` if Flex did not.
+- Routes keep their names and paths; keep importing `@PdfEditorBundle/Resources/config/routing.yaml`.
+- If you referenced the root `assets/` or `editor/` directories of the package, use `src/Resources/assets` / `src/Resources/views` (the root copies were stale and are removed).
+
 ## To 1.2.2
 
 From **1.2.1**:

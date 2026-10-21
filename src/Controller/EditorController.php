@@ -23,7 +23,9 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Csrf\CsrfToken;
@@ -49,6 +51,7 @@ use function unlink;
 use const LOCK_EX;
 use const LOCK_UN;
 
+#[AsController]
 final class EditorController
 {
     public function __construct(
@@ -65,6 +68,7 @@ final class EditorController
     ) {
     }
 
+    #[Route(path: '/pdf-editor', name: 'nowo_pdf_editor_home', methods: ['GET', 'POST'])]
     public function index(Request $request): Response
     {
         $this->assertAccess();
@@ -86,6 +90,7 @@ final class EditorController
         ]));
     }
 
+    #[Route(path: '/pdf-editor/{id}', name: 'nowo_pdf_editor_workspace', requirements: ['id' => '[a-f0-9]{32}'], methods: ['GET'])]
     public function workspace(string $id): Response
     {
         $this->assertAccess();
@@ -100,6 +105,7 @@ final class EditorController
         ]));
     }
 
+    #[Route(path: '/pdf-editor/{id}/inspect', name: 'nowo_pdf_editor_inspect', requirements: ['id' => '[a-f0-9]{32}'], methods: ['GET'])]
     public function inspect(string $id): JsonResponse
     {
         $this->assertAccess();
@@ -116,6 +122,7 @@ final class EditorController
         return new JsonResponse($this->engine->inspect($workspace->pdfPath));
     }
 
+    #[Route(path: '/pdf-editor/{id}/pages/{page}', name: 'nowo_pdf_editor_page', requirements: ['id' => '[a-f0-9]{32}', 'page' => '\d+'], methods: ['GET'])]
     public function pageImage(string $id, int $page): BinaryFileResponse
     {
         $this->assertAccess();
@@ -173,6 +180,7 @@ final class EditorController
         }
     }
 
+    #[Route(path: '/pdf-editor/{id}/apply', name: 'nowo_pdf_editor_apply', requirements: ['id' => '[a-f0-9]{32}'], methods: ['POST'])]
     public function apply(Request $request, string $id): JsonResponse
     {
         $this->assertAccess();
@@ -216,6 +224,7 @@ final class EditorController
         return new JsonResponse(['ok' => true, 'result' => $result]);
     }
 
+    #[Route(path: '/pdf-editor/{id}/view', name: 'nowo_pdf_editor_view', requirements: ['id' => '[a-f0-9]{32}'], methods: ['GET'])]
     public function view(string $id): BinaryFileResponse
     {
         $this->assertAccess();
@@ -231,6 +240,7 @@ final class EditorController
         return $response;
     }
 
+    #[Route(path: '/pdf-editor/{id}/download', name: 'nowo_pdf_editor_download', requirements: ['id' => '[a-f0-9]{32}'], methods: ['GET'])]
     public function download(string $id): BinaryFileResponse
     {
         $this->assertAccess();

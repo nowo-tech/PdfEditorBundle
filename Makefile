@@ -7,7 +7,7 @@ COMPOSE_BIN := $(shell docker compose version >/dev/null 2>&1 && echo "docker co
 COMPOSE     := $(COMPOSE_BIN) -f $(COMPOSE_FILE)
 SERVICE_PHP := php
 
-.PHONY: help up down down-dev build shell install test test-coverage coverage-php-percent cs-check cs-fix qa clean release-check release-check-demos demo-smoke composer-sync rector rector-dry phpstan igor update validate setup-hooks check-no-cursor-coauthor check-open-prs strip-cursor-coauthor-from-history
+.PHONY: help up down down-dev build shell install test test-coverage coverage-php-percent cs-check cs-fix qa clean release-check release-check-demos demo-smoke composer-sync rector rector-dry phpstan igor update validate setup-hooks check-no-cursor-coauthor check-open-prs strip-cursor-coauthor-from-history check-twig-extra check-no-raw-html-form validate-translations test-python test-ts
 
 help:
 	@echo "PDF Editor Bundle - Development Commands"
@@ -111,7 +111,48 @@ validate: ensure-up
 # Run Igor worker-state audit (REQ-CS-008)
 igor: ensure-up
 	$(COMPOSE) exec -T php composer igor
-release-check: check-no-cursor-coauthor check-open-prs ensure-up composer-sync cs-fix cs-check rector-dry phpstan igor test-coverage release-check-demos
+# REQ-MAKE-002: sequential chain, ensure-up first.
+release-check:
+	@$(MAKE) ensure-up
+	@$(MAKE) check-no-cursor-coauthor
+	@$(MAKE) check-open-prs
+	@$(MAKE) check-twig-extra
+	@$(MAKE) check-no-raw-html-form
+	@$(MAKE) composer-sync
+	@$(MAKE) cs-fix
+	@$(MAKE) cs-check
+	@$(MAKE) rector-dry
+	@$(MAKE) phpstan
+	@$(MAKE) igor
+	@$(MAKE) validate-translations
+	@$(MAKE) test-coverage
+	@$(MAKE) test-python
+	@$(MAKE) test-ts
+	@$(MAKE) release-check-demos
+
+# REQ-TWIG-004: twig/extra-bundle + string-extra required and configured in the demo.
+check-twig-extra:
+	@chmod +x .scripts/check-twig-extra.sh
+	@./.scripts/check-twig-extra.sh
+
+# REQ-TWIG-005: no raw <form>/<input>/<textarea>/<select> in bundle views or demo templates.
+check-no-raw-html-form:
+	@chmod +x .scripts/check-no-raw-html-form.sh
+	@./.scripts/check-no-raw-html-form.sh
+
+# REQ-MAKE-004 / REQ-I18N-002: key parity across the 7 locales + YAML syntax.
+validate-translations: ensure-up
+	python3 .scripts/check-translation-key-parity.py
+	$(COMPOSE) exec -T $(SERVICE_PHP) php -r 'require "vendor/autoload.php"; foreach (glob("src/Resources/translations/*.yaml") as $$f) { Symfony\Component\Yaml\Yaml::parseFile($$f); } echo "YAML OK\n";'
+
+# REQ-TEST-004: pytest for engine/pdf_editor_engine.py with a 90% line gate.
+test-python: ensure-up
+	$(COMPOSE) exec -T $(SERVICE_PHP) python3 -m pytest tests/Python -q -p no:cacheprovider --cov=engine --cov-report=term-missing --cov-fail-under=90
+
+# TypeScript: strict type check of the React editor (no TS unit tests yet; REQ-MAKE-002 "equivalent").
+test-ts:
+	pnpm install --frozen-lockfile
+	pnpm run typecheck
 
 release-check-demos:
 	@$(MAKE) -C demo release-check

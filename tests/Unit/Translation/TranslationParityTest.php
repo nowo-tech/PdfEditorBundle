@@ -52,8 +52,8 @@ final class TranslationParityTest extends TestCase
     #[DataProvider('provideLocales')]
     public function testLocaleHasSameKeysAsEnglish(string $locale): void
     {
-        $english = self::keys('en');
-        $keys    = self::keys($locale);
+        $english = $this->keys('en');
+        $keys    = $this->keys($locale);
 
         self::assertSame([], array_values(array_diff($english, $keys)), sprintf('Keys missing in "%s".', $locale));
         self::assertSame([], array_values(array_diff($keys, $english)), sprintf('Keys in "%s" missing in English.', $locale));
@@ -62,7 +62,7 @@ final class TranslationParityTest extends TestCase
     #[DataProvider('provideLocales')]
     public function testLocaleValuesAreNotEmpty(string $locale): void
     {
-        foreach (self::catalogue($locale) as $key => $value) {
+        foreach ($this->catalogue($locale) as $key => $value) {
             self::assertIsString($value, $key);
             self::assertNotSame('', trim($value), sprintf('Empty translation for "%s" in "%s".', $key, $locale));
         }
@@ -86,16 +86,16 @@ final class TranslationParityTest extends TestCase
         }
         self::assertNotSame([], $used);
 
-        $missing = array_values(array_diff(array_keys($used), self::keys('en')));
+        $missing = array_values(array_diff(array_keys($used), $this->keys('en')));
         self::assertSame([], $missing, 'Keys used in views/assets but missing in English: ' . implode(', ', $missing));
     }
 
     /**
      * @return list<string>
      */
-    private static function keys(string $locale): array
+    private function keys(string $locale): array
     {
-        $keys = array_keys(self::catalogue($locale));
+        $keys = array_keys($this->catalogue($locale));
         sort($keys);
 
         return $keys;
@@ -104,7 +104,7 @@ final class TranslationParityTest extends TestCase
     /**
      * @return array<string, mixed>
      */
-    private static function catalogue(string $locale): array
+    private function catalogue(string $locale): array
     {
         /** @var array<string, mixed> $data */
         $data = Yaml::parseFile(sprintf('%s/%s.%s.yaml', self::DIR, self::DOMAIN, $locale));

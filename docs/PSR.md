@@ -23,21 +23,21 @@ Others are **N/A** (or already covered by Symfony) so the decision stays auditab
 
 | PSR | Decision | Notes |
 | --- | -------- | ----- |
-| PSR-3 Logger | **Adopted** | `LoggerInterface` on Graph client, WhatsApp client, and webhook controller. Tokens and full phone numbers are never logged. |
-| PSR-6 / PSR-16 Cache | **N/A** | No package-owned cache layer. |
-| PSR-7 / PSR-17 HTTP messages | **N/A** | Symfony HttpFoundation is the webhook surface. |
-| PSR-18 HTTP client | **N/A** | Symfony HttpClient (`HttpClientInterface`) is the outbound Graph client; a PSR-18 bridge would not help Symfony hosts. |
+| PSR-3 Logger | **Adopted** | `WorkspaceManager` (workspace creation, TTL purge) and `PythonPdfEngine` (engine timeouts / failures) take an optional `Psr\Log\LoggerInterface` (the `logger` service); no document data, file names or tokens are logged. `psr/log` in `require`. |
+| PSR-6 / PSR-16 Cache | **N/A** | Workspaces live on the filesystem (`workspace_dir`); rendered page images are files next to the PDF, not a cache pool. |
+| PSR-7 / PSR-17 HTTP messages | **N/A** | Symfony HttpFoundation controllers (upload, inspect, render, apply, download). |
+| PSR-18 HTTP client | **N/A** | No outbound HTTP; the only external process is the optional Python engine (Symfony Process, REQ-RUNTIME-001). |
 | PSR-11 Container | **N/A** | Constructor injection only. |
-| PSR-14 Event dispatcher | **Adopted** | Symfony `EventDispatcherInterface` (PSR-14 compatible) for send/webhook events. |
-| PSR-15 HTTP middleware | **N/A** | Symfony controller for webhooks. |
-| PSR-20 Clock | **N/A** | No time-sensitive domain logic requiring a clock SPI. |
+| PSR-14 Event dispatcher | **N/A** | No PHP extension events; the editor talks to the browser through JSON endpoints. |
+| PSR-15 HTTP middleware | **N/A** | No middleware. |
+| PSR-20 Clock | **Adopted** | `WorkspaceManager::purgeOlderThan()` takes the TTL reference time from an optional `Psr\Clock\ClockInterface` (the `clock` service). `psr/clock` in `require`. |
 
 ## Summary
 
-- **Adopted beyond baseline:** PSR-3 Logger, PSR-14 Event dispatcher
+- **Adopted beyond baseline:** PSR-3 (logging), PSR-20 (clock).
 - **Rule:** do not add `psr/*` Composer dependencies without matching type-hints and DI wiring.
-- **Re-evaluate** when the package gains cache, clock, or PSR-18 surfaces.
+- **Re-evaluate** when the package gains HTTP clients, caches or extension events.
 
 ---
 
-_REQ-CS-007 evaluation date: 2026-08-24._
+_REQ-CS-007 evaluation date: 2026-10-21._

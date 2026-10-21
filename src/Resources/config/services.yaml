@@ -26,8 +26,8 @@ services:
     Nowo\PdfEditorBundle\Operation\OperationDecoder: ~
     Nowo\PdfEditorBundle\Form\PdfUploadType: ~
 
-    Nowo\PdfEditorBundle\Controller\EditorController:
-        tags: ['controller.service_arguments']
+    # #[AsController] + autoconfigure tag it controller.service_arguments (REQ-SF-003).
+    Nowo\PdfEditorBundle\Controller\EditorController: ~
 
     Nowo\PdfEditorBundle\Command\CheckEngineCommand: ~
     Nowo\PdfEditorBundle\Command\PurgeWorkspacesCommand: ~

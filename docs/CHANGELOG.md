@@ -21,6 +21,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Python engine test suite (`tests/Python`, pytest + pytest-cov, 90% line gate) with `make test-python` and a CI `python` job (REQ-TEST-004).
+- CI `frontend` job (TypeScript type check + Vite build) and `make test-ts`; `Demo smoke` workflow (tags, weekly, manual) (REQ-TEST-011).
+- `WorkspaceManager` and `PythonPdfEngine` log workspace creation, purges and engine timeouts/failures through the `logger` service (no document data, names or paths) (REQ-OBS-001); the workspace TTL reads the `clock` service (REQ-DI-001).
+
+### Changed
+
+- Routes are `#[Route]` attributes on `EditorController` (`#[AsController]`); `Resources/config/routing.yaml` only imports them, so the host import is unchanged (REQ-SF-004 / REQ-SF-003).
+- `twig/extra-bundle` and `twig/string-extra` are required; `psr/clock` and `psr/log` are explicit requirements (REQ-PKG-004 / REQ-TWIG-004).
+- `release-check` runs sequentially from `ensure-up` and adds `check-twig-extra`, `check-no-raw-html-form`, `validate-translations` (new, key parity across the 7 locales), `test-python` and `test-ts` (REQ-MAKE-002 / REQ-MAKE-004).
+- React sources use kebab-case file names (`pdf-editor-app.tsx`, `components/editor-shell.tsx`, …) (REQ-ASSETS-003); shipped build regenerated.
+- Demo: FrankenPHP Caddyfiles set the documented timeout stack (PHP 90 s < Caddy write 100 s, `max_wait_time` 30 s) (REQ-RUNTIME-001); `release-check` refreshes the bundle first (REQ-DEMO-007); DNS block commented (REQ-DEMO-009).
+- Docs: `docs/PSR.md` is the PdfEditor evaluation (it was a WhatsApp leftover) (REQ-CS-007); `docs/CONFIGURATION.md` Profiles and Translations sections (REQ-CFG-002 / REQ-I18N-001); `docs/SECURITY.md` Logging section.
+- Cursor baseline: `.cursorignore` and the 00/10/20/40/50 rule files (REQ-IDE-001…004); `.gitignore` grouped with comments (REQ-GITIGNORE-001).
+
+### Removed
+
+- Stale root copies `assets/` and `editor/` (unused duplicates of `src/Resources/assets` and `src/Resources/views`) no longer ship in the package (REQ-PKG-004 / REQ-ASSETS-001).
+
+### Fixed
+
+- `.scripts/check-no-cursor-coauthor.sh` also runs inside git worktrees (`.git` file instead of directory).
+- Docker images (bundle and demo) install PyMuPDF from 1.x binary wheels (`pymupdf>=1.24.0,<2`): PyMuPDF 2.0 has no musllinux wheel and the image build failed compiling it.
+
 ## [1.2.2] - 2026-10-20
 
 Dependency refresh (bundle and demos), php-cs-fixer ParallelConfig(2). See [UPGRADING](UPGRADING.md#to-122).

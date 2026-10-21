@@ -19,7 +19,7 @@ The Symfony **8** demo runs FrankenPHP. Set `FRANKENPHP_MODE=worker` (default) o
 
 This bundle is **100% compatible** with worker mode and `reset_kernel: false`. No bundle-specific reset hooks are required.
 
-Timeout stack: engine `timeout` 60s < PHP 90s < Caddy write 100s.
+Timeout stack: engine `timeout` 60s < PHP 90s < Caddy write 100s, with `max_wait_time 30s`; both demo Caddyfiles set it (`servers { timeouts { write 100s } }` and `frankenphp { php_ini max_execution_time 90; php_ini max_input_time 90; max_wait_time 30s }`).
 
 ```bash
 cd demo

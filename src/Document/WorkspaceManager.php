@@ -8,10 +8,13 @@ use InvalidArgumentException;
 use Nowo\PdfEditorBundle\Config\EditorProfile;
 use Nowo\PdfEditorBundle\Exception\DocumentException;
 use Nowo\PdfEditorBundle\Security\WorkspaceOwnerResolverInterface;
+use Psr\Clock\ClockInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 use function bin2hex;
 use function copy;
+use function count;
 use function fclose;
 use function file_get_contents;
 use function file_put_contents;
@@ -44,10 +47,14 @@ final class WorkspaceManager
 
     /**
      * @param WorkspaceOwnerResolverInterface|null $owners binds workspaces to their creator; null disables the check (direct instantiation / BC)
+     * @param ClockInterface|null                  $clock  time source for the workspace TTL (REQ-DI-001); system time when null
+     * @param LoggerInterface|null                 $logger logs workspace creation and purges, never file contents or names (REQ-OBS-001)
      */
     public function __construct(
         private readonly EditorProfile $profile,
         private readonly ?WorkspaceOwnerResolverInterface $owners = null,
+        private readonly ?ClockInterface $clock = null,
+        private readonly ?LoggerInterface $logger = null,
     ) {
     }
 
@@ -82,7 +89,7 @@ final class WorkspaceManager
         }
 
         // The client extension proves nothing: require the PDF magic bytes before keeping the file.
-        if (!self::hasPdfSignature($target)) {
+        if (!$this->hasPdfSignature($target)) {
             @unlink($target);
             @rmdir($directory);
 
@@ -92,6 +99,7 @@ final class WorkspaceManager
         $original = preg_replace('/[^A-Za-z0-9._-]+/', '_', $file->getClientOriginalName()) ?: 'document.pdf';
         file_put_contents($directory . '/meta.txt', $original);
         $this->writeOwner($directory);
+        $this->logger?->info('PDF editor workspace created from upload.', ['bundle' => 'pdf_editor', 'workspace' => $id, 'bytes' => $size === false ? null : $size]);
 
         return new Workspace($id, $directory, $target, $original);
     }
@@ -192,7 +200,7 @@ final class WorkspaceManager
         return hash_equals($stored, $current);
     }
 
-    private static function hasPdfSignature(string $path): bool
+    private function hasPdfSignature(string $path): bool
     {
         $handle = @fopen($path, 'r');
         if ($handle === false) { // @codeCoverageIgnoreStart
@@ -224,7 +232,7 @@ final class WorkspaceManager
             return [];
         }
 
-        $cutoff = ($now ?? time()) - $maxAgeSeconds;
+        $cutoff = ($now ?? $this->clock?->now()->getTimestamp() ?? time()) - $maxAgeSeconds;
         $purged = [];
         foreach ((array) scandir($root) as $entry) {
             $directory = $root . '/' . $entry;
@@ -239,6 +247,8 @@ final class WorkspaceManager
             }
             $purged[] = $entry;
         }
+
+        $this->logger?->info($dryRun ? 'PDF editor workspaces eligible for purge.' : 'PDF editor workspaces purged.', ['bundle' => 'pdf_editor', 'count' => count($purged), 'max_age_seconds' => $maxAgeSeconds, 'dry_run' => $dryRun]);
 
         return $purged;
     }

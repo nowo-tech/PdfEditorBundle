@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Nowo\PdfEditorBundle\Security;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -36,7 +37,7 @@ final readonly class WorkspaceOwnerResolver implements WorkspaceOwnerResolverInt
         }
 
         $request = $this->requestStack?->getCurrentRequest();
-        if ($request === null || !$request->hasSession()) {
+        if (!$request instanceof Request || !$request->hasSession()) {
             return null;
         }
 

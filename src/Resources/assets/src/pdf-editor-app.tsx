@@ -13,12 +13,23 @@ import {
   subscribePageChanges,
   subscribeTotalPages,
 } from './embedpdf-bridge';
-import { subscribeSelectionChanges, type SelectionSnapshot } from './selection-bridge';
-import { EditorShell } from './components/EditorShell';
-import { EditorToolbar } from './components/EditorToolbar';
-import { PageRail } from './components/PageRail';
-import { PropertiesPanel } from './components/PropertiesPanel';
-import { ViewerSkeleton } from './components/ViewerSkeleton';
+import {
+  applyObjectSelectionPatch,
+  deleteObjectSelection,
+  subscribeObjectSelection,
+  type ObjectSelection,
+  type ObjectSelectionPatch,
+} from './object-selection-bridge';
+import {
+  nativeTextReplacePlacement,
+  subscribeSelectionChanges,
+  type SelectionSnapshot,
+} from './selection-bridge';
+import { EditorShell } from './components/editor-shell';
+import { EditorToolbar } from './components/editor-toolbar';
+import { PageRail } from './components/page-rail';
+import { PropertiesPanel } from './components/properties-panel';
+import { ViewerSkeleton } from './components/viewer-skeleton';
 import './styles/editor.css';
 
 interface Props {
@@ -59,6 +70,7 @@ export function PdfEditorApp({ config }: Props) {
   const [thumbUrls, setThumbUrls] = useState<Record<number, string>>({});
   const [pending, setPending] = useState<EditorOp[]>([]);
   const [selection, setSelection] = useState<SelectionSnapshot | null>(null);
+  const [objectSelection, setObjectSelection] = useState<ObjectSelection | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -105,6 +117,7 @@ export function PdfEditorApp({ config }: Props) {
   useEffect(() => {
     setLoading(true);
     setSelection(null);
+    setObjectSelection(null);
     revokeThumbs();
   }, [reloadKey, revokeThumbs]);
 
@@ -133,6 +146,15 @@ export function PdfEditorApp({ config }: Props) {
       return undefined;
     }
     return subscribeSelectionChanges(registry, docId, setSelection);
+  }, [reloadKey, loading]);
+
+  useEffect(() => {
+    const registry = registryRef.current;
+    const docId = documentIdRef.current;
+    if (!registry || !docId || loading) {
+      return undefined;
+    }
+    return subscribeObjectSelection(registry, docId, setObjectSelection);
   }, [reloadKey, loading]);
 
   useEffect(() => {
@@ -177,6 +199,60 @@ export function PdfEditorApp({ config }: Props) {
     }
     scrollToPageNumber(registry, docId, page);
   }, []);
+
+  const handleApplyObject = useCallback(
+    (selected: ObjectSelection, patch: ObjectSelectionPatch) => {
+      const registry = registryRef.current;
+      const docId = documentIdRef.current;
+      if (!registry || !docId) {
+        return;
+      }
+      applyObjectSelectionPatch(registry, docId, selected, patch);
+    },
+    [],
+  );
+
+  const handleDeleteObject = useCallback(() => {
+    const registry = registryRef.current;
+    const docId = documentIdRef.current;
+
+    if (objectSelection && registry && docId) {
+      if (deleteObjectSelection(registry, docId, objectSelection)) {
+        setObjectSelection(null);
+        flash(t('properties.deleted', 'Deleted'));
+      }
+      return;
+    }
+
+    if (selection?.deletePages?.length) {
+      for (const page of selection.deletePages) {
+        queueOp({ op: 'delete_text', page: page.page, rects: page.rects });
+      }
+      setSelection(null);
+    }
+  }, [objectSelection, selection, queueOp, t]);
+
+  const handleReplaceNativeText = useCallback(
+    (text: string, fontSize: number) => {
+      if (!selection || !text.trim()) {
+        return;
+      }
+      const placement = nativeTextReplacePlacement(selection);
+      for (const page of selection.deletePages) {
+        queueOp({ op: 'delete_text', page: page.page, rects: page.rects });
+      }
+      queueOp({
+        op: 'insert_text',
+        page: placement.page,
+        x: placement.x,
+        y: placement.y,
+        text,
+        fontSize,
+      });
+      setSelection(null);
+    },
+    [selection, queueOp],
+  );
 
   const handleToolChange = (next: string) => {
     setTool(next);
@@ -296,11 +372,15 @@ export function PdfEditorApp({ config }: Props) {
           tool={tool}
           currentPage={currentPage}
           selection={selection}
+          objectSelection={objectSelection}
           pending={pending}
           i18n={config.i18n}
           saveError={saveError}
           onQueueOp={queueOp}
           onRemovePending={(index) => setPending((current) => current.filter((_, i) => i !== index))}
+          onApplyObject={handleApplyObject}
+          onDeleteObject={handleDeleteObject}
+          onReplaceNativeText={handleReplaceNativeText}
         />
       )}
       toast={toast ? <p className="nowo-ui-toast" role="status">{toast}</p> : null}

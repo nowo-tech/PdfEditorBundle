@@ -6,6 +6,7 @@
 - [Reporting a Vulnerability](#reporting-a-vulnerability)
 - [Scope and attack surface](#scope-and-attack-surface)
 - [Threat model and mitigations](#threat-model-and-mitigations)
+- [Logging](#logging)
 - [Dependencies and updates](#dependencies-and-updates)
 - [Release security checklist (12.4.1)](#release-security-checklist-1241)
 
@@ -59,6 +60,19 @@ This bundle provides:
   - Twig escapes config JSON for HTML attributes; prefer `textContent` in legacy JS.
 - **Secrets**
   - No bundle feature requires hardcoded secrets; keep `.env` untracked.
+
+## Logging
+
+The bundle logs through the injected `logger` service (REQ-OBS-001):
+
+| Event | Level | Context |
+| --- | --- | --- |
+| Workspace created from an upload | `info` | `bundle`, `workspace` (random id), `bytes` |
+| Workspaces purged (`nowo:pdf-editor:purge`, TTL) | `info` | `bundle`, `count`, `max_age_seconds`, `dry_run` |
+| Python engine timed out | `warning` | `bundle`, `command` (`inspect` / `render` / `apply` / `version`), `timeout` |
+| Python engine exited with an error | `error` | `bundle`, `command`, `exit_code` |
+
+Never logged: PDF contents or text, original file names, workspace paths, owner identifiers, CSRF tokens or engine stderr.
 
 ## Dependencies and updates
 

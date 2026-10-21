@@ -127,3 +127,39 @@ jobs:
 
       - name: Check code style
         run: composer cs-check
+
+  python:
+    name: Python engine (pytest, coverage gate)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Install engine and test dependencies (runner Python 3, isolated venv)
+        run: |
+          python3 -m venv .venv
+          .venv/bin/python -m pip install -r engine/requirements.txt pytest pytest-cov
+
+      - name: Run pytest (REQ-TEST-004, fails below 90% lines)
+        run: .venv/bin/python -m pytest tests/Python -q --cov=engine --cov-report=term-missing --cov-fail-under=90
+
+  frontend:
+    name: Frontend (TypeScript type check + build)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+
+      - name: Setup pnpm (version from package.json packageManager)
+        uses: pnpm/action-setup@v6
+
+      - name: Install JS dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Type check and build
+        run: pnpm run build

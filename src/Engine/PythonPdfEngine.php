@@ -8,6 +8,7 @@ use JsonException;
 use Nowo\PdfEditorBundle\Config\EditorProfile;
 use Nowo\PdfEditorBundle\Exception\EngineException;
 use Nowo\PdfEditorBundle\Operation\EditorOperation;
+use Psr\Log\LoggerInterface;
 
 use function is_array;
 use function is_file;
@@ -22,9 +23,15 @@ use const JSON_THROW_ON_ERROR;
 
 final class PythonPdfEngine implements PdfEngineInterface
 {
+    /**
+     * @param ProcessRunnerInterface $processRunner runs the Python engine with the profile timeouts
+     * @param EditorProfile          $profile       engine script, binary and timeouts
+     * @param LoggerInterface|null   $logger        logs engine failures and timeouts (command only, no document data, REQ-OBS-001)
+     */
     public function __construct(
         private readonly ProcessRunnerInterface $processRunner,
         private readonly EditorProfile $profile,
+        private readonly ?LoggerInterface $logger = null,
     ) {
     }
 
@@ -104,7 +111,13 @@ final class PythonPdfEngine implements PdfEngineInterface
         $outcome = $this->processRunner->run($command, $this->profile->timeout, $this->profile->idleTimeout);
 
         if ($outcome->timedOut) {
+            $this->logger?->warning('PDF engine process timed out.', ['bundle' => 'pdf_editor', 'command' => $args[0] ?? '', 'timeout' => $this->profile->timeout]);
+
             throw EngineException::timedOut($this->profile->timeout);
+        }
+
+        if (!$outcome->isSuccessful()) {
+            $this->logger?->error('PDF engine process failed.', ['bundle' => 'pdf_editor', 'command' => $args[0] ?? '', 'exit_code' => $outcome->exitCode]);
         }
 
         $raw = $outcome->stdout !== '' ? $outcome->stdout : $outcome->stderr;

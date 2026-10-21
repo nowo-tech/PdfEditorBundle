@@ -1,6 +1,6 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { PdfEditorApp } from './PdfEditorApp';
+import { PdfEditorApp } from './pdf-editor-app';
 import type { WorkspaceConfig } from './types';
 
 const mount = document.getElementById('nowo-pdf-editor-react-root');
