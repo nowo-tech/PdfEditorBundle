@@ -3,6 +3,7 @@
 ## Table of contents
 
 - [Unreleased](#unreleased)
+- [To 1.3.0](#to-130)
 - [To 1.2.2](#to-122)
 - [To 1.2.1](#to-121)
 - [To 1.2.0](#to-120)
@@ -16,6 +17,14 @@
 - [From nothing → 1.0.0](#from-nothing--100)
 
 ## Unreleased
+
+## To 1.3.0
+
+From **1.2.2**:
+
+```bash
+composer update nowo-tech/pdf-editor-bundle
+```
 
 - Run `composer update nowo-tech/pdf-editor-bundle -W`: `twig/extra-bundle` and `twig/string-extra` are now required. Register `Twig\Extra\TwigExtraBundle\TwigExtraBundle` in `config/bundles.php` if Flex did not.
 - Routes keep their names and paths; keep importing `@PdfEditorBundle/Resources/config/routing.yaml`.
