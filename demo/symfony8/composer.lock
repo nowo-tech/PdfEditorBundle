@@ -8,7 +8,7 @@
     "packages": [
         {
             "name": "nowo-tech/pdf-editor-bundle",
-            "version": "dev-chore/req-wave2",
+            "version": "dev-main",
             "dist": {
                 "type": "path",
                 "url": "/var/pdf-editor-bundle",
