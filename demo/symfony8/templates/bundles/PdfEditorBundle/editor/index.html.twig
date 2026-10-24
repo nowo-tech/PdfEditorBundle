@@ -10,7 +10,11 @@
             <div class="demo-upload-drop">
                 <p>{{ 'demo.upload.drop_hint'|trans|default('Drop a PDF here or choose a file below') }}</p>
                 {{ form_start(form, { attr: { class: 'nowo-ui-form' } }) }}
-                    {{ form_row(form.pdf) }}
+                    {% for child in form %}
+                        {% if not child.rendered %}
+                            {{ form_row(child) }}
+                        {% endif %}
+                    {% endfor %}
                     <button type="submit" class="nowo-ui-btn nowo-ui-btn-primary">{{ 'pdf_editor.home.open'|trans({}, 'NowoPdfEditorBundle') }}</button>
                 {{ form_end(form) }}
             </div>

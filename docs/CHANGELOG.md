@@ -22,6 +22,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- `editor/index.html.twig` renders the upload form body through the child loop (`{% for child in form %}` + `not child.rendered` + `form_row(child)`) instead of `form_row(form.pdf)`; the demo overrides follow the same pattern (REQ-TWIG-003). Same markup for the current `PdfUploadType`; new fields now render without overriding the template.
+
 ## [1.3.0] - 2026-10-21
 
 Attribute routes, logger and clock, Python engine tests, release-check gates, demo timeouts, stale root trees removed. See [UPGRADING](UPGRADING.md#to-130).
