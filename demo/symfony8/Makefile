@@ -1,6 +1,6 @@
 # Makefile for Symfony 8.1 Demo (PDF Editor Bundle)
 
-.PHONY: help up down build install shell logs test test-coverage cache-clear update-bundle ensure-up verify assets assets-install assets-bundle restart fixtures-sync
+.PHONY: help up down build install shell logs test test-coverage cache-clear update-bundle ensure-up verify assets assets-install assets-bundle restart fixtures-sync test-e2e demo-screenshots
 
 BUNDLE_ROOT := $(abspath $(dir $(lastword $(MAKEFILE_LIST)))/../..)
 COMPOSE := $(shell docker compose version >/dev/null 2>&1 && echo "docker compose" || echo "docker-compose")
@@ -22,6 +22,8 @@ help:
 	@echo "  make cache-clear     Clear Symfony cache"
 	@echo "  make update-bundle   Update bundle from path and clear cache"
 	@echo "  make verify          Start and check HTTP 200"
+	@echo "  make test-e2e        Playwright happy path (official Playwright image)"
+	@echo "  make demo-screenshots Refresh docs/images/demo/*.webp"
 	@echo ""
 
 fixtures-sync:
@@ -114,3 +116,28 @@ verify:
 # REQ-MAKE-008: update-deps (REQ-MAKE-008)
 # Optional: monorepo helper absent on standalone GitHub Actions checkout (REQ-MAKE-009).
 -include $(BUNDLE_ROOT)/../.scripts/Makefile.demo-update-deps.mk
+
+# REQ-DEMO-013: Playwright e2e and README screenshots (official Playwright image, nothing to install on the host).
+PLAYWRIGHT_IMAGE ?= mcr.microsoft.com/playwright:v1.63.0-jammy
+
+test-e2e: ensure-up
+	@mkdir -p e2e/node_modules
+	@PORT=$$(grep -E '^PORT=' .env 2>/dev/null | cut -d= -f2); PORT=$${PORT:-8031}; \
+	docker run --rm --network host \
+		-v "$(CURDIR)/e2e:/e2e" -w /e2e \
+		-e DEMO_BASE_URL=http://127.0.0.1:$$PORT \
+		$(PLAYWRIGHT_IMAGE) \
+		bash -lc 'npm install --no-fund --no-audit && npx playwright test --project=chromium'
+
+demo-screenshots: ensure-up
+	@mkdir -p ../../docs/images/demo e2e/node_modules
+	@PORT=$$(grep -E '^PORT=' .env 2>/dev/null | cut -d= -f2); PORT=$${PORT:-8031}; \
+	docker run --rm --network host \
+		-v "$(CURDIR)/e2e:/e2e" \
+		-v "$(CURDIR)/../../docs/images/demo:/screenshots" \
+		-w /e2e \
+		-e DEMO_BASE_URL=http://127.0.0.1:$$PORT \
+		-e SCREENSHOT_DIR=/screenshots \
+		$(PLAYWRIGHT_IMAGE) \
+		bash -lc 'npm install --no-fund --no-audit && npx playwright test --project=screenshots && node scripts/to-webp.mjs /screenshots'
+	@echo "Screenshots written under docs/images/demo/ (WebP)"

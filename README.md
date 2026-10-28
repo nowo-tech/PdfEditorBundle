@@ -14,6 +14,21 @@ This includes **`reset_kernel: false`** (long-lived kernel).
 
 **FrankenPHP worker mode:** Supported at **100%** under scenario B (kernel not rebooted). All shared services are stateless; Process timeouts stop the Python engine on expiry. Demo defaults: `FRANKENPHP_MODE=worker`, `FRANKENPHP_RESET_KERNEL` unset (`false`). See [Demo with FrankenPHP](docs/DEMO-FRANKENPHP.md) and the [worker audit](docs/FRANKENPHP-WORKER-AUDIT.md).
 
+<table>
+  <tr>
+    <td align="center" width="50%">
+      <img src="docs/images/demo/editor.webp" alt="PDF editor workspace with the tool bar, page thumbnails, the rendered page and the properties panel" />
+      <br /><sub>Editor workspace: tools, page rail, PDF canvas and properties</sub>
+    </td>
+    <td align="center" width="50%">
+      <img src="docs/images/demo/draft.webp" alt="Draft panel listing a queued rotate-page operation before saving to PDF" />
+      <br /><sub>Draft-then-save: page operations queue until Save to PDF</sub>
+    </td>
+  </tr>
+</table>
+
+The screenshots come from the Symfony 8 demo (`make -C demo/symfony8 up`, then **Scenarios**). Refresh them with `make -C demo/symfony8 demo-screenshots`; `make -C demo/symfony8 test-e2e` runs the Playwright happy path.
+
 ## Table of contents
 
 - [What is this?](#what-is-this)
