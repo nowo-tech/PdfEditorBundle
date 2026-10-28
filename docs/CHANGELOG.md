@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Table of contents
 
 - [[Unreleased]](#unreleased)
+- [[1.4.0] - 2026-10-28](#140---2026-10-28)
 - [[1.3.1] - 2026-10-24](#131---2026-10-24)
 - [[1.3.0] - 2026-10-21](#130---2026-10-21)
 - [[1.2.2] - 2026-10-20](#122---2026-10-20)
@@ -22,6 +23,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [[1.0.0] - 2026-08-24](#100---2026-08-24)
 
 ## [Unreleased]
+
+## [1.4.0] - 2026-10-28
+
+Security: allow_unauthenticated is refused in production (prod or non-debug kernels). See [UPGRADING](UPGRADING.md#to-140).
 
 ### Security
 
@@ -145,6 +150,7 @@ Dependency refresh (bundle and demos), php-cs-fixer ParallelConfig(2). See [UPGR
 
 - **Worker safety (Igor):** justified `// @igor-ignore` annotations and/or `ResetInterface` / request-scoped fixes so `make igor` passes on package `src/`.
 
+[1.4.0]: https://github.com/nowo-tech/PdfEditorBundle/releases/tag/v1.4.0
 [1.3.1]: https://github.com/nowo-tech/PdfEditorBundle/releases/tag/v1.3.1
 [1.3.0]: https://github.com/nowo-tech/PdfEditorBundle/releases/tag/v1.3.0
 [1.2.2]: https://github.com/nowo-tech/PdfEditorBundle/releases/tag/v1.2.2
