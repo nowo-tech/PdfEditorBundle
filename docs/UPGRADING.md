@@ -3,6 +3,7 @@
 ## Table of contents
 
 - [Unreleased](#unreleased)
+- [To 1.4.1](#to-141)
 - [To 1.4.0](#to-140)
 - [To 1.3.1](#to-131)
 - [To 1.3.0](#to-130)
@@ -19,6 +20,14 @@
 - [From nothing → 1.0.0](#from-nothing--100)
 
 ## Unreleased
+
+## To 1.4.1
+
+From **1.4.0**:
+
+```bash
+composer update nowo-tech/pdf-editor-bundle
+```
 
 ## To 1.4.0
 
