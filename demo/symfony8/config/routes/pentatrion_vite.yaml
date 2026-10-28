@@ -1,3 +1,10 @@
 _pentatrion_vite:
     prefix: /build
     resource: '@PentatrionViteBundle/Resources/config/routing.yaml'
+
+# Web Debug Toolbar "Vite" panel (Pentatrion collector links to this route in dev).
+when@dev:
+    _profiler_vite:
+        path: /_profiler/vite
+        defaults:
+            _controller: Pentatrion\ViteBundle\Controller\ProfilerController::info

@@ -118,5 +118,6 @@
 {% endblock %}
 
 {% block nowo_pdf_editor_scripts %}
-    {{ vite_entry_script_tags('pdf-editor') }}
+    {# Bundle build (rebuilt from src/Resources/assets by `make up`); the demo Vite entrypoints only ship `app`. #}
+    <script type="module" src="{{ asset('build/pdf-editor.js', 'nowo_pdf_editor') }}"></script>
 {% endblock %}
