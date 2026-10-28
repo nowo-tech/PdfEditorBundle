@@ -24,6 +24,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Stock layout stylesheet.** `editor/layout.html.twig` linked only the base `css/pdf-editor.css`, never the compiled
+  editor styles `build/pdf-editor.css` (page rail, paginator, badges…); hosts using the bundle layout got a partly
+  unstyled editor. Both are linked now (the demo override already did).
+
 ## [1.4.0] - 2026-10-28
 
 Security: allow_unauthenticated is refused in production (prod or non-debug kernels). See [UPGRADING](UPGRADING.md#to-140).
