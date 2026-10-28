@@ -13,3 +13,9 @@ nowo_pdf_editor:
     security:
         allow_unauthenticated: true
         roles: [ROLE_ADMIN]
+
+# Production mode (DEMO-FRANKENPHP): allow_unauthenticated is refused outside dev/test, so the editor needs a role.
+when@prod:
+    nowo_pdf_editor:
+        security:
+            allow_unauthenticated: false

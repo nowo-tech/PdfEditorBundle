@@ -23,6 +23,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Security
+
+- **`allow_unauthenticated` refused in production.** The switch opens the PDF editor to anonymous users; the
+  container now refuses to compile with it in the `prod` environment or in any non-debug kernel outside `test*`
+  environments (as ContactFormBundle). The demo keeps it in `dev` and requires `ROLE_ADMIN` in its production mode
+  (`when@prod`).
+
 ## [1.3.1] - 2026-10-24
 
 Bundle views render form bodies through the child loop (REQ-TWIG-003). See [UPGRADING](UPGRADING.md#to-131).

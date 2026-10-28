@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Nowo\PdfEditorBundle\DependencyInjection;
 
+use LogicException;
 use Nowo\PdfEditorBundle\Config\EditorProfile;
 use Nowo\PdfEditorBundle\Document\WorkspaceManager;
 use Nowo\PdfEditorBundle\Engine\PdfEngineInterface;
@@ -26,6 +27,8 @@ use Symfony\Component\DependencyInjection\Reference;
 
 use function class_exists;
 use function dirname;
+use function is_string;
+use function str_starts_with;
 
 /**
  * @author Héctor Franco Aceituno <hectorfranco@nowo.tech>
@@ -46,7 +49,10 @@ final class PdfEditorExtension extends Extension implements PrependExtensionInte
         $profiles       = $config['profiles'];
         $security       = $config['security'];
         $allowUnauth    = (bool) $security['allow_unauthenticated'];
-        $roles          = array_values($security['roles']);
+        if ($allowUnauth) {
+            $this->refuseAllowUnauthenticatedInProduction($container);
+        }
+        $roles = array_values($security['roles']);
 
         // Configuration guarantees that default_profile exists under profiles.
         $profileConfig = $profiles[$defaultProfile];
@@ -146,5 +152,20 @@ final class PdfEditorExtension extends Extension implements PrependExtensionInte
     public function getAlias(): string
     {
         return 'nowo_pdf_editor';
+    }
+
+    /**
+     * `allow_unauthenticated` opens the PDF editor to anonymous users: a dev / demo switch, refused in the prod environment and in
+     * any non-debug kernel outside the test environments (test*), as in ContactFormBundle.
+     */
+    private function refuseAllowUnauthenticatedInProduction(ContainerBuilder $container): void
+    {
+        $environment = $container->hasParameter('kernel.environment') ? $container->getParameter('kernel.environment') : '';
+        $environment = is_string($environment) ? $environment : '';
+        $debug       = $container->hasParameter('kernel.debug') ? (bool) $container->getParameter('kernel.debug') : true;
+
+        if ($environment === 'prod' || (!$debug && !str_starts_with($environment, 'test'))) {
+            throw new LogicException('nowo_pdf_editor.security.allow_unauthenticated is a dev/demo switch: it opens the PDF editor to anonymous users and is refused in the prod environment and in non-debug kernels (test* environments excepted).');
+        }
     }
 }

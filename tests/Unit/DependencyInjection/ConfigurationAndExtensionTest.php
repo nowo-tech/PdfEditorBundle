@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Nowo\PdfEditorBundle\Tests\Unit\DependencyInjection;
 
+use LogicException;
 use Nowo\PdfEditorBundle\Config\EditorProfile;
 use Nowo\PdfEditorBundle\DependencyInjection\Configuration;
 use Nowo\PdfEditorBundle\DependencyInjection\PdfEditorExtension;
@@ -80,6 +81,21 @@ final class ConfigurationAndExtensionTest extends TestCase
         self::assertIsString($engineScript);
         self::assertStringEndsWith('/engine/pdf_editor_engine.py', $engineScript);
         self::assertStringNotContainsString('vendor/nowo-tech/pdf-editor-bundle', $engineScript);
+    }
+
+    public function testAllowUnauthenticatedIsRefusedInProduction(): void
+    {
+        foreach ([['prod', true], ['staging', false]] as [$environment, $debug]) {
+            $container = $this->container();
+            $container->setParameter('kernel.environment', $environment);
+            $container->setParameter('kernel.debug', $debug);
+            try {
+                (new PdfEditorExtension())->load([['security' => ['allow_unauthenticated' => true]]], $container);
+                self::fail($environment . ': allow_unauthenticated must be refused');
+            } catch (LogicException $e) {
+                self::assertStringContainsString('dev/demo switch', $e->getMessage());
+            }
+        }
     }
 
     public function testLoadAllowUnauthenticatedAndCustomEngineScript(): void
