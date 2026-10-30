@@ -127,7 +127,7 @@ def test_apply_all_operations(workspace: Path) -> None:
         {"op": "delete_page", "page": 4},
     ]
     result = engine.apply_ops(str(pdf), ops, str(out))
-    assert result == {"applied": len(ops), "pageCount": 3, "out": str(out)}
+    assert result == {"applied": len(ops), "pageCount": 3}
     inspected = engine.inspect_pdf(str(out))
     assert inspected["pageCount"] == 3
 
@@ -156,7 +156,9 @@ def test_cli_commands(workspace: Path, capsys: pytest.CaptureFixture[str]) -> No
 
     png = workspace / "p.png"
     engine.main(["render", "--pdf", str(pdf), "--page", "1", "--out", str(png), "--dpi", "36"])
-    assert json.loads(capsys.readouterr().out)["out"] == str(png)
+    rendered = json.loads(capsys.readouterr().out)
+    assert "out" not in rendered
+    assert rendered["page"] == 1
     assert png.exists()
 
     ops = workspace / "ops.json"
@@ -266,3 +268,21 @@ def test_memory_limit_stops_a_pixel_bomb_in_a_real_process(workspace: Path) -> N
     assert result.returncode == 1
     assert json.loads(result.stderr.strip().splitlines()[-1])["ok"] is False
     assert not (workspace / "b.png").exists()
+
+
+def test_documents_above_max_pages_stay_editable(workspace: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(engine, "MAX_PAGES", 3)
+    pdf = make_pdf(workspace / "big.pdf", pages=5)
+    out = workspace / "rotated.pdf"
+    result = engine.apply_ops(str(pdf), [{"op": "rotate_page", "page": 1}, {"op": "delete_page", "page": 5}], str(out))
+    assert result == {"applied": 2, "pageCount": 4}
+
+    with pytest.raises(ValueError, match="more than 5 pages"):
+        engine.apply_ops(str(pdf), [{"op": "insert_blank_page"}], str(workspace / "grown.pdf"))
+
+
+def test_apply_result_carries_no_paths(workspace: Path) -> None:
+    pdf = make_pdf(workspace / "p.pdf")
+    result = engine.apply_ops(str(pdf), [{"op": "rotate_page", "page": 1}], str(workspace / "o.pdf"))
+    assert result == {"applied": 1, "pageCount": 1}
+    assert str(workspace) not in json.dumps(result)
