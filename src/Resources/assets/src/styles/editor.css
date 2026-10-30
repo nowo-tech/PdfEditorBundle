@@ -382,7 +382,7 @@
   }
 }
 
-.nowo-pdf-editor-shell .nowo-ui-toast {
+.nowo-pdf-editor-shell .nowo-pdf-editor-toast {
   position: fixed;
   bottom: 16px;
   right: 16px;
@@ -394,7 +394,7 @@
   margin: 0;
 }
 
-.nowo-ui-btn-icon svg {
+.nowo-pdf-editor-btn-icon svg {
   stroke: currentColor;
 }
 

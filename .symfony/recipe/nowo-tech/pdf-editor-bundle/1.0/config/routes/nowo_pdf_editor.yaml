@@ -1,2 +1,2 @@
 nowo_pdf_editor:
-    resource: '@PdfEditorBundle/Resources/config/routing.yaml'
+    resource: '@NowoPdfEditorBundle/Resources/config/routing.yaml'

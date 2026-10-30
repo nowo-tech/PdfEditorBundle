@@ -21,6 +21,52 @@
 
 ## Unreleased
 
+From **1.4.1**. Requires Symfony **7.4 / 8.0 / 8.1** (6.4 and 7.0–7.3 are no longer supported: the pages now use
+`nowo-tech/ui-kit-bundle` 2.x, installed as a dependency).
+
+```bash
+composer update nowo-tech/pdf-editor-bundle --with-dependencies
+```
+
+1. **Bundle class** (deprecated alias kept until 2.0). In `config/bundles.php` register UiKit and the new class:
+
+   ```php
+   Nowo\UiKitBundle\NowoUiKitBundle::class => ['all' => true],
+   Nowo\PdfEditorBundle\NowoPdfEditorBundle::class => ['all' => true],   // was Nowo\PdfEditorBundle\PdfEditorBundle
+   ```
+
+   and change the routing import to `resource: '@NowoPdfEditorBundle/Resources/config/routing.yaml'` (route names and
+   paths are unchanged). Then run `php bin/console assets:install`: public assets move from `/bundles/pdfeditor/` to
+   `/bundles/nowopdfeditor/` (the `nowo_pdf_editor` asset package follows automatically). Keeping the old class works
+   (deprecation notice; assets stay under `/bundles/pdfeditor/`), but you still have to register `NowoUiKitBundle`.
+2. **Security keys** (REQ-UI-002): rename `nowo_pdf_editor.security.roles` to `security.access_roles` (the old key is
+   deprecated and mapped). New `security.access_checker` (service id of your `PdfEditorAccessCheckerInterface`). An
+   empty `access_roles` list without a custom checker now fails the container build instead of locking everybody out.
+   The container also fails to build without SecurityBundle or with CSRF protection disabled.
+3. **Template contract** (REQ-UI-003 / REQ-TWIG-002):
+   - Twig namespace: `@NowoPdfEditorBundle/...` (application overrides under `templates/bundles/NowoPdfEditorBundle/`).
+     `@PdfEditor/...` still resolves to the bundle views until 2.0, but the bundle renders `@NowoPdfEditorBundle/...`,
+     so files under `templates/bundles/PdfEditorBundle/` **no longer override the editor pages**: move them to
+     `templates/bundles/NowoPdfEditorBundle/` (and replace `{% extends '@NowoPdfEditorBundle/…' %}` inside them by
+     `@!NowoPdfEditorBundle/…`).
+   - The pages render inside the UiKit admin layout (`nowo_ui_kit.layouts.admin`, or the new
+     `nowo_pdf_editor.web_ui.layout_template`) instead of the standalone `editor/layout.html.twig` HTML document. Set
+     `nowo_ui_kit.layouts.admin` to your layout (or a bridge) once. Overrides of `editor/layout.html.twig` made only to
+     add host chrome can be deleted.
+   - `editor/index.html.twig` (upload) is now the UiKit form scaffold with a `page` view model
+     (`PdfEditorPages::upload()`); its 1.x block `nowo_pdf_editor_body` is gone — use `nowo_ui_form_aside` /
+     `nowo_ui_form_body`, or the UiKit theme, instead of a full fork.
+   - `editor/workspace.html.twig` is a unique page: it keeps the `nowo_pdf_editor_body` and `nowo_pdf_editor_scripts`
+     blocks (now inside `nowo_ui_content` / `nowo_ui_scripts`) and accepts a `nowo_pdf_editor_config` hash merged into
+     the editor configuration; the editor config now always contains the complete `i18n` map and `layout.mode: embed`.
+   - `editor/layout.html.twig` and `editor/_toolbar.html.twig` are deprecated (removed in 2.0). The layout is a shim
+     on the UiKit layout that maps `nowo_pdf_editor_title` / `nowo_pdf_editor_body` / `nowo_pdf_editor_scripts` onto
+     the canonical blocks.
+   - CSS: the editor's private classes are renamed from `nowo-ui-btn*`, `nowo-ui-input`, `nowo-ui-label`,
+     `nowo-ui-muted`, `nowo-ui-subtitle`, `nowo-ui-toast` to `nowo-pdf-editor-btn*`, `nowo-pdf-editor-input`, … so they
+     no longer restyle UiKit's `nowo-ui-*` classes on the host page. Update host CSS that targeted the old names inside
+     the editor. `.nowo-ui-body`, `.nowo-ui-card` and `.nowo-ui-title` are no longer styled by `css/pdf-editor.css`.
+
 ## To 1.4.1
 
 From **1.4.0**:

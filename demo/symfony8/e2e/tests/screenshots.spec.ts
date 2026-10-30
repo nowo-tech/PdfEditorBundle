@@ -22,13 +22,20 @@ test.describe('PdfEditor screenshots', () => {
     await page.screenshot({ path: resolve(outDir, 'editor.png') });
   });
 
+  test('upload — UiKit form scaffold inside the host layout', async ({ page }) => {
+    await page.goto('/pdf-editor');
+    await expect(page.locator('[data-testid="pdf-editor-upload"]')).toBeVisible();
+    await waitForWebProfiler(page);
+    await page.screenshot({ path: resolve(outDir, 'upload.png') });
+  });
+
   test('draft — queued page operations before saving to PDF', async ({ page }) => {
     await openScenario(page, 'pages');
     await page.getByRole('button', { name: 'Rotate page' }).click();
     await expect(page.locator('.nowo-pdf-editor-pending-count')).toHaveText('1');
     // Drop the button tooltip and let the "Added to draft" toast fade out.
     await page.mouse.move(700, 450);
-    await expect(page.locator('.nowo-ui-toast')).toHaveCount(0, { timeout: 15000 }).catch(() => undefined);
+    await expect(page.locator('.nowo-pdf-editor-toast')).toHaveCount(0, { timeout: 15000 }).catch(() => undefined);
     await waitForWebProfiler(page);
     await page.screenshot({ path: resolve(outDir, 'draft.png') });
   });

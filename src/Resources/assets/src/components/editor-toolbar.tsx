@@ -46,7 +46,7 @@ export function EditorToolbar({
             <button
               key={id}
               type="button"
-              className={`nowo-ui-btn nowo-ui-btn-icon${tool === id ? ' is-active' : ''}`}
+              className={`nowo-pdf-editor-btn nowo-pdf-editor-btn-icon${tool === id ? ' is-active' : ''}`}
               title={t(tipKey, id)}
               data-tooltip={t(tipKey, id)}
               aria-label={t(`tool.${id}`, id)}
@@ -91,7 +91,7 @@ export function EditorToolbar({
             <button
               key={id}
               type="button"
-              className={`nowo-ui-btn nowo-ui-btn-icon${isPrimary ? ' nowo-ui-btn-primary' : ''}`}
+              className={`nowo-pdf-editor-btn nowo-pdf-editor-btn-icon${isPrimary ? ' nowo-pdf-editor-btn-primary' : ''}`}
               title={t(tipKey, id)}
               data-tooltip={t(tipKey, id)}
               aria-label={t(labelKey, id)}
@@ -111,7 +111,7 @@ export function EditorToolbar({
           );
         })}
         <a
-          className="nowo-ui-btn nowo-ui-btn-icon"
+          className="nowo-pdf-editor-btn nowo-pdf-editor-btn-icon"
           href={downloadUrl}
           title={t('action.download_tip', 'Download')}
           data-tooltip={t('action.download_tip', 'Download')}

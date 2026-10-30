@@ -1,5 +1,5 @@
-# Bundle routes are #[Route] attributes on EditorController (REQ-SF-004); this file only imports them,
-# so hosts keep `resource: '@PdfEditorBundle/Resources/config/routing.yaml'` unchanged.
+# Bundle routes are #[Route] attributes on EditorController (REQ-SF-004); this file only imports them.
+# Hosts import `@NowoPdfEditorBundle/Resources/config/routing.yaml` (`@PdfEditorBundle/...` with the deprecated 1.x class).
 nowo_pdf_editor:
     resource: '../../Controller/EditorController.php'
     type: attribute

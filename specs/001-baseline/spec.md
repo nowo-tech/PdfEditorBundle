@@ -43,8 +43,8 @@ Standalone Symfony **PDF editor workspace**: upload a PDF, edit in a CKEditor-li
 
 ### Bundle & config
 
-- **FR-BUNDLE-001**: `PdfEditorBundle` alias `nowo_pdf_editor`.
-- **FR-CFG-001**: `Configuration` — `default_profile`, `profiles.*`, security; profile must exist.
+- **FR-BUNDLE-001**: `NowoPdfEditorBundle` (extension alias `nowo_pdf_editor`; registers `TwigPathsPass`, `SecurityBundlePass`, `CsrfProtectionPass`); `PdfEditorBundle` is its deprecated 1.x alias (removed in 2.0).
+- **FR-CFG-001**: `Configuration` — `default_profile`, `profiles.*`, `web_ui` (`layout_template`, `templates.*`), `security` (`access_roles`, `access_checker`, `allow_unauthenticated`; deprecated `roles`); profile must exist; empty `access_roles` without a checker is refused.
 - **FR-CFG-002**: `PdfEditorExtension` wires profile, engine, access checker.
 
 ### Document & engine
@@ -68,12 +68,14 @@ Standalone Symfony **PDF editor workspace**: upload a PDF, edit in a CKEditor-li
 
 ### Twig / i18n / frontend
 
-- **FR-TWIG-001**: Editor Twig templates under `Resources/views`.
+- **FR-TWIG-001**: Editor Twig templates under `Resources/views` (`@NowoPdfEditorBundle`): upload page on the UiKit form scaffold, workspace unique page on the UiKit admin layout (`docs/TEMPLATES.md`); `TwigPathsPass` registers application overrides first.
+- **FR-UI-001**: `View/PdfEditorPages` builds the UiKit view models (plain data) of the editor pages (REQ-UI-003).
+- **FR-SEC-003**: `SecurityBundlePass` / `CsrfProtectionPass` fail the container build without SecurityBundle or CSRF protection.
 - **FR-I18N-001**: Translation domains `NowoPdfEditorBundle` (`en`, `es`, `it`, `fr`, `pt`, `de`, `nl`).
 - **FR-FE-001**: React editor (`main.tsx`, `pdf-editor-app.tsx`, `components/*`, `styles/editor.css`, `types.ts`, `op-labels.ts`) under `Resources/assets/src`.
 - **FR-FE-002**: Client engine (`engines/client-engine.ts`, default `engine_mode: client`) rewrites the PDF in the browser with pdf-lib; `engines/vensas/*` hold the content-stream / XObject helpers adapted from vensas/pdf-editor (MIT).
 - **FR-FE-003**: embedpdf bridges (`embedpdf-bridge.ts`, `selection-bridge.ts`, `object-selection-bridge.ts`, `redaction-bridge.ts`) connect the viewer plugins to the editor state.
-- **FR-FE-004**: `Resources/public/css/pdf-editor.css` (layout styles loaded by `editor/layout.html.twig`) and the legacy `Resources/public/js/pdf-editor.js` shim ship as static assets.
+- **FR-FE-004**: `Resources/public/css/pdf-editor.css` (editor surface styles loaded by `editor/workspace.html.twig`) and the legacy `Resources/public/js/pdf-editor.js` shim ship as static assets.
 - **FR-BUILD-001**: `Resources/public/build/**` (`pdf-editor.js`, `pdf-editor.css`, `pdf-editor.wasm`, `chunks/*`) is the committed Vite build output of `Resources/assets/src/main.tsx` (`vite.config.ts`), never edited by hand.
 
 ### DI
@@ -88,7 +90,7 @@ Standalone Symfony **PDF editor workspace**: upload a PDF, edit in a CKEditor-li
 
 ## Success Criteria
 
-- **SC-001**: **69/69** tracked files under `src/` mapped in [`code-inventory.md`](code-inventory.md) (build outputs as FR-BUILD-001 rows).
+- **SC-001**: **74/74** tracked files under `src/` mapped in [`code-inventory.md`](code-inventory.md) (build outputs as FR-BUILD-001 rows).
 - **SC-002**: Config matches `docs/CONFIGURATION.md`.
 - **SC-003**: QA/CI green; PHPStan classic + worker + hardening clean.
 - **SC-004**: Worker audit verdict remains 100% compatible under scenario B.

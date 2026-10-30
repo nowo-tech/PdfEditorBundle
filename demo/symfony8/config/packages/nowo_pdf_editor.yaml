@@ -10,9 +10,11 @@ nowo_pdf_editor:
             max_upload_bytes: 26214400
             render_dpi: 144
             engine_mode: client
+    # web_ui.layout_template stays null: the pages use nowo_ui_kit.layouts.admin (config/packages/nowo_ui_kit.yaml).
     security:
+        access_roles: [ROLE_ADMIN]
+        # Demo only (no login in this demo); refused in prod / non-debug kernels (see when@prod below).
         allow_unauthenticated: true
-        roles: [ROLE_ADMIN]
 
 # Production mode (DEMO-FRANKENPHP): allow_unauthenticated is refused outside dev/test, so the editor needs a role.
 when@prod:

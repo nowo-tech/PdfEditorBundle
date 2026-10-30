@@ -385,3 +385,50 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* UiKit-hosted editor pages (templates/layouts/admin.html.twig = nowo_ui_kit.layouts.admin). */
+body:has(.demo-topbar) {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  background: var(--demo-paper);
+}
+
+/* Upload page (UiKit form scaffold): centred form + the demo "how it works" aside. */
+main[data-nowo-ui-bundle="NowoPdfEditorBundle"]:has([data-nowo-ui-page="form"]) {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 32px 24px 48px;
+}
+
+.demo-upload-aside {
+  background: #fff;
+  border: 1px solid #ddd4c4;
+  border-radius: 12px;
+  padding: 20px 24px;
+  box-shadow: var(--demo-shadow);
+}
+
+.demo-upload-aside h2 {
+  font-size: 1rem;
+  margin: 0 0 8px;
+}
+
+/* Workspace (unique page): the editor fills the viewport under the 57px demo top bar. */
+main[data-nowo-ui-bundle="NowoPdfEditorBundle"]:has(.nowo-pdf-editor-workspace) {
+  display: flex;
+  flex-direction: column;
+  height: calc(100dvh - 57px);
+  padding: 0;
+  margin: 0;
+  max-width: none;
+  overflow: hidden;
+}
+
+main[data-nowo-ui-bundle="NowoPdfEditorBundle"] .nowo-pdf-editor-surface,
+main[data-nowo-ui-bundle="NowoPdfEditorBundle"] .nowo-pdf-editor-workspace {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  --nowo-pdf-editor-chrome-offset: 57px;
+}

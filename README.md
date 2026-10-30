@@ -1,6 +1,6 @@
 # PDF Editor Bundle
 
-[![CI](https://github.com/nowo-tech/PdfEditorBundle/actions/workflows/ci.yml/badge.svg)](https://github.com/nowo-tech/PdfEditorBundle/actions/workflows/ci.yml) [![Packagist Version](https://img.shields.io/packagist/v/nowo-tech/pdf-editor-bundle.svg?style=flat)](https://packagist.org/packages/nowo-tech/pdf-editor-bundle) [![Packagist Downloads](https://img.shields.io/packagist/dt/nowo-tech/pdf-editor-bundle.svg)](https://packagist.org/packages/nowo-tech/pdf-editor-bundle) [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE) [![PHP](https://img.shields.io/badge/PHP-8.2%2B-777BB4?logo=php)](https://php.net) [![Symfony](https://img.shields.io/badge/Symfony-6.4%20%7C%207.4%20%7C%208.0%20%7C%208.1%2B-000000?logo=symfony)](https://symfony.com) [![GitHub stars](https://img.shields.io/github/stars/nowo-tech/PdfEditorBundle.svg?style=social&label=Star)](https://github.com/nowo-tech/PdfEditorBundle) [![Coverage](https://img.shields.io/badge/Coverage-100%25-brightgreen)](#tests-and-coverage)
+[![CI](https://github.com/nowo-tech/PdfEditorBundle/actions/workflows/ci.yml/badge.svg)](https://github.com/nowo-tech/PdfEditorBundle/actions/workflows/ci.yml) [![Packagist Version](https://img.shields.io/packagist/v/nowo-tech/pdf-editor-bundle.svg?style=flat)](https://packagist.org/packages/nowo-tech/pdf-editor-bundle) [![Packagist Downloads](https://img.shields.io/packagist/dt/nowo-tech/pdf-editor-bundle.svg)](https://packagist.org/packages/nowo-tech/pdf-editor-bundle) [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE) [![PHP](https://img.shields.io/badge/PHP-8.2%2B-777BB4?logo=php)](https://php.net) [![Symfony](https://img.shields.io/badge/Symfony-7.4%20%7C%208.0%20%7C%208.1%2B-000000?logo=symfony)](https://symfony.com) [![GitHub stars](https://img.shields.io/github/stars/nowo-tech/PdfEditorBundle.svg?style=social&label=Star)](https://github.com/nowo-tech/PdfEditorBundle) [![Coverage](https://img.shields.io/badge/Coverage-100%25-brightgreen)](#tests-and-coverage)
 
 > ⭐ **Found this useful?** Give it a star on [GitHub](https://github.com/nowo-tech/PdfEditorBundle).
 
@@ -24,6 +24,13 @@ This includes **`reset_kernel: false`** (long-lived kernel).
       <img src="docs/images/demo/draft.webp" alt="Draft panel listing a queued rotate-page operation before saving to PDF" />
       <br /><sub>Draft-then-save: page operations queue until Save to PDF</sub>
     </td>
+  </tr>
+  <tr>
+    <td align="center" width="50%">
+      <img src="docs/images/demo/upload.webp" alt="Upload page rendered with the UiKit form scaffold inside the demo layout, with a how-it-works panel" />
+      <br /><sub>Upload page: UiKit form scaffold in the host layout</sub>
+    </td>
+    <td></td>
   </tr>
 </table>
 
@@ -62,7 +69,7 @@ A PDF is not a word-processor file: scanned pages without text need OCR (out of 
 
 ## Features
 
-- Isolated admin UI (`/pdf-editor`) following REQ-UI-001 / REQ-UI-002
+- Private admin UI (`/pdf-editor`) on the UiKit page contract (REQ-UI-001 / REQ-UI-002 / REQ-UI-003): renders inside your layout (`nowo_ui_kit.layouts.admin`), themed once in UiKit; `security.access_roles` / `access_checker`
 - Draft-then-save: the React client queues edits, exports via embedpdf/pdf-lib, then Symfony persists the PDF
 - Default `engine_mode: client` (no Python required); optional `python` profile for PyMuPDF
 - Editor profile (`default_profile` + `profiles`) — REQ-CFG-001; only the default profile is used (extra profiles are deprecated)
@@ -74,7 +81,7 @@ A PDF is not a word-processor file: scanned pages without text need OCR (out of 
 ## Requirements
 
 - PHP >= 8.2, < 8.6
-- Symfony 6.4 / 7 / 8
+- Symfony 7.4 / 8.0 / 8.1+ and [UiKitBundle](https://github.com/nowo-tech/UiKitBundle) 2.17.3+ (installed with the bundle)
 - Node >= 20 + pnpm (to build the React editor assets)
 - Python 3.9+ and `pymupdf` — **only when** `engine_mode: python`
 
@@ -108,6 +115,7 @@ See [docs/INSTALLATION.md](docs/INSTALLATION.md).
 
 ### Additional documentation
 
+- [Templates and page contract (UiKit, overrides)](docs/TEMPLATES.md)
 - [Architecture decisions (ADR)](docs/adr/README.md)
 - [Demo with FrankenPHP](docs/DEMO-FRANKENPHP.md)
 - [FrankenPHP worker audit (`reset_kernel: false`)](docs/FRANKENPHP-WORKER-AUDIT.md)

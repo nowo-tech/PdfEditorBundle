@@ -15,6 +15,7 @@ use Nowo\PdfEditorBundle\Form\EditorTextType;
 use Nowo\PdfEditorBundle\Form\PdfUploadType;
 use Nowo\PdfEditorBundle\Operation\OperationDecoder;
 use Nowo\PdfEditorBundle\Security\PdfEditorAccessCheckerInterface;
+use Nowo\PdfEditorBundle\View\PdfEditorPages;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -32,12 +33,14 @@ use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Twig\Environment;
 
+use function ctype_digit;
 use function fclose;
 use function file_put_contents;
 use function filemtime;
 use function flock;
 use function fopen;
 use function glob;
+use function intdiv;
 use function is_array;
 use function is_file;
 use function is_object;
@@ -54,6 +57,9 @@ use const LOCK_UN;
 #[AsController]
 final class EditorController
 {
+    /** Room for the JSON envelope / operation list around a base64 PDF in the apply body. */
+    private const JSON_ENVELOPE_BYTES = 65536;
+
     public function __construct(
         private readonly PdfEditorAccessCheckerInterface $accessChecker,
         private readonly WorkspaceManager $workspaces,
@@ -65,6 +71,9 @@ final class EditorController
         private readonly UrlGeneratorInterface $urlGenerator,
         private readonly EditorProfile $profile,
         private readonly CsrfTokenManagerInterface $csrfTokenManager,
+        private readonly ?string $layoutTemplate = null,
+        /** @var array{upload?: string, workspace?: string} */
+        private readonly array $templates = [],
     ) {
     }
 
@@ -85,8 +94,13 @@ final class EditorController
             }
         }
 
-        return new Response($this->twig->render('@PdfEditor/editor/index.html.twig', [
-            'form' => $form->createView(),
+        $formView = $form->createView();
+
+        return new Response($this->twig->render($this->templates['upload'] ?? '@NowoPdfEditorBundle/editor/index.html.twig', [
+            'page'   => PdfEditorPages::upload($formView, $this->layoutTemplate),
+            'form'   => $formView,
+            'layout' => $this->layoutTemplate,
+            'bundle' => PdfEditorPages::BUNDLE,
         ]));
     }
 
@@ -98,7 +112,9 @@ final class EditorController
 
         $textForm = $this->formFactory->create(EditorTextType::class);
 
-        return new Response($this->twig->render('@PdfEditor/editor/workspace.html.twig', [
+        return new Response($this->twig->render($this->templates['workspace'] ?? '@NowoPdfEditorBundle/editor/workspace.html.twig', [
+            'layout'      => $this->layoutTemplate,
+            'bundle'      => PdfEditorPages::BUNDLE,
             'workspace'   => $workspace,
             'textForm'    => $textForm->createView(),
             'engine_mode' => $this->profile->engineMode,
@@ -188,7 +204,8 @@ final class EditorController
         if (!$this->csrfTokenManager->isTokenValid(new CsrfToken('pdf_editor', $csrf))) {
             throw AccessDeniedException::workspace();
         }
-        $workspace   = $this->ownedWorkspace($id);
+        $workspace = $this->ownedWorkspace($id);
+        $this->assertDeclaredBodySize($request);
         $contentType = strtolower((string) $request->headers->get('Content-Type', ''));
 
         if (str_starts_with($contentType, 'application/pdf')) {
@@ -270,6 +287,23 @@ final class EditorController
         $user = is_object($user) ? $user : null;
         if (!$this->accessChecker->canUseEditor($user)) {
             throw AccessDeniedException::workspace();
+        }
+    }
+
+    /**
+     * Rejects an oversized body from its Content-Length before reading it into memory: a raw PDF may be up to
+     * max_upload_bytes, the base64 JSON variant up to 4/3 of it (plus a small JSON envelope).
+     */
+    private function assertDeclaredBodySize(Request $request): void
+    {
+        $max      = $this->profile->maxUploadBytes;
+        $declared = $request->headers->get('Content-Length');
+        if ($max <= 0 || $declared === null || !ctype_digit($declared)) {
+            return;
+        }
+
+        if ((int) $declared > intdiv($max * 4, 3) + self::JSON_ENVELOPE_BYTES) {
+            throw new PdfEditorException(sprintf('Request body exceeds max_upload_bytes (%d).', $max));
         }
     }
 

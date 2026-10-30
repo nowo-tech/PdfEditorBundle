@@ -54,7 +54,7 @@ export function PageRail({
       <nav className="nowo-pdf-editor-paginator" aria-label={t('pages.nav', 'Page navigation')}>
         <button
           type="button"
-          className="nowo-ui-btn nowo-ui-btn-tiny nowo-pdf-editor-paginator-btn"
+          className="nowo-pdf-editor-btn nowo-pdf-editor-btn-tiny nowo-pdf-editor-paginator-btn"
           disabled={disabled || currentPage <= 1}
           aria-label={t('pages.prev', 'Previous page')}
           onClick={onPrev}
@@ -68,7 +68,7 @@ export function PageRail({
         </span>
         <button
           type="button"
-          className="nowo-ui-btn nowo-ui-btn-tiny nowo-pdf-editor-paginator-btn"
+          className="nowo-pdf-editor-btn nowo-pdf-editor-btn-tiny nowo-pdf-editor-paginator-btn"
           disabled={disabled || currentPage >= totalPages}
           aria-label={t('pages.next', 'Next page')}
           onClick={onNext}

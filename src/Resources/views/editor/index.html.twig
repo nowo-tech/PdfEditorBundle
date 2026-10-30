@@ -1,18 +1,9 @@
-{% extends '@PdfEditor/editor/layout.html.twig' %}
-
-{% block nowo_pdf_editor_title %}{{ 'pdf_editor.home.title'|trans({}, 'NowoPdfEditorBundle') }}{% endblock %}
-
-{% block nowo_pdf_editor_body %}
-    <section class="nowo-ui-card nowo-pdf-editor-upload">
-        <h1 class="nowo-ui-title">{{ 'pdf_editor.home.heading'|trans({}, 'NowoPdfEditorBundle') }}</h1>
-        <p class="nowo-ui-lead">{{ 'pdf_editor.home.lead'|trans({}, 'NowoPdfEditorBundle') }}</p>
-        {{ form_start(form, { attr: { class: 'nowo-ui-form' } }) }}
-            {% for child in form %}
-                {% if not child.rendered %}
-                    {{ form_row(child) }}
-                {% endif %}
-            {% endfor %}
-            <button type="submit" class="nowo-ui-btn nowo-ui-btn-primary">{{ 'pdf_editor.home.open'|trans({}, 'NowoPdfEditorBundle') }}</button>
-        {{ form_end(form) }}
-    </section>
-{% endblock %}
+{#
+ # Upload page (REQ-UI-003): UiKit form scaffold. Variable: page (View\FormPage from
+ # Nowo\PdfEditorBundle\View\PdfEditorPages::upload(): header pdf_editor.home.heading / pdf_editor.home.lead, form =
+ # PdfUploadType (multipart), submit pdf_editor.home.open, bundle NowoPdfEditorBundle, layout =
+ # nowo_pdf_editor.web_ui.layout_template). Data blocks: nowo_ui_form_body (REQ-TWIG-003 child loop, scaffold
+ # default) and nowo_ui_form_aside (empty; e.g. a "how it works" panel in a web_ui.templates.upload override that
+ # {% extends '@!NowoPdfEditorBundle/editor/index.html.twig' %}).
+ #}
+{% extends '@NowoUiKit/page/form.html.twig' %}

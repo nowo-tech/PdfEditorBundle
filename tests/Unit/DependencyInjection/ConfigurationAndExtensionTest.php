@@ -11,6 +11,7 @@ use Nowo\PdfEditorBundle\DependencyInjection\PdfEditorExtension;
 use Nowo\PdfEditorBundle\Engine\PdfEngineInterface;
 use Nowo\PdfEditorBundle\Engine\ProcessRunnerInterface;
 use Nowo\PdfEditorBundle\Security\AllowAllPdfEditorAccessChecker;
+use Nowo\PdfEditorBundle\Security\PdfEditorAccessCheckerInterface;
 use Nowo\PdfEditorBundle\Security\RolePdfEditorAccessChecker;
 use Nowo\PdfEditorBundle\Security\WorkspaceOwnerResolverInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -31,7 +32,72 @@ final class ConfigurationAndExtensionTest extends TestCase
         self::assertSame('default', $config['default_profile']);
         self::assertArrayHasKey('default', $config['profiles']);
         self::assertFalse($config['security']['allow_unauthenticated']);
-        self::assertSame(['ROLE_ADMIN'], $config['security']['roles']);
+        self::assertSame(['ROLE_ADMIN'], $config['security']['access_roles']);
+        self::assertNull($config['security']['access_checker']);
+        self::assertNull($config['web_ui']['layout_template']);
+        self::assertSame([
+            'upload'    => '@NowoPdfEditorBundle/editor/index.html.twig',
+            'workspace' => '@NowoPdfEditorBundle/editor/workspace.html.twig',
+        ], $config['web_ui']['templates']);
+    }
+
+    public function testLegacyRolesMapOntoAccessRoles(): void
+    {
+        $this->expectUserDeprecationMessageMatches('/"nowo_pdf_editor\.security\.roles" option is deprecated, use "nowo_pdf_editor\.security\.access_roles"/');
+
+        $config = (new Processor())->processConfiguration(new Configuration(), [[
+            'security' => ['roles' => ['ROLE_EDITOR']],
+        ]]);
+
+        self::assertSame(['ROLE_EDITOR'], $config['security']['access_roles']);
+        self::assertArrayNotHasKey('roles', $config['security']);
+    }
+
+    public function testAccessRolesWinOverLegacyRoles(): void
+    {
+        $config = @(new Processor())->processConfiguration(new Configuration(), [[
+            'security' => ['roles' => ['ROLE_OLD'], 'access_roles' => ['ROLE_NEW']],
+        ]]);
+
+        self::assertSame(['ROLE_NEW'], $config['security']['access_roles']);
+    }
+
+    public function testEmptyAccessRolesWithoutCheckerAreRejected(): void
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('access_roles is empty');
+        (new Processor())->processConfiguration(new Configuration(), [[
+            'security' => ['access_roles' => []],
+        ]]);
+    }
+
+    public function testEmptyAccessRolesAreAcceptedWithACustomChecker(): void
+    {
+        $config = (new Processor())->processConfiguration(new Configuration(), [[
+            'security' => ['access_roles' => [], 'access_checker' => 'app.pdf_editor_checker'],
+        ]]);
+
+        self::assertSame([], $config['security']['access_roles']);
+        self::assertSame('app.pdf_editor_checker', $config['security']['access_checker']);
+    }
+
+    public function testCustomAccessCheckerIsAliased(): void
+    {
+        $container = $this->container();
+        (new PdfEditorExtension())->load([[
+            'security' => ['access_checker' => 'app.pdf_editor_checker'],
+            'web_ui'   => ['layout_template' => 'admin/layout.html.twig', 'templates' => ['upload' => 'admin/pdf_upload.html.twig']],
+        ]], $container);
+
+        self::assertTrue($container->hasAlias('nowo_pdf_editor.access_checker'));
+        self::assertSame('app.pdf_editor_checker', (string) $container->getAlias('nowo_pdf_editor.access_checker'));
+        self::assertSame('nowo_pdf_editor.access_checker', (string) $container->getAlias(PdfEditorAccessCheckerInterface::class));
+        self::assertSame('app.pdf_editor_checker', $container->getParameter('nowo_pdf_editor.security.access_checker'));
+        self::assertSame('admin/layout.html.twig', $container->getParameter('nowo_pdf_editor.web_ui.layout_template'));
+        self::assertSame([
+            'upload'    => 'admin/pdf_upload.html.twig',
+            'workspace' => '@NowoPdfEditorBundle/editor/workspace.html.twig',
+        ], $container->getParameter('nowo_pdf_editor.web_ui.templates'));
     }
 
     public function testUnknownDefaultProfile(): void
@@ -76,6 +142,11 @@ final class ConfigurationAndExtensionTest extends TestCase
         self::assertTrue($container->hasAlias(EditorProfile::class));
         self::assertSame('default', $container->getParameter('nowo_pdf_editor.default_profile'));
         self::assertSame(RolePdfEditorAccessChecker::class, $container->getDefinition('nowo_pdf_editor.access_checker')->getClass());
+        self::assertSame(['ROLE_ADMIN'], $container->getDefinition('nowo_pdf_editor.access_checker')->getArgument('$roles'));
+        self::assertSame(['ROLE_ADMIN'], $container->getParameter('nowo_pdf_editor.security.access_roles'));
+        self::assertNull($container->getParameter('nowo_pdf_editor.security.access_checker'));
+        self::assertFalse($container->getParameter('nowo_pdf_editor.security.allow_unauthenticated'));
+        self::assertNull($container->getParameter('nowo_pdf_editor.web_ui.layout_template'));
 
         $engineScript = $container->getDefinition('nowo_pdf_editor.profile')->getArgument('$engineScript');
         self::assertIsString($engineScript);
@@ -126,11 +197,31 @@ final class ConfigurationAndExtensionTest extends TestCase
         $container->registerExtension(new StubExtension('framework'));
         $extension = new PdfEditorExtension();
         $extension->prepend($container);
-        $twig = $container->getExtensionConfig('twig');
-        self::assertNotSame([], $twig);
-        self::assertArrayHasKey('paths', $twig[0]);
+        // The Twig namespace is registered by TwigPathsPass (overrides first), not through twig.paths.
+        self::assertSame([], $container->getExtensionConfig('twig'));
         $framework = $container->getExtensionConfig('framework');
         self::assertCount(2, $framework);
+        self::assertSame('/bundles/nowopdfeditor', $framework[0]['assets']['packages']['nowo_pdf_editor']['base_path']);
+    }
+
+    public function testPrependKeepsThe1xAssetPathForTheDeprecatedBundleClass(): void
+    {
+        $container = $this->container();
+        $container->setParameter('kernel.bundles', ['PdfEditorBundle' => 'Nowo\\PdfEditorBundle\\PdfEditorBundle']);
+        $container->registerExtension(new StubExtension('framework'));
+        (new PdfEditorExtension())->prepend($container);
+
+        self::assertSame('/bundles/pdfeditor', $container->getExtensionConfig('framework')[0]['assets']['packages']['nowo_pdf_editor']['base_path']);
+    }
+
+    public function testPrependUsesTheNewAssetPathWhenNowoPdfEditorBundleIsRegistered(): void
+    {
+        $container = $this->container();
+        $container->setParameter('kernel.bundles', ['NowoPdfEditorBundle' => 'Nowo\\PdfEditorBundle\\NowoPdfEditorBundle']);
+        $container->registerExtension(new StubExtension('framework'));
+        (new PdfEditorExtension())->prepend($container);
+
+        self::assertSame('/bundles/nowopdfeditor', $container->getExtensionConfig('framework')[0]['assets']['packages']['nowo_pdf_editor']['base_path']);
     }
 
     public function testPrependSkipsMissingTwigAndFramework(): void

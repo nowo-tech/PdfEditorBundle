@@ -1,15 +1,30 @@
-<!DOCTYPE html>
-<html lang="{{ app.request.locale|default('en') }}">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{% block nowo_pdf_editor_title %}PDF Editor{% endblock %}</title>
+{#
+ # Deprecated since 1.5, removed in 2.0 — 1.x compatibility shim, not used by the bundle pages.
+ #
+ # 1.x host templates that `{% extends '@PdfEditor/editor/layout.html.twig' %}` (or the @NowoPdfEditorBundle name)
+ # and fill nowo_pdf_editor_title / nowo_pdf_editor_body / nowo_pdf_editor_scripts keep rendering, now inside the
+ # UiKit admin layout (`layout ?? nowo_ui_layout.admin`) instead of a standalone HTML document. Migrate them to the
+ # canonical blocks (nowo_ui_document_title, nowo_ui_content, nowo_ui_scripts) or, better, drop the fork and use
+ # nowo_pdf_editor.web_ui.layout_template / nowo_ui_kit.layouts.admin (see docs/TEMPLATES.md and docs/UPGRADING.md).
+ #}
+{% extends layout ?? nowo_ui_layout.admin %}
+{% set nowo_ui_bundle = bundle|default('NowoPdfEditorBundle') %}
+
+{% block nowo_ui_document_title %}{% block nowo_pdf_editor_title %}{{ 'pdf_editor.home.title'|trans({}, 'NowoPdfEditorBundle') }}{% endblock %}{% endblock %}
+
+{% block nowo_ui_styles %}
+    {{ parent() }}
     <link rel="stylesheet" href="{{ asset('css/pdf-editor.css', 'nowo_pdf_editor') }}">
-    {# Compiled editor component styles (Vite build, next to build/pdf-editor.js loaded by the workspace). #}
     <link rel="stylesheet" href="{{ asset('build/pdf-editor.css', 'nowo_pdf_editor') }}">
-</head>
-<body class="nowo-ui-body nowo-pdf-editor">
-    {% block nowo_pdf_editor_body %}{% endblock %}
+{% endblock %}
+
+{% block nowo_ui_content %}
+    <div class="{{ nowo_ui_class('section', nowo_ui_bundle) }} nowo-pdf-editor-surface" data-nowo-ui-region="section"{{ nowo_ui_attrs('section', nowo_ui_bundle) }}>
+        {% block nowo_pdf_editor_body %}{% endblock %}
+    </div>
+{% endblock %}
+
+{% block nowo_ui_scripts %}
+    {{ parent() }}
     {% block nowo_pdf_editor_scripts %}{% endblock %}
-</body>
-</html>
+{% endblock %}

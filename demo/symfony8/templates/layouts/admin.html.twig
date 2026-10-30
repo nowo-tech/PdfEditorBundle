@@ -1,0 +1,24 @@
+{#
+  Demo host layout on the UiKit contract (nowo_ui_kit.layouts.admin): UiKit document + admin regions, the demo top bar
+  in nowo_ui_navigation and the demo stylesheet stacked after the UiKit one. The editor pages (upload form scaffold and
+  the PDF workspace unique page) render here with nowo_pdf_editor.web_ui.layout_template left null.
+#}
+{% extends '@NowoUiKit/layout/admin.html.twig' %}
+
+{% block nowo_ui_styles %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/demo.css') }}">
+{% endblock %}
+
+{% block nowo_ui_navigation %}
+    <header class="demo-topbar">
+        <a href="{{ path('demo_home') }}" class="demo-brand">PdfEditorBundle</a>
+        <span class="demo-badge">{{ 'demo.badge'|trans }}</span>
+        <nav class="demo-nav">
+            <a href="{{ path('demo_home') }}">{{ 'demo.nav.about'|trans }}</a>
+            <a href="{{ path('demo_scenarios') }}">{{ 'demo.nav.scenarios'|trans }}</a>
+            {% include 'demo/_locale_switch.html.twig' %}
+            <a href="{{ path('nowo_pdf_editor_home') }}" class="demo-nav-primary">{{ 'demo.nav.editor'|trans }}</a>
+        </nav>
+    </header>
+{% endblock %}

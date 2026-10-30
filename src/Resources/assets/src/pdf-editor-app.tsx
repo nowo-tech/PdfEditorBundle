@@ -383,7 +383,7 @@ export function PdfEditorApp({ config }: Props) {
           onReplaceNativeText={handleReplaceNativeText}
         />
       )}
-      toast={toast ? <p className="nowo-ui-toast" role="status">{toast}</p> : null}
+      toast={toast ? <p className="nowo-pdf-editor-toast" role="status">{toast}</p> : null}
     />
   );
 }

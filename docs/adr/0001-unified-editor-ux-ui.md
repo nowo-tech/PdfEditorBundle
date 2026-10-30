@@ -138,7 +138,7 @@ Draft labels must come from **`opLabel(i18n, op)`**, not raw `op` strings.
 
 - Shell reads optional `theme: 'light' | 'dark' | 'auto'` from Twig → `WorkspaceConfig`.  
 - Demo topbar (`demo.css`) stays **outside** the shell; shell fills remaining viewport (`calc(100vh - topbar)`).  
-- Host apps override `@PdfEditor/editor/layout.html.twig` only for branding — not toolbar logic.
+- Host apps theme the editor pages through UiKit (`nowo_ui_kit.layouts.admin`, theme tokens) — not toolbar logic (1.5: `@NowoPdfEditorBundle`, see TEMPLATES.md).
 
 ## UX principles (normative)
 

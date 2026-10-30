@@ -25,6 +25,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **UiKit page contract (REQ-UI-001 / REQ-UI-003).** The upload page is the UiKit form scaffold (`PdfEditorPages::upload()`
+  view model) and the PDF workspace a unique page on the UiKit admin layout; both render inside
+  `nowo_ui_kit.layouts.admin` and stack the editor assets with `parent()`. New `web_ui.layout_template` (default null)
+  and `web_ui.templates.upload` / `.workspace`. `docs/TEMPLATES.md` and a `PageContractTestCase` test.
+- **Twig overrides (REQ-TWIG-001).** `TwigPathsPass` registers `@NowoPdfEditorBundle` with
+  `templates/bundles/NowoPdfEditorBundle/` first (plus `@!NowoPdfEditorBundle` for the vendor copy); documented
+  subpaths, freeze rule and recovery.
+- **Canonical access keys (REQ-UI-002).** `security.access_roles` and `security.access_checker` (custom
+  `PdfEditorAccessCheckerInterface` service).
+- Container build fails without SecurityBundle or with CSRF protection disabled (upload form / apply).
+
+### Changed
+
+- **Bundle class `NowoPdfEditorBundle`** (REQ-TWIG-002 / REQ-I18N-003): class name, Twig namespace
+  `@NowoPdfEditorBundle`, override directory and translation domain now match. Public assets move to
+  `/bundles/nowopdfeditor/` (the asset package follows the registered class); the editor build uses relative URLs.
+- Requires Symfony 7.4 / 8.0 / 8.1 and `nowo-tech/ui-kit-bundle` ^2.17.3 (Symfony 6.4 and 7.0–7.3 dropped).
+- The editor's private CSS classes are `nowo-pdf-editor-*` (were `nowo-ui-btn*`, `nowo-ui-input`, …) so they no longer
+  restyle UiKit classes on the host page.
+- An empty `security.access_roles` list without a custom checker fails the container build (it never grants anyone).
+- `apply` rejects a declared `Content-Length` above the `max_upload_bytes` allowance before reading the body.
+
+### Deprecated
+
+- `Nowo\PdfEditorBundle\PdfEditorBundle` (use `NowoPdfEditorBundle`), the `@PdfEditor` Twig namespace,
+  `security.roles` (use `security.access_roles`), `editor/layout.html.twig` (now a shim on the UiKit layout) and
+  `editor/_toolbar.html.twig`; all removed in 2.0. See [UPGRADING](UPGRADING.md#unreleased).
+
+### Template contract
+
+- `editor/index.html.twig` extends `@NowoUiKit/page/form.html.twig` (variable `page`); the 1.x `nowo_pdf_editor_body`
+  block of the upload page is gone (data blocks `nowo_ui_form_body`, `nowo_ui_form_aside`).
+- `editor/workspace.html.twig` extends `layout ?? nowo_ui_layout.admin`; data blocks `nowo_pdf_editor_body`,
+  `nowo_pdf_editor_styles`, `nowo_pdf_editor_scripts`; optional `nowo_pdf_editor_config` variable.
+
 ## [1.4.1] - 2026-10-28
 
 PdfEditor: the stock editor layout links the compiled editor styles. See [UPGRADING](UPGRADING.md#to-141).

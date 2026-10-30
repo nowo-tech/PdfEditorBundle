@@ -29,7 +29,7 @@ export function ViewportChrome({
       <div className="nowo-pdf-editor-viewport-zoom" role="group" aria-label={t('viewport.zoom', 'Zoom')}>
         <button
           type="button"
-          className="nowo-ui-btn nowo-ui-btn-tiny nowo-pdf-editor-zoom-btn"
+          className="nowo-pdf-editor-btn nowo-pdf-editor-btn-tiny nowo-pdf-editor-zoom-btn"
           disabled={disabled}
           aria-label={t('zoom.out', 'Zoom out')}
           onClick={onZoomOut}
@@ -38,7 +38,7 @@ export function ViewportChrome({
         </button>
         <button
           type="button"
-          className="nowo-ui-btn nowo-ui-btn-tiny nowo-pdf-editor-zoom-btn"
+          className="nowo-pdf-editor-btn nowo-pdf-editor-btn-tiny nowo-pdf-editor-zoom-btn"
           disabled={disabled}
           aria-label={t('zoom.fit', 'Fit page')}
           onClick={onZoomFit}
@@ -47,7 +47,7 @@ export function ViewportChrome({
         </button>
         <button
           type="button"
-          className="nowo-ui-btn nowo-ui-btn-tiny nowo-pdf-editor-zoom-btn"
+          className="nowo-pdf-editor-btn nowo-pdf-editor-btn-tiny nowo-pdf-editor-zoom-btn"
           disabled={disabled}
           aria-label={t('zoom.in', 'Zoom in')}
           onClick={onZoomIn}

@@ -1,4 +1,5 @@
-.nowo-ui-body { margin: 0; font-family: system-ui, sans-serif; background: #f4f1ea; color: #1f1b16; }
+/* PdfEditorBundle editor surfaces (nowo-pdf-editor-*). Page chrome, buttons and forms outside the editor come from UiKit (nowo-ui-*). */
+.nowo-pdf-editor-workspace, .nowo-pdf-editor-shell { font-family: var(--nowo-ui-font-family, system-ui, -apple-system, "Segoe UI", sans-serif); }
 html.nowo-pdf-editor-html,
 body.nowo-pdf-editor-page { height: 100%; }
 body.nowo-pdf-editor-page { display: flex; flex-direction: column; }
@@ -8,20 +9,20 @@ body.nowo-pdf-editor-page .nowo-pdf-editor-workspace { flex: 1; min-height: 0; }
 .nowo-pdf-editor-shell--embed { min-height: calc(100dvh - var(--nowo-pdf-editor-chrome-offset, 0px)); }
 .nowo-pdf-editor-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 16px; background: #2b2118; color: #fff; flex-wrap: wrap; }
 .nowo-pdf-editor-toolbar-group { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
-.nowo-ui-btn { border: 1px solid #c4b8a5; background: #fff; color: #2b2118; padding: 8px 12px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; border-radius: 6px; font: inherit; }
-.nowo-ui-btn:disabled { opacity: 0.45; cursor: not-allowed; }
-.nowo-ui-btn.is-active { outline: 2px solid #7dffc3; background: #f0fff8; }
-.nowo-ui-btn-primary { background: #0b6e4f; color: #fff; border-color: #0b6e4f; }
-.nowo-ui-btn-primary.is-active { background: #0b6e4f; outline-color: #7dffc3; }
-.nowo-ui-btn-tiny { padding: 0 6px; margin-left: 8px; }
-.nowo-ui-btn-icon { width: 40px; height: 40px; padding: 0; position: relative; }
-.nowo-ui-btn-icon svg { width: 20px; height: 20px; fill: currentColor; }
-.nowo-pdf-editor-toolbar .nowo-ui-btn { border-color: #4a4036; background: #3d3429; color: #fff; }
-.nowo-pdf-editor-toolbar .nowo-ui-btn:hover:not(:disabled) { background: #4f4538; }
-.nowo-pdf-editor-toolbar .nowo-ui-btn.is-active { background: #0b6e4f; border-color: #7dffc3; outline: none; }
-.nowo-pdf-editor-toolbar .nowo-ui-btn-primary { background: #0b6e4f; border-color: #0b6e4f; }
-.nowo-pdf-editor-toolbar .nowo-ui-btn-primary:hover:not(:disabled) { background: #0a5d43; }
-.nowo-ui-btn-icon[data-tooltip]::after {
+.nowo-pdf-editor-btn { border: 1px solid #c4b8a5; background: #fff; color: #2b2118; padding: 8px 12px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; border-radius: 6px; font: inherit; }
+.nowo-pdf-editor-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.nowo-pdf-editor-btn.is-active { outline: 2px solid #7dffc3; background: #f0fff8; }
+.nowo-pdf-editor-btn-primary { background: #0b6e4f; color: #fff; border-color: #0b6e4f; }
+.nowo-pdf-editor-btn-primary.is-active { background: #0b6e4f; outline-color: #7dffc3; }
+.nowo-pdf-editor-btn-tiny { padding: 0 6px; margin-left: 8px; }
+.nowo-pdf-editor-btn-icon { width: 40px; height: 40px; padding: 0; position: relative; }
+.nowo-pdf-editor-btn-icon svg { width: 20px; height: 20px; fill: currentColor; }
+.nowo-pdf-editor-toolbar .nowo-pdf-editor-btn { border-color: #4a4036; background: #3d3429; color: #fff; }
+.nowo-pdf-editor-toolbar .nowo-pdf-editor-btn:hover:not(:disabled) { background: #4f4538; }
+.nowo-pdf-editor-toolbar .nowo-pdf-editor-btn.is-active { background: #0b6e4f; border-color: #7dffc3; outline: none; }
+.nowo-pdf-editor-toolbar .nowo-pdf-editor-btn-primary { background: #0b6e4f; border-color: #0b6e4f; }
+.nowo-pdf-editor-toolbar .nowo-pdf-editor-btn-primary:hover:not(:disabled) { background: #0a5d43; }
+.nowo-pdf-editor-btn-icon[data-tooltip]::after {
   content: attr(data-tooltip);
   position: absolute;
   top: calc(100% + 8px);
@@ -44,8 +45,8 @@ body.nowo-pdf-editor-page .nowo-pdf-editor-workspace { flex: 1; min-height: 0; }
   z-index: 20;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
 }
-.nowo-ui-btn-icon[data-tooltip]:hover::after,
-.nowo-ui-btn-icon[data-tooltip]:focus-visible::after {
+.nowo-pdf-editor-btn-icon[data-tooltip]:hover::after,
+.nowo-pdf-editor-btn-icon[data-tooltip]:focus-visible::after {
   opacity: 1;
   visibility: visible;
 }
@@ -65,11 +66,9 @@ body.nowo-pdf-editor-page .nowo-pdf-editor-workspace { flex: 1; min-height: 0; }
 .nowo-pdf-editor-props { background: #fff; padding: 16px; border-left: 1px solid #d7cdb8; overflow: auto; }
 .nowo-pdf-editor-pending { list-style: none; padding: 0; margin: 0; }
 .nowo-pdf-editor-pending li { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding: 6px 0; font-size: 13px; }
-.nowo-ui-card { max-width: 640px; margin: 48px auto; background: #fff; padding: 24px; }
-.nowo-ui-title { margin-top: 0; }
-.nowo-ui-subtitle { font-size: 1rem; margin: 16px 0 8px; }
-.nowo-ui-muted { color: #6b6258; }
-.nowo-ui-toast { position: fixed; bottom: 16px; right: 16px; background: #2b2118; color: #fff; padding: 10px 14px; border-radius: 6px; z-index: 30; }
-.nowo-ui-input, textarea.nowo-ui-input { width: 100%; }
-.nowo-ui-label { display: block; margin-bottom: 6px; }
-.nowo-ui-form textarea { width: 100%; }
+.nowo-pdf-editor-subtitle { font-size: 1rem; margin: 16px 0 8px; }
+.nowo-pdf-editor-muted { color: #6b6258; }
+.nowo-pdf-editor-toast { position: fixed; bottom: 16px; right: 16px; background: #2b2118; color: #fff; padding: 10px 14px; border-radius: 6px; z-index: 30; }
+.nowo-pdf-editor-input, textarea.nowo-pdf-editor-input { width: 100%; }
+.nowo-pdf-editor-props textarea { width: 100%; }
+.nowo-pdf-editor-label { display: block; margin-bottom: 6px; }

@@ -1,6 +1,7 @@
 {
     "bundles": {
-        "Nowo\\PdfEditorBundle\\PdfEditorBundle": ["all"]
+        "Nowo\\UiKitBundle\\NowoUiKitBundle": ["all"],
+        "Nowo\\PdfEditorBundle\\NowoPdfEditorBundle": ["all"]
     },
     "copy-from-recipe": {
         "config/": "%CONFIG_DIR%/"

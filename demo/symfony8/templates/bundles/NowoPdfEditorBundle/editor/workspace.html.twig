@@ -1,0 +1,15 @@
+{#
+  Demo surgical override (REQ-TWIG-001): extends the vendor workspace and only adds the scenario banner data to the
+  editor configuration (nowo_pdf_editor_config); the editor mount, assets and i18n keep coming from the bundle.
+#}
+{% extends '@!NowoPdfEditorBundle/editor/workspace.html.twig' %}
+
+{% set scenario_id = app.request.query.get('scenario') %}
+{% set nowo_pdf_editor_config = scenario_id ? {
+    scenario: {
+        id: scenario_id,
+        title: ('demo.scenario.' ~ scenario_id ~ '.title')|trans,
+        lead: ('demo.scenario.' ~ scenario_id ~ '.lead')|trans,
+        hubUrl: path('demo_scenarios'),
+    },
+} : {} %}

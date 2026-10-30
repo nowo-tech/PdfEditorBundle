@@ -2,8 +2,11 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { resolve } from 'node:path';
 
-/** Symfony asset path (@see PdfEditorBundle public assets package). */
-const ASSET_BASE = '/bundles/pdfeditor/build/';
+/**
+ * Relative base: chunks, preloads and the PDFium wasm resolve from the URL of pdf-editor.js, so the same build works
+ * under /bundles/nowopdfeditor/build/ (NowoPdfEditorBundle) and /bundles/pdfeditor/build/ (deprecated PdfEditorBundle class).
+ */
+const ASSET_BASE = './';
 
 /**
  * Production build for `assets:install` (REQ-ASSETS-001).
