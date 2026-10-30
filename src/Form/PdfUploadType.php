@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Nowo\PdfEditorBundle\Form;
 
+use Nowo\FormKitBundle\Attribute\FormKitConfig;
+use Nowo\FormKitBundle\Form\FormOptionsTrait;
+use Nowo\PdfEditorBundle\DependencyInjection\PdfEditorExtension;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -12,11 +15,14 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<array<string, mixed>>
  */
+#[FormKitConfig(PdfEditorExtension::FORM_KIT_PROFILE)]
 final class PdfUploadType extends AbstractType
 {
+    use FormOptionsTrait;
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder->add('pdf', FileType::class, [
+        $this->addWithDefaults($builder, 'pdf', FileType::class, [
             'label'    => 'pdf_editor.upload.label',
             'mapped'   => false,
             'required' => true,

@@ -3,7 +3,7 @@
 ## Requirements
 
 - PHP >= 8.2, < 8.6
-- Symfony 7.4 / 8.0 / 8.1+ and nowo-tech/ui-kit-bundle 2.17.3+ (a dependency; register `NowoUiKitBundle` too)
+- Symfony 7.4 / 8.0 / 8.1+, nowo-tech/ui-kit-bundle 2.17.3+ and nowo-tech/form-kit-bundle 2.16+ (dependencies; register `NowoUiKitBundle` and `NowoFormKitBundle` too)
 - Composer 2
 - Python 3.9+
 - PyMuPDF: `python3 -m pip install pymupdf` (free, required)
@@ -23,6 +23,7 @@ Without Flex:
 return [
     // ...
     Symfony\Bundle\SecurityBundle\SecurityBundle::class => ['all' => true],
+    Nowo\FormKitBundle\NowoFormKitBundle::class => ['all' => true],
     Nowo\UiKitBundle\NowoUiKitBundle::class => ['all' => true],
     Nowo\PdfEditorBundle\NowoPdfEditorBundle::class => ['all' => true],
 ];

@@ -25,6 +25,7 @@ use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 
+use function array_key_exists;
 use function array_values;
 use function class_exists;
 use function dirname;
@@ -39,6 +40,30 @@ use function str_starts_with;
  */
 final class PdfEditorExtension extends Extension implements PrependExtensionInterface
 {
+    /** FormKit profile name of the editor forms ({@code #[FormKitConfig]}). */
+    public const FORM_KIT_PROFILE = 'pdf_editor';
+
+    /**
+     * FormKit profile prepended as {@code nowo_form_kit.profiles.pdf_editor} (REQ-TWIG-005 rule 11).
+     *
+     * Framework-neutral on purpose (REQ-UI-003): the UiKit form scaffold and the host {@code twig.form_themes} add the
+     * CSS framework classes. The form types pass explicit label keys, so the convention placeholder / help keys are
+     * off. A host overrides the whole profile by defining {@code nowo_form_kit.profiles.pdf_editor} itself.
+     *
+     * @var array<string, mixed>
+     */
+    public const FORM_KIT_PROFILE_CONFIG = [
+        'alias'              => self::FORM_KIT_PROFILE,
+        'translation_domain' => 'NowoPdfEditorBundle',
+        'auto_placeholder'   => false,
+        'auto_help'          => false,
+        'defaults'           => [
+            'attr'     => [],
+            'row_attr' => [],
+        ],
+        'field_types' => [],
+    ];
+
     /**
      * @param array<int, array<string, mixed>> $configs
      */
@@ -130,6 +155,8 @@ final class PdfEditorExtension extends Extension implements PrependExtensionInte
 
     public function prepend(ContainerBuilder $container): void
     {
+        $this->prependFormKitProfile($container);
+
         // The @NowoPdfEditorBundle Twig namespace is registered by TwigPathsPass (application overrides first, REQ-TWIG-001).
         if (!$container->hasExtension('framework')) {
             return;
@@ -161,6 +188,28 @@ final class PdfEditorExtension extends Extension implements PrependExtensionInte
     public function getAlias(): string
     {
         return 'nowo_pdf_editor';
+    }
+
+    /**
+     * Registers the {@see self::FORM_KIT_PROFILE} FormKit profile unless the host already defines it.
+     * FormKit is a required dependency; the guard only keeps kernels without NowoFormKitBundle bootable.
+     */
+    private function prependFormKitProfile(ContainerBuilder $container): void
+    {
+        if (!$container->hasExtension('nowo_form_kit')) {
+            return;
+        }
+
+        foreach ($container->getExtensionConfig('nowo_form_kit') as $cfg) {
+            $profiles = $cfg['profiles'] ?? null;
+            if (is_array($profiles) && array_key_exists(self::FORM_KIT_PROFILE, $profiles)) {
+                return;
+            }
+        }
+
+        $container->prependExtensionConfig('nowo_form_kit', [
+            'profiles' => [self::FORM_KIT_PROFILE => self::FORM_KIT_PROFILE_CONFIG],
+        ]);
     }
 
     /**

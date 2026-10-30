@@ -6,6 +6,7 @@ return [
     Symfony\Bundle\SecurityBundle\SecurityBundle::class => ['all' => true],
     Symfony\Bundle\DebugBundle\DebugBundle::class => ['dev' => true, 'test' => true],
     Symfony\Bundle\WebProfilerBundle\WebProfilerBundle::class => ['dev' => true, 'test' => true],
+    Nowo\FormKitBundle\NowoFormKitBundle::class => ['all' => true],
     Nowo\UiKitBundle\NowoUiKitBundle::class => ['all' => true],
     Nowo\PdfEditorBundle\NowoPdfEditorBundle::class => ['all' => true],
     Pentatrion\ViteBundle\PentatrionViteBundle::class => ['all' => true],
