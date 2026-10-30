@@ -15,6 +15,7 @@ use Nowo\PdfEditorBundle\Operation\OperationDecoder;
 use Nowo\PdfEditorBundle\Security\PdfEditorAccessCheckerInterface;
 use Nowo\PdfEditorBundle\Security\WorkspaceOwnerResolver;
 use Nowo\PdfEditorBundle\Tests\ProfileFactory;
+use Nowo\UiKitBundle\View\FormPage;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -31,6 +32,8 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Twig\Environment;
 
+use function intdiv;
+
 use const JSON_THROW_ON_ERROR;
 
 #[CoversClass(EditorController::class)]
@@ -46,6 +49,55 @@ final class EditorControllerTest extends TestCase
     {
         $response = $this->controller(withUserObject: true)->index(new Request());
         self::assertSame(200, $response->getStatusCode());
+    }
+
+    public function testIndexRendersTheUploadFormPageInTheDefaultTemplate(): void
+    {
+        $calls = [];
+        $twig  = $this->createMock(Environment::class);
+        $twig->method('render')->willReturnCallback(static function (string $name, array $context) use (&$calls): string {
+            $calls[] = [$name, $context];
+
+            return '<main></main>';
+        });
+
+        $this->controller(twig: $twig)->index(new Request());
+
+        self::assertSame('@NowoPdfEditorBundle/editor/index.html.twig', $calls[0][0]);
+        $page = $calls[0][1]['page'];
+        self::assertInstanceOf(FormPage::class, $page);
+        self::assertSame('NowoPdfEditorBundle', $page->bundle);
+        self::assertNull($page->layout);
+        self::assertNull($calls[0][1]['layout']);
+        self::assertSame('NowoPdfEditorBundle', $calls[0][1]['bundle']);
+        self::assertSame($page->form, $calls[0][1]['form']);
+    }
+
+    public function testConfiguredTemplatesAndLayoutAreUsed(): void
+    {
+        $root  = $this->workspaceRoot();
+        $ws    = $this->seedWorkspace($root);
+        $calls = [];
+        $twig  = $this->createMock(Environment::class);
+        $twig->method('render')->willReturnCallback(static function (string $name, array $context) use (&$calls): string {
+            $calls[] = [$name, $context];
+
+            return '<main></main>';
+        });
+        $controller = $this->controller(workspaceRoot: $root, twig: $twig, layout: 'admin/layout.html.twig', templates: [
+            'upload'    => 'admin/pdf/upload.html.twig',
+            'workspace' => 'admin/pdf/workspace.html.twig',
+        ]);
+
+        $controller->index(new Request());
+        $controller->workspace($ws->id);
+
+        self::assertSame('admin/pdf/upload.html.twig', $calls[0][0]);
+        self::assertSame('admin/layout.html.twig', $calls[0][1]['page']->layout);
+        self::assertSame('admin/pdf/workspace.html.twig', $calls[1][0]);
+        self::assertSame('admin/layout.html.twig', $calls[1][1]['layout']);
+        self::assertSame('NowoPdfEditorBundle', $calls[1][1]['bundle']);
+        self::assertSame($ws->id, $calls[1][1]['workspace']->id);
     }
 
     public function testIndexSubmittedWithoutFile(): void
@@ -309,6 +361,47 @@ final class EditorControllerTest extends TestCase
         self::assertFileDoesNotExist($ws->directory . '/next.pdf');
     }
 
+    public function testApplyRejectsOversizedDeclaredBodyBeforeReadingIt(): void
+    {
+        $root    = $this->workspaceRoot();
+        $ws      = $this->seedWorkspace($root);
+        $request = Request::create('/', 'POST', [], [], [], [], '%PDF-1.4');
+        $request->headers->set('Content-Type', 'application/pdf');
+        $request->headers->set('Content-Length', (string) (intdiv(1024 * 4, 3) + 65536 + 1));
+        $request->headers->set('X-CSRF-TOKEN', 'token');
+        $controller = $this->controllerWithProfile($this->clientProfile($root, 1024));
+
+        $this->expectException(PdfEditorException::class);
+        $this->expectExceptionMessage('Request body exceeds max_upload_bytes (1024).');
+        $controller->apply($request, $ws->id);
+    }
+
+    public function testApplyAcceptsDeclaredBodyWithinTheBase64Allowance(): void
+    {
+        $root    = $this->workspaceRoot();
+        $ws      = $this->seedWorkspace($root);
+        $request = Request::create('/', 'POST', [], [], [], [], '%PDF-1.4 small');
+        $request->headers->set('Content-Type', 'application/pdf');
+        $request->headers->set('Content-Length', (string) (intdiv(1024 * 4, 3) + 65536));
+        $request->headers->set('X-CSRF-TOKEN', 'token');
+
+        $response = $this->controllerWithProfile($this->clientProfile($root, 1024))->apply($request, $ws->id);
+
+        self::assertSame(200, $response->getStatusCode());
+    }
+
+    public function testApplyIgnoresANonNumericContentLength(): void
+    {
+        $root    = $this->workspaceRoot();
+        $ws      = $this->seedWorkspace($root);
+        $request = Request::create('/', 'POST', [], [], [], [], '%PDF-1.4 small');
+        $request->headers->set('Content-Type', 'application/pdf');
+        $request->headers->set('Content-Length', 'abc');
+        $request->headers->set('X-CSRF-TOKEN', 'token');
+
+        self::assertSame(200, $this->controllerWithProfile($this->clientProfile($root, 1024))->apply($request, $ws->id)->getStatusCode());
+    }
+
     private function clientProfile(string $root, int $maxUploadBytes): EditorProfile
     {
         return new EditorProfile(
@@ -327,7 +420,8 @@ final class EditorControllerTest extends TestCase
     }
 
     /**
-     * @param array<string, mixed> $inspect
+     * @param array<string, mixed>                       $inspect
+     * @param array{upload?: string, workspace?: string} $templates
      */
     private function controller(
         bool $canUse = true,
@@ -338,6 +432,9 @@ final class EditorControllerTest extends TestCase
         bool $writePageImage = true,
         bool $submittedEmpty = false,
         bool $withUserObject = false,
+        ?Environment $twig = null,
+        ?string $layout = null,
+        array $templates = [],
     ): EditorController {
         $root   = $workspaceRoot ?? $this->workspaceRoot();
         $access = $this->createMock(PdfEditorAccessCheckerInterface::class);
@@ -373,8 +470,10 @@ final class EditorControllerTest extends TestCase
         $form->method('createView')->willReturn(new FormView());
         $forms = $this->createMock(FormFactoryInterface::class);
         $forms->method('create')->willReturn($form);
-        $twig = $this->createMock(Environment::class);
-        $twig->method('render')->willReturn('<html></html>');
+        if (!$twig instanceof Environment) {
+            $twig = $this->createMock(Environment::class);
+            $twig->method('render')->willReturn('<html></html>');
+        }
         $urls = $this->createMock(UrlGeneratorInterface::class);
         $urls->method('generate')->willReturn('/pdf-editor/x');
         $csrfMgr = $this->createMock(CsrfTokenManagerInterface::class);
@@ -391,6 +490,8 @@ final class EditorControllerTest extends TestCase
             $urls,
             ProfileFactory::create($root),
             $csrfMgr,
+            $layout,
+            $templates,
         );
     }
 

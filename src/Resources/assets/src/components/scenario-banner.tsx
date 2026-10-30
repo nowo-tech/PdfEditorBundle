@@ -13,7 +13,7 @@ export function ScenarioBanner({ title, lead, hubUrl, backLabel }: Props) {
         <span>{lead}</span>
       </div>
       {hubUrl ? (
-        <a className="nowo-ui-btn nowo-ui-btn-tiny" href={hubUrl}>
+        <a className="nowo-pdf-editor-btn nowo-pdf-editor-btn-tiny" href={hubUrl}>
           {backLabel}
         </a>
       ) : null}

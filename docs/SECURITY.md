@@ -32,18 +32,22 @@ This bundle provides:
 - Workspace storage under a configured `workspace_dir` (32-hex workspace ids)
 - Optional Python/PyMuPDF engine invoked via Symfony `Process` (argv list only)
 - Client-side PDF apply path (default `engine_mode: client`) with CSRF-protected POST
-- Access checker (`ROLE_ADMIN` by default; `allow_unauthenticated` for demos only)
+- Access checker (`security.access_roles`, default `[ROLE_ADMIN]`; or the host's `security.access_checker` service; `allow_unauthenticated` for demos only)
+- Twig pages rendered in the host layout through UiKit (`nowo-tech/ui-kit-bundle`), and the compiled React editor (`src/Resources/public/build`)
 
 ## Threat model and mitigations
 
 - **Actors / trust**
   - Treat the editor as a private admin UI.
-  - Default `security.allow_unauthenticated: false` and `roles: [ROLE_ADMIN]`.
-  - Never enable unauthenticated access outside isolated demos.
+  - Default `security.allow_unauthenticated: false` and `access_roles: [ROLE_ADMIN]`; anonymous users are always denied by the built-in checker.
+  - An empty `access_roles` list is refused at container build (unless a custom `access_checker` is set): it never means "everyone".
+  - `allow_unauthenticated: true` (the admin-UI footgun: anyone can upload PDFs and run the engine) is a dev/demo switch, refused at container build in `prod` and in non-debug kernels. Never enable it outside isolated demos.
+  - The container refuses to compile without SecurityBundle (token storage / authorization checker) or without CSRF protection, so a misconfigured host cannot silently run the editor unprotected.
+  - Add a firewall rule for the editor prefix too (`access_control: - { path: ^/pdf-editor, roles: ROLE_ADMIN }`): the bundle checker is the second layer.
 - **HTTP surface**
   - Routes under `/pdf-editor*`; workspace `{id}` constrained to `[a-f0-9]{32}`.
   - CSRF on `POST .../apply` (`X-CSRF-TOKEN` / token id `pdf_editor`).
-  - Symfony form CSRF on upload POST.
+  - Symfony form CSRF on upload POST (fails closed: compile error when form CSRF is disabled).
 - **Workspaces**
   - Random 32-hex ids; reject empty id, `/`, `\`, and `..`.
   - Each workspace is bound to its creator (`owner.txt`: SHA-256 of the user identifier, or of a random token stored in the anonymous session). Every `{id}` route returns **404** for other users/sessions (`WorkspaceOwnerResolverInterface`, overridable).
@@ -52,12 +56,14 @@ This bundle provides:
 - **Uploads & client apply**
   - Extension must be `.pdf` **and** the stored file must start with the `%PDF-` signature; create path enforces `max_upload_bytes` (default 25 MiB).
   - `/view` serves the PDF inline with `X-Content-Type-Options: nosniff` and `Content-Security-Policy: sandbox`; `/download` sends `nosniff`.
-  - Client apply checks `%PDF` magic; residual: apply body size is not capped by the bundle — set host PHP/`client_max_body_size` limits and virus-scan if needed.
+  - Client apply checks `%PDF` magic and `max_upload_bytes`; a declared `Content-Length` above `max_upload_bytes × 4/3` (+64 KiB JSON envelope) is rejected **before** the body is read. Residual: chunked bodies without `Content-Length` are read before the size check — keep host PHP `post_max_size` / proxy `client_max_body_size` limits, and virus-scan if needed.
+  - Residual: no per-owner workspace quota; abandoned workspaces are removed by `nowo:pdf-editor:purge` (schedule it).
 - **Python engine**
   - Argv-only `Process` with `timeout` / `idle_timeout` (defaults 60s / 30s).
   - Never pass unsanitized shell strings.
 - **XSS / output**
   - Twig escapes config JSON for HTML attributes; prefer `textContent` in legacy JS.
+  - Pages carry no inline `on*=` handlers, no `javascript:` URLs and no CDN assets (enforced by `tests/Integration/PageContractTest.php`).
 - **Secrets**
   - No bundle feature requires hardcoded secrets; keep `.env` untracked.
 

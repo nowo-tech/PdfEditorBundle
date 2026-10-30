@@ -7,6 +7,9 @@ nowo_pdf_editor:
             workspace_dir: '%kernel.project_dir%/var/pdf-editor'
             timeout: 60
             idle_timeout: 30
+    # web_ui:
+    #     layout_template: null   # null = nowo_ui_kit.layouts.admin (set that once to your layout or bridge)
     security:
-        allow_unauthenticated: false
-        roles: [ROLE_ADMIN]
+        access_roles: [ROLE_ADMIN]
+        # access_checker: App\Security\PdfEditorAccessChecker
+        allow_unauthenticated: false   # dev/demo only; refused in prod

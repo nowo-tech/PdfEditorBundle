@@ -206,7 +206,7 @@ find src -type f ! -path '*/assets/dist/*' ! -name '*.test.ts' | wc -l
 
 The **Total production sources** row in `code-inventory.md` must match this count.
 
-In **PdfEditorBundle**, the baseline inventory covers **69/69** tracked files under `src/` (including the Vite build outputs documented as FR-BUILD-001 rows) — see [`specs/001-baseline/code-inventory.md`](../specs/001-baseline/code-inventory.md).
+In **PdfEditorBundle**, the baseline inventory covers **74/74** tracked files under `src/` (including the Vite build outputs documented as FR-BUILD-001 rows) — see [`specs/001-baseline/code-inventory.md`](../specs/001-baseline/code-inventory.md).
 
 ---
 

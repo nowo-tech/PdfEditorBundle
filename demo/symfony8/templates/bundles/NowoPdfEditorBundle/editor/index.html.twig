@@ -1,0 +1,17 @@
+{#
+  Demo surgical override (REQ-TWIG-001): extends the vendor upload page and only fills the nowo_ui_form_aside data
+  block of the UiKit form scaffold; the form, header and submit keep coming from the bundle on upgrades.
+#}
+{% extends '@!NowoPdfEditorBundle/editor/index.html.twig' %}
+
+{% block nowo_ui_form_aside %}
+    <aside class="demo-upload-aside">
+        <h2>{{ 'demo.upload.how_it_works'|trans }}</h2>
+        <ol>
+            <li>{{ 'demo.upload.step1'|trans }}</li>
+            <li>{{ 'demo.upload.step2'|trans }}</li>
+            <li>{{ 'demo.upload.step3'|trans }}</li>
+            <li>{{ 'demo.upload.step4'|trans }}</li>
+        </ol>
+    </aside>
+{% endblock %}

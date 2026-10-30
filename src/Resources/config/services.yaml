@@ -13,6 +13,8 @@ services:
         exclude:
             - '../../DependencyInjection/'
             - '../../PdfEditorBundle.php'
+            - '../../NowoPdfEditorBundle.php'
+            - '../../View/'
             - '../../Resources/'
             - '../../Config/'
             - '../../Exception/'
@@ -27,7 +29,10 @@ services:
     Nowo\PdfEditorBundle\Form\PdfUploadType: ~
 
     # #[AsController] + autoconfigure tag it controller.service_arguments (REQ-SF-003).
-    Nowo\PdfEditorBundle\Controller\EditorController: ~
+    Nowo\PdfEditorBundle\Controller\EditorController:
+        arguments:
+            $layoutTemplate: '%nowo_pdf_editor.web_ui.layout_template%'
+            $templates: '%nowo_pdf_editor.web_ui.templates%'
 
     Nowo\PdfEditorBundle\Command\CheckEngineCommand: ~
     Nowo\PdfEditorBundle\Command\PurgeWorkspacesCommand: ~

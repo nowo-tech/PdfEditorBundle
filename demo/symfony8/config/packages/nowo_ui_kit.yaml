@@ -1,0 +1,16 @@
+# UiKit host setup of the demo (REQ-UI-003): the editor pages render in the demo layout (layouts.admin) with UiKit's
+# semantic nowo-ui-* styles only (css_framework: custom — no CSS framework is loaded by the demo or the bundle).
+nowo_ui_kit:
+    css_framework: custom
+    layouts:
+        admin: 'layouts/admin.html.twig'
+    theme:
+        tokens:
+            primary: '#0b6e4f'
+            primary-contrast: '#ffffff'
+            surface: '#ffffff'
+            surface-muted: '#f4f1ea'
+            border: '#ddd4c4'
+            text: '#1f1b16'
+            muted: '#6b6258'
+            radius: '0.5rem'

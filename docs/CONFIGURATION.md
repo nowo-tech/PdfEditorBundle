@@ -13,9 +13,15 @@ nowo_pdf_editor:
             max_upload_bytes: 26214400
             render_dpi: 144
             engine_mode: client   # client | python
+    web_ui:
+        layout_template: null            # null = nowo_ui_kit.layouts.admin
+        templates:
+            upload: '@NowoPdfEditorBundle/editor/index.html.twig'
+            workspace: '@NowoPdfEditorBundle/editor/workspace.html.twig'
     security:
-        allow_unauthenticated: false
-        roles: [ROLE_ADMIN]
+        access_roles: [ROLE_ADMIN]
+        access_checker: null             # service id of your PdfEditorAccessCheckerInterface
+        allow_unauthenticated: false     # dev/demo only
 ```
 
 `default_profile` must exist under `profiles` (REQ-CFG-001).
@@ -25,6 +31,8 @@ Only the profile named by `default_profile` is used: the engine, the workspace m
 ## Table of contents
 
 - [Profiles](#profiles)
+- [Security (private access)](#security-private-access)
+- [Web UI (layout, look and feel, templates)](#web-ui-layout-look-and-feel-templates)
 - [Translations](#translations)
 - [Workspace cleanup (TTL)](#workspace-cleanup-ttl)
 - [`engine_mode`](#engine_mode)
@@ -40,6 +48,66 @@ Only the profile named by `default_profile` is used: the engine, the workspace m
 | Validation | Container build fails when `default_profile` is not a key of `profiles` |
 | Runtime selection | Always `default_profile`: one engine, workspace manager and controller per application; no request, route or option selects another profile |
 | Extra profiles | Deprecated since 1.2 (a deprecation names the unused profiles); removed in 2.0 — use per-environment config files instead |
+
+## Security (private access)
+
+The editor is a private UI (REQ-UI-002). Every route checks the access checker; mutations also check CSRF.
+
+| Key | Default | Purpose |
+| --- | --- | --- |
+| `security.access_roles` | `[ROLE_ADMIN]` | The user must be granted at least one role (`isGranted`). Anonymous users are always denied by the built-in checker. An **empty list is refused** at container build unless `access_checker` is set or `allow_unauthenticated` is true (an empty list never means "everyone"). |
+| `security.access_checker` | `null` | Service id of your own `Nowo\PdfEditorBundle\Security\PdfEditorAccessCheckerInterface` (`canUseEditor(?object $user): bool`); the interface and `nowo_pdf_editor.access_checker` are aliased to it. `null` = built-in role checker. |
+| `security.allow_unauthenticated` | `false` | **DEV/DEMO only**: no role check, anonymous visitors may use the editor (workspaces are then bound to the session). Refused at container build in the `prod` environment and in non-debug kernels (test environments excepted). |
+| `security.roles` | — | Deprecated since 1.5 (removed in 2.0): mapped onto `access_roles` (when both are set, `access_roles` wins unless it is the default). |
+
+The container also refuses to compile when SecurityBundle is not enabled (the editor binds workspaces to the current
+user / session) or when CSRF protection is off (`framework.csrf_protection` / `framework.form.csrf_protection`).
+
+Routes live under `/pdf-editor` (plus the prefix of your routing import). Add the firewall layer in the host:
+
+```yaml
+# config/packages/security.yaml
+security:
+    access_control:
+        - { path: ^/pdf-editor, roles: ROLE_ADMIN }   # or ^/admin/pdf-editor with an import prefix
+```
+
+## Web UI (layout, look and feel, templates)
+
+The editor pages follow the UiKit page contract (REQ-UI-001 / REQ-UI-003; see [TEMPLATES.md](TEMPLATES.md)): the
+upload page is the UiKit form scaffold, the workspace a unique page on the UiKit admin layout. Configure the look and
+feel **once, in UiKit**, for every UiKit page of the application:
+
+```yaml
+# config/packages/nowo_ui_kit.yaml
+nowo_ui_kit:
+    css_framework: bootstrap5           # bootstrap5 (bootstrap) | bootstrap4 | tailwind | foundation | custom | none | tabler
+    layouts:
+        admin: 'layouts/admin.html.twig' # your layout or a one-file bridge rendering the UiKit canonical blocks
+    theme:
+        tokens: { primary: '#0b6e4f' }   # --nowo-ui-* tokens; class maps under theme.classes
+```
+
+| Key | Default | Purpose |
+| --- | --- | --- |
+| `web_ui.layout_template` | `null` | Per-bundle layout override. `null` = `nowo_ui_kit.layouts.admin`. Set it to your project layout (or a bridge) only when the editor needs a different layout from your other admin pages; the bundle default (UiKit admin layout) is meant for demos / standalone installs. |
+| `web_ui.templates.upload` | `@NowoPdfEditorBundle/editor/index.html.twig` | Template rendered for the upload page (a host template that extends `@!NowoPdfEditorBundle/editor/index.html.twig` and redefines one block). |
+| `web_ui.templates.workspace` | `@NowoPdfEditorBundle/editor/workspace.html.twig` | Template rendered for the workspace (same idea). |
+
+`css_framework`, `icon_set` and `row_actions_display` are not repeated per bundle: they are inherited from
+`nowo_ui_kit` (REQ-UI-003 configuration vocabulary). Examples:
+
+```yaml
+nowo_ui_kit:
+    css_framework: bootstrap5   # Bootstrap 5 / Tabler hosts: UiKit slot defaults emit Bootstrap classes
+    # css_framework: tailwind   # Tailwind hosts
+    # css_framework: foundation # Foundation hosts
+    # css_framework: custom     # own design system: only nowo-ui-* classes; map them (or the --nowo-ui-* tokens) in your CSS
+```
+
+Assets stack with `{{ parent() }}`: the workspace adds `css/pdf-editor.css` and `build/pdf-editor.css` to
+`nowo_ui_styles` and the `build/pdf-editor.js` module to `nowo_ui_scripts` (asset package `nowo_pdf_editor`), after the
+host / UiKit assets. Content block: `nowo_ui_content`. The bundle has no modals, tables or row actions.
 
 ## Translations
 
@@ -81,4 +149,8 @@ Override `Nowo\PdfEditorBundle\Security\WorkspaceOwnerResolverInterface` (e.g. t
 
 ## Requirements
 
-Twig paths and `framework` translator/asset packages are prepended only when TwigBundle / FrameworkBundle are registered. `symfony/framework-bundle` and `symfony/asset` are runtime requirements (the views use `asset(..., 'nowo_pdf_editor')`).
+The `framework` translator / asset packages are prepended only when FrameworkBundle is registered; the
+`@NowoPdfEditorBundle` Twig namespace is registered by `TwigPathsPass` when TwigBundle is. `symfony/framework-bundle`,
+`symfony/asset`, SecurityBundle, CSRF protection and `nowo-tech/ui-kit-bundle` are runtime requirements (the views use
+`asset(..., 'nowo_pdf_editor')` — `/bundles/nowopdfeditor`, or `/bundles/pdfeditor` with the deprecated
+`PdfEditorBundle` class — and the UiKit layouts / scaffolds).

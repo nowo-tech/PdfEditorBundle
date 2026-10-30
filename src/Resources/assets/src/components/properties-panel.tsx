@@ -110,11 +110,11 @@ export function PropertiesPanel({
   return (
     <aside className="nowo-pdf-editor-props">
       <details className="nowo-pdf-editor-props-section" open>
-        <summary className="nowo-ui-subtitle">{t('properties', 'Properties')}</summary>
+        <summary className="nowo-pdf-editor-subtitle">{t('properties', 'Properties')}</summary>
 
         {objectSelection ? (
           <div className="nowo-pdf-editor-props-form">
-            <p className="nowo-ui-muted nowo-pdf-editor-props-kind">
+            <p className="nowo-pdf-editor-muted nowo-pdf-editor-props-kind">
               {objectSelection.kind === 'widget'
                 ? t('properties.kind.form', 'Form field')
                 : objectSelection.kind === 'note'
@@ -125,37 +125,37 @@ export function PropertiesPanel({
             </p>
             {objectSelection.kind === 'widget' ? (
               <>
-                <label className="nowo-ui-label" htmlFor="nowo-pdf-prop-field-name">
+                <label className="nowo-pdf-editor-label" htmlFor="nowo-pdf-prop-field-name">
                   {t('properties.field_name', 'Field name')}
                 </label>
                 <input
                   id="nowo-pdf-prop-field-name"
-                  className="nowo-ui-input"
+                  className="nowo-pdf-editor-input"
                   value={objFieldName}
                   onChange={(event) => setObjFieldName(event.target.value)}
                   onBlur={applyObjectIfSelected}
                 />
               </>
             ) : null}
-            <label className="nowo-ui-label" htmlFor="nowo-pdf-prop-obj-text">
+            <label className="nowo-pdf-editor-label" htmlFor="nowo-pdf-prop-obj-text">
               {objectSelection.kind === 'widget'
                 ? t('properties.value', 'Value')
                 : t('properties.text', 'Text')}
             </label>
             <textarea
               id="nowo-pdf-prop-obj-text"
-              className="nowo-ui-input"
+              className="nowo-pdf-editor-input"
               rows={3}
               value={objContents}
               onChange={(event) => setObjContents(event.target.value)}
               onBlur={applyObjectIfSelected}
             />
-            <label className="nowo-ui-label" htmlFor="nowo-pdf-prop-obj-font">
+            <label className="nowo-pdf-editor-label" htmlFor="nowo-pdf-prop-obj-font">
               {t('properties.font_size', 'Font size')}
             </label>
             <input
               id="nowo-pdf-prop-obj-font"
-              className="nowo-ui-input"
+              className="nowo-pdf-editor-input"
               type="number"
               min={6}
               max={96}
@@ -163,12 +163,12 @@ export function PropertiesPanel({
               onChange={(event) => setObjFontSize(Number(event.target.value) || 12)}
               onBlur={applyObjectIfSelected}
             />
-            <label className="nowo-ui-label" htmlFor="nowo-pdf-prop-obj-color">
+            <label className="nowo-pdf-editor-label" htmlFor="nowo-pdf-prop-obj-color">
               {t('properties.font_color', 'Color')}
             </label>
             <input
               id="nowo-pdf-prop-obj-color"
-              className="nowo-ui-input nowo-pdf-editor-color-input"
+              className="nowo-pdf-editor-input nowo-pdf-editor-color-input"
               type="color"
               value={objFontColor}
               onChange={(event) => {
@@ -188,12 +188,12 @@ export function PropertiesPanel({
                 }
               }}
             />
-            <label className="nowo-ui-label" htmlFor="nowo-pdf-prop-obj-family">
+            <label className="nowo-pdf-editor-label" htmlFor="nowo-pdf-prop-obj-family">
               {t('properties.font_family', 'Font')}
             </label>
             <select
               id="nowo-pdf-prop-obj-family"
-              className="nowo-ui-input"
+              className="nowo-pdf-editor-input"
               value={objFontFamily}
               onChange={(event) => {
                 setObjFontFamily(event.target.value);
@@ -215,45 +215,45 @@ export function PropertiesPanel({
               ))}
             </select>
             <div className="nowo-pdf-editor-props-actions">
-              <button type="button" className="nowo-ui-btn nowo-ui-btn-primary" onClick={applyObject}>
+              <button type="button" className="nowo-pdf-editor-btn nowo-pdf-editor-btn-primary" onClick={applyObject}>
                 {t('properties.apply_live', 'Apply')}
               </button>
               <button
                 type="button"
-                className="nowo-ui-btn"
+                className="nowo-pdf-editor-btn"
                 onClick={() => onDeleteObject()}
               >
                 {t('properties.delete', 'Delete')}
               </button>
             </div>
-            <p className="nowo-ui-muted nowo-pdf-editor-props-hint">
+            <p className="nowo-pdf-editor-muted nowo-pdf-editor-props-hint">
               {t('properties.live_help', 'Changes apply in the viewer. Save to PDF to persist.')}
             </p>
           </div>
         ) : selection?.text ? (
           <div className="nowo-pdf-editor-props-form">
-            <p className="nowo-ui-muted">
+            <p className="nowo-pdf-editor-muted">
               {t(
                 'properties.native_text_help',
                 'Native PDF text — edit below and replace. The old text is redacted and new text is stamped on save.',
               )}
             </p>
-            <label className="nowo-ui-label" htmlFor="nowo-pdf-prop-native-text">
+            <label className="nowo-pdf-editor-label" htmlFor="nowo-pdf-prop-native-text">
               {t('properties.text', 'Text')}
             </label>
             <textarea
               id="nowo-pdf-prop-native-text"
-              className="nowo-ui-input"
+              className="nowo-pdf-editor-input"
               rows={3}
               value={nativeText}
               onChange={(event) => setNativeText(event.target.value)}
             />
-            <label className="nowo-ui-label" htmlFor="nowo-pdf-prop-native-font">
+            <label className="nowo-pdf-editor-label" htmlFor="nowo-pdf-prop-native-font">
               {t('properties.font_size', 'Font size')}
             </label>
             <input
               id="nowo-pdf-prop-native-font"
-              className="nowo-ui-input"
+              className="nowo-pdf-editor-input"
               type="number"
               min={6}
               max={72}
@@ -263,51 +263,51 @@ export function PropertiesPanel({
             <div className="nowo-pdf-editor-props-actions">
               <button
                 type="button"
-                className="nowo-ui-btn nowo-ui-btn-primary"
+                className="nowo-pdf-editor-btn nowo-pdf-editor-btn-primary"
                 disabled={!nativeText.trim()}
                 onClick={() => onReplaceNativeText(nativeText.trim(), nativeFontSize)}
               >
                 {t('properties.replace_text', 'Replace text')}
               </button>
-              <button type="button" className="nowo-ui-btn" onClick={() => onDeleteObject()}>
+              <button type="button" className="nowo-pdf-editor-btn" onClick={() => onDeleteObject()}>
                 {t('properties.delete_text', 'Delete selected text')}
               </button>
             </div>
-            <p className="nowo-ui-muted nowo-pdf-editor-props-hint">
+            <p className="nowo-pdf-editor-muted nowo-pdf-editor-props-hint">
               {t('properties.native_text_replace_hint', 'Hold Shift while dragging to select native PDF text.')}
             </p>
           </div>
         ) : showDraftInsert ? (
           <div className="nowo-pdf-editor-props-form">
-            <p className="nowo-ui-muted">{t('properties.draft_insert_help', 'Queue a pdf-lib text stamp on save.')}</p>
-            <label className="nowo-ui-label" htmlFor="nowo-pdf-prop-text">
+            <p className="nowo-pdf-editor-muted">{t('properties.draft_insert_help', 'Queue a pdf-lib text stamp on save.')}</p>
+            <label className="nowo-pdf-editor-label" htmlFor="nowo-pdf-prop-text">
               {t('properties.text', 'Text')}
             </label>
             <textarea
               id="nowo-pdf-prop-text"
-              className="nowo-ui-input"
+              className="nowo-pdf-editor-input"
               rows={3}
               value={insertText}
               onChange={(event) => setInsertText(event.target.value)}
             />
-            <label className="nowo-ui-label" htmlFor="nowo-pdf-prop-font">
+            <label className="nowo-pdf-editor-label" htmlFor="nowo-pdf-prop-font">
               {t('properties.font_size', 'Font size')}
             </label>
             <input
               id="nowo-pdf-prop-font"
-              className="nowo-ui-input"
+              className="nowo-pdf-editor-input"
               type="number"
               min={6}
               max={72}
               value={fontSize}
               onChange={(event) => setFontSize(Number(event.target.value) || 12)}
             />
-            <button type="button" className="nowo-ui-btn nowo-ui-btn-primary" onClick={queueInsertText}>
+            <button type="button" className="nowo-pdf-editor-btn nowo-pdf-editor-btn-primary" onClick={queueInsertText}>
               {t('properties.apply', 'Add to draft')}
             </button>
           </div>
         ) : (
-          <p className="nowo-ui-muted">
+          <p className="nowo-pdf-editor-muted">
             {t(
               'properties.empty_select',
               'Use Select to click a text box or form field. Drag to move; handles resize. Hold Shift to select native PDF text.',
@@ -317,13 +317,13 @@ export function PropertiesPanel({
       </details>
 
       <details className="nowo-pdf-editor-props-section" open>
-        <summary className="nowo-ui-subtitle">
+        <summary className="nowo-pdf-editor-subtitle">
           {t('pending.title', 'Draft')}{' '}
           <span className="nowo-pdf-editor-pending-count">{pending.length}</span>
         </summary>
-        <p className="nowo-ui-muted">{t('pending.help', 'Edits stay in the browser until you save.')}</p>
+        <p className="nowo-pdf-editor-muted">{t('pending.help', 'Edits stay in the browser until you save.')}</p>
         {pending.length === 0 ? (
-          <p className="nowo-ui-muted">{t('pending.empty', 'No pending changes.')}</p>
+          <p className="nowo-pdf-editor-muted">{t('pending.empty', 'No pending changes.')}</p>
         ) : (
           <ul className="nowo-pdf-editor-pending">
             {pending.map((op, index) => (
@@ -331,7 +331,7 @@ export function PropertiesPanel({
                 <span>{opLabel(i18n, op)}</span>
                 <button
                   type="button"
-                  className="nowo-ui-btn nowo-ui-btn-tiny"
+                  className="nowo-pdf-editor-btn nowo-pdf-editor-btn-tiny"
                   aria-label={t('pending.remove', 'Remove from draft')}
                   onClick={() => onRemovePending(index)}
                 >

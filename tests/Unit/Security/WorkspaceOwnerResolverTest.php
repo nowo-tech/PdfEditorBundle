@@ -36,11 +36,10 @@ final class WorkspaceOwnerResolverTest extends TestCase
 
     public function testAnonymousOwnerIsBoundToSessionToken(): void
     {
-        $stack   = new RequestStack();
         $request = new Request();
         $session = new Session(new MockArraySessionStorage());
         $request->setSession($session);
-        $stack->push($request);
+        $stack = new RequestStack([$request]);
 
         $resolver = new WorkspaceOwnerResolver(new TokenStorage(), $stack);
         $first    = $resolver->currentOwner();
@@ -49,23 +48,20 @@ final class WorkspaceOwnerResolverTest extends TestCase
         self::assertStringStartsWith('session:', $first);
         self::assertSame($first, $resolver->currentOwner(), 'Stable for the same session.');
         self::assertIsString($session->get(WorkspaceOwnerResolver::SESSION_KEY));
-
-        $otherStack   = new RequestStack();
         $otherRequest = new Request();
         $otherRequest->setSession(new Session(new MockArraySessionStorage()));
-        $otherStack->push($otherRequest);
+        $otherStack = new RequestStack([$otherRequest]);
 
         self::assertNotSame($first, (new WorkspaceOwnerResolver(new TokenStorage(), $otherStack))->currentOwner());
     }
 
     public function testTamperedSessionTokenIsRegenerated(): void
     {
-        $stack   = new RequestStack();
         $request = new Request();
         $session = new Session(new MockArraySessionStorage());
         $session->set(WorkspaceOwnerResolver::SESSION_KEY, 'short');
         $request->setSession($session);
-        $stack->push($request);
+        $stack = new RequestStack([$request]);
 
         (new WorkspaceOwnerResolver(null, $stack))->currentOwner();
 
@@ -76,8 +72,7 @@ final class WorkspaceOwnerResolverTest extends TestCase
 
     public function testRequestWithoutSessionHasNoOwner(): void
     {
-        $stack = new RequestStack();
-        $stack->push(new Request());
+        $stack = new RequestStack([new Request()]);
 
         self::assertNull((new WorkspaceOwnerResolver(new TokenStorage(), $stack))->currentOwner());
     }

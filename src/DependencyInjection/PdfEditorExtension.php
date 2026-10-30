@@ -25,9 +25,12 @@ use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 
+use function array_values;
 use function class_exists;
 use function dirname;
+use function is_array;
 use function is_string;
+use function str_contains;
 use function str_starts_with;
 
 /**
@@ -52,7 +55,10 @@ final class PdfEditorExtension extends Extension implements PrependExtensionInte
         if ($allowUnauth) {
             $this->refuseAllowUnauthenticatedInProduction($container);
         }
-        $roles = array_values($security['roles']);
+        /** @var list<string> $roles */
+        $roles         = array_values($security['access_roles']);
+        $customChecker = $security['access_checker'];
+        $webUi         = $config['web_ui'];
 
         // Configuration guarantees that default_profile exists under profiles.
         $profileConfig = $profiles[$defaultProfile];
@@ -97,31 +103,31 @@ final class PdfEditorExtension extends Extension implements PrependExtensionInte
         $container->setDefinition('nowo_pdf_editor.workspace_manager', $workspace);
         $container->setAlias(WorkspaceManager::class, 'nowo_pdf_editor.workspace_manager');
 
-        if ($allowUnauth) {
-            $checker = new Definition(AllowAllPdfEditorAccessChecker::class);
+        if (is_string($customChecker) && $customChecker !== '') {
+            // Host checker (REQ-UI-002): the interface alias points at the configured service.
+            $container->setAlias('nowo_pdf_editor.access_checker', $customChecker);
+        } elseif ($allowUnauth) {
+            $container->setDefinition('nowo_pdf_editor.access_checker', new Definition(AllowAllPdfEditorAccessChecker::class));
         } else {
-            $checker = new Definition(RolePdfEditorAccessChecker::class, [
+            $container->setDefinition('nowo_pdf_editor.access_checker', new Definition(RolePdfEditorAccessChecker::class, [
                 '$authorizationChecker' => new Reference('security.authorization_checker'),
                 '$roles'                => $roles,
-            ]);
+            ]));
         }
-        $container->setDefinition('nowo_pdf_editor.access_checker', $checker);
         $container->setAlias(PdfEditorAccessCheckerInterface::class, 'nowo_pdf_editor.access_checker');
 
+        $container->setParameter('nowo_pdf_editor.security.access_roles', $roles);
+        $container->setParameter('nowo_pdf_editor.security.access_checker', is_string($customChecker) && $customChecker !== '' ? $customChecker : null);
+        $container->setParameter('nowo_pdf_editor.security.allow_unauthenticated', $allowUnauth);
+        $container->setParameter('nowo_pdf_editor.web_ui.layout_template', $webUi['layout_template']);
+        $container->setParameter('nowo_pdf_editor.web_ui.templates', $webUi['templates']);
         $container->setParameter('nowo_pdf_editor.default_profile', $defaultProfile);
         $container->setParameter('nowo_pdf_editor.profiles', array_keys($profiles));
     }
 
     public function prepend(ContainerBuilder $container): void
     {
-        if ($container->hasExtension('twig')) {
-            $container->prependExtensionConfig('twig', [
-                'paths' => [
-                    __DIR__ . '/../Resources/views' => 'NowoPdfEditorBundle',
-                ],
-            ]);
-        }
-
+        // The @NowoPdfEditorBundle Twig namespace is registered by TwigPathsPass (application overrides first, REQ-TWIG-001).
         if (!$container->hasExtension('framework')) {
             return;
         }
@@ -142,7 +148,7 @@ final class PdfEditorExtension extends Extension implements PrependExtensionInte
             'assets' => [
                 'packages' => [
                     'nowo_pdf_editor' => [
-                        'base_path' => '/bundles/pdfeditor',
+                        'base_path' => $this->publicBasePath($container),
                     ],
                 ],
             ],
@@ -152,6 +158,20 @@ final class PdfEditorExtension extends Extension implements PrependExtensionInte
     public function getAlias(): string
     {
         return 'nowo_pdf_editor';
+    }
+
+    /**
+     * `assets:install` publishes `src/Resources/public` under `/bundles/<bundle name without "Bundle", lowercased>`:
+     * `/bundles/nowopdfeditor` for NowoPdfEditorBundle, `/bundles/pdfeditor` for the deprecated PdfEditorBundle class.
+     */
+    private function publicBasePath(ContainerBuilder $container): string
+    {
+        $bundles = $container->hasParameter('kernel.bundles') ? $container->getParameter('kernel.bundles') : [];
+        if (is_array($bundles) && !isset($bundles['NowoPdfEditorBundle']) && isset($bundles['PdfEditorBundle'])) {
+            return '/bundles/pdfeditor';
+        }
+
+        return '/bundles/nowopdfeditor';
     }
 
     /**

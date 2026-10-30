@@ -27,4 +27,4 @@ when@dev:
         resource: '@NowoTwigInspectorBundle/Resources/config/routes.yaml'
 
 nowo_pdf_editor:
-    resource: '@PdfEditorBundle/Resources/config/routing.yaml'
+    resource: '@NowoPdfEditorBundle/Resources/config/routing.yaml'

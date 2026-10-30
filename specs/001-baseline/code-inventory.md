@@ -2,7 +2,7 @@
 
 **Baseline spec**: [`spec.md`](spec.md)  
 **Package**: `nowo-tech/pdf-editor-bundle`  
-**Last audited**: 2026-10-20 (audit: `git ls-files src | wc -l` → 69)
+**Last audited**: 2026-10-30 (audit: `git ls-files src | wc -l` → 74)
 
 Paths are relative to `src/`. Every tracked file is listed; Vite outputs under `Resources/public/build/` are rows of **Build outputs** (FR-BUILD-001), produced from `Resources/assets/src/main.tsx`.
 
@@ -17,9 +17,14 @@ Paths are relative to `src/`. Every tracked file is listed; Vite outputs under `
 
 | Source file | Spec section | Requirement IDs |
 | --- | --- | --- |
+| `DependencyInjection/Compiler/CsrfProtectionPass.php` | CSRF fail-closed check | FR-SEC-003 |
+| `DependencyInjection/Compiler/SecurityBundlePass.php` | SecurityBundle check | FR-SEC-003 |
+| `DependencyInjection/Compiler/TwigPathsPass.php` | Twig namespace + overrides | FR-TWIG-001 |
 | `DependencyInjection/Configuration.php` | Config tree | FR-CFG-001 |
 | `DependencyInjection/PdfEditorExtension.php` | DI extension | FR-CFG-002 |
-| `PdfEditorBundle.php` | Bundle entry | FR-BUNDLE-001 |
+| `NowoPdfEditorBundle.php` | Bundle entry | FR-BUNDLE-001 |
+| `PdfEditorBundle.php` | Deprecated bundle alias | FR-BUNDLE-001 |
+| `View/PdfEditorPages.php` | UiKit view models | FR-UI-001 |
 
 ## Config VO
 
@@ -138,9 +143,9 @@ Paths are relative to `src/`. Every tracked file is listed; Vite outputs under `
 
 | Source file | Spec section | Requirement IDs |
 | --- | --- | --- |
-| `Resources/public/build/chunks/browser-BKLM0ThC-IxjwuOIz-BWnWt4uP.js` | Output of `main.tsx` | FR-BUILD-001 |
-| `Resources/public/build/chunks/direct-engine-DdrQKpgq-DbkvhJYl.js` | Output of `main.tsx` | FR-BUILD-001 |
-| `Resources/public/build/chunks/worker-engine-m0rlHn8R-DC67B-UE.js` | Output of `main.tsx` | FR-BUILD-001 |
+| `Resources/public/build/chunks/browser-BKLM0ThC-BCLQGPD6-BWnWt4uP.js` | Output of `main.tsx` | FR-BUILD-001 |
+| `Resources/public/build/chunks/direct-engine-DVLMOJWp-uJ1WMVjk.js` | Output of `main.tsx` | FR-BUILD-001 |
+| `Resources/public/build/chunks/worker-engine-BCCrxWYm-CM6XALFo.js` | Output of `main.tsx` | FR-BUILD-001 |
 | `Resources/public/build/pdf-editor.css` | Output of `main.tsx` | FR-BUILD-001 |
 | `Resources/public/build/pdf-editor.js` | Output of `main.tsx` | FR-BUILD-001 |
 | `Resources/public/build/pdf-editor.wasm` | Output of `main.tsx` | FR-BUILD-001 |
@@ -150,7 +155,7 @@ Paths are relative to `src/`. Every tracked file is listed; Vite outputs under `
 | Category | Files | Mapped |
 | --- | ---: | ---: |
 | Symfony config | 2 | 2 |
-| Bundle & DI | 3 | 3 |
+| Bundle & DI | 8 | 8 |
 | Config VO | 1 | 1 |
 | Document | 2 | 2 |
 | Engine | 5 | 5 |
@@ -163,7 +168,7 @@ Paths are relative to `src/`. Every tracked file is listed; Vite outputs under `
 | Frontend sources (React / TS) | 20 | 20 |
 | Static assets | 2 | 2 |
 | Build outputs (Vite) | 6 | 6 |
-| **Total production sources** | **69** | **69** |
+| **Total production sources** | **74** | **74** |
 
 ## FrankenPHP worker evidence (not inventory rows)
 

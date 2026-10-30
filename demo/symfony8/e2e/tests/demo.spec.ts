@@ -10,6 +10,16 @@ test.describe('PdfEditor demo', () => {
     expect(await page.locator('.demo-scenario-card').count()).toBeGreaterThan(2);
   });
 
+  test('upload page renders on the UiKit form scaffold inside the demo layout', async ({ page }) => {
+    const response = await page.goto('/pdf-editor');
+    expect(response?.ok()).toBeTruthy();
+    await expect(page.locator('.demo-topbar')).toBeVisible();
+    await expect(page.locator('[data-nowo-ui-page="form"][data-testid="pdf-editor-upload"]')).toBeVisible();
+    await expect(page.locator('input[type="file"]')).toHaveCount(1);
+    await expect(page.getByRole('button', { name: 'Open PDF' })).toBeVisible();
+    await expect(page.locator('.demo-upload-aside')).toBeVisible();
+  });
+
   test('opening a scenario renders the PDF with tools and page rail', async ({ page }) => {
     await openScenario(page, 'full');
     await expect(page.getByRole('group', { name: 'Tools' })).toBeVisible();
