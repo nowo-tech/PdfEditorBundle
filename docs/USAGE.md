@@ -18,7 +18,10 @@ JSON apply (Python engine only): `POST /pdf-editor/{id}/apply` with header `X-CS
 ## Twig templates and layout
 
 The upload page is the UiKit form scaffold and the workspace a unique page on the UiKit admin layout; both render
-inside `nowo_ui_kit.layouts.admin` (or `nowo_pdf_editor.web_ui.layout_template`). Templates use the
+inside `nowo_ui_kit.layouts.admin` (or `nowo_pdf_editor.web_ui.layout_template`). The upload form is a Symfony Form
+built as a FormKit Type (`PdfUploadType`, profile `nowo_form_kit.profiles.pdf_editor`, REQ-TWIG-005 rule 11 — see
+[CONFIGURATION](CONFIGURATION.md#form-profile-formkit)) rendered with `form_start` / child loop / `form_end`; overrides
+must not reintroduce raw `<form>` / `<input>` markup. Templates use the
 `@NowoPdfEditorBundle` namespace and can be overridden under `templates/bundles/NowoPdfEditorBundle/<subpath>`; an
 application file there **always wins** and freezes that `<subpath>` (it will not pick up vendor changes until you delete
 or merge it), so prefer the layout / theme configuration or a surgical override that extends

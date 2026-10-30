@@ -26,6 +26,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **FormKit Types (REQ-TWIG-005 rule 11):** `nowo-tech/form-kit-bundle` (^2.16) is now a required dependency. `PdfUploadType` and `EditorTextType` carry `#[FormKitConfig('pdf_editor')]` + `FormOptionsTrait` and add their fields through FormKit; the extension prepends the framework-neutral profile `nowo_form_kit.profiles.pdf_editor` (translation domain `NowoPdfEditorBundle`, no auto placeholder / help) unless the host defines it. The upload page (UiKit form scaffold) is themed through that profile; field names and labels are unchanged. See [UPGRADING](UPGRADING.md#unreleased).
+
 ## [1.5.0] - 2026-10-30
 
 UiKit page contract, NowoPdfEditorBundle namespace, access_roles/access_checker, fail-closed CSRF, opt-in routes, bounded engine (memory, pixels, operations, pages, body size) after audit BT. See [UPGRADING](UPGRADING.md#to-150).

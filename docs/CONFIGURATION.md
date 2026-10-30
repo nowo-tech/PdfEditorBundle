@@ -36,6 +36,7 @@ Only the profile named by `default_profile` is used: the engine, the workspace m
 - [Profiles](#profiles)
 - [Security (private access)](#security-private-access)
 - [Web UI (layout, look and feel, templates)](#web-ui-layout-look-and-feel-templates)
+  - [Form profile (FormKit)](#form-profile-formkit)
 - [Translations](#translations)
 - [Workspace cleanup (TTL)](#workspace-cleanup-ttl)
 - [`engine_mode`](#engine_mode)
@@ -112,6 +113,30 @@ nowo_ui_kit:
 Assets stack with `{{ parent() }}`: the workspace adds `css/pdf-editor.css` and `build/pdf-editor.css` to
 `nowo_ui_styles` and the `build/pdf-editor.js` module to `nowo_ui_scripts` (asset package `nowo_pdf_editor`), after the
 host / UiKit assets. Content block: `nowo_ui_content`. The bundle has no modals, tables or row actions.
+
+### Form profile (FormKit)
+
+The editor forms (`PdfUploadType` on the upload page, `EditorTextType`) are FormKit Types
+(`#[FormKitConfig('pdf_editor')]` + `FormOptionsTrait`, REQ-TWIG-005 rule 11). `nowo-tech/form-kit-bundle` is a
+required dependency (register `NowoFormKitBundle`). The bundle prepends the profile
+**`nowo_form_kit.profiles.pdf_editor`**:
+
+```yaml
+nowo_form_kit:
+    profiles:
+        pdf_editor:
+            alias: pdf_editor
+            translation_domain: NowoPdfEditorBundle
+            auto_placeholder: false   # the types pass explicit label keys
+            auto_help: false
+            defaults: { attr: {}, row_attr: {} }   # framework-neutral: the form theme adds the CSS classes
+            field_types: {}
+```
+
+To change field classes or row attributes (e.g. `field_types.file.attr.class`), define
+`nowo_form_kit.profiles.pdf_editor` in your `config/packages/nowo_form_kit.yaml`: when the host defines it, the
+bundle does not prepend its own, so copy the keys above and change what you need. The pages set no `form_theme`: the
+UiKit form scaffold and your `twig.form_themes` render the fields.
 
 ## Translations
 

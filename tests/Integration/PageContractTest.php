@@ -6,10 +6,10 @@ namespace Nowo\PdfEditorBundle\Tests\Integration;
 
 use Nowo\PdfEditorBundle\Document\Workspace;
 use Nowo\PdfEditorBundle\Form\PdfUploadType;
+use Nowo\PdfEditorBundle\Tests\Support\FormKitTestSupport;
 use Nowo\PdfEditorBundle\View\PdfEditorPages;
 use Nowo\UiKitBundle\Test\PageContractTestCase;
 use Nowo\UiKitBundle\Test\PageFixture;
-use Symfony\Component\Form\Forms;
 
 use function dirname;
 use function html_entity_decode;
@@ -117,7 +117,7 @@ final class PageContractTest extends PageContractTestCase
      */
     private static function uploadContext(): array
     {
-        $form = Forms::createFormFactory()->create(PdfUploadType::class)->createView();
+        $form = FormKitTestSupport::formFactory()->create(PdfUploadType::class)->createView();
 
         return [
             'page'   => PdfEditorPages::upload($form),

@@ -243,6 +243,29 @@ final class ConfigurationAndExtensionTest extends TestCase
         self::assertSame([], $container->getExtensionConfig('framework'));
     }
 
+    public function testPrependRegistersTheFormKitProfile(): void
+    {
+        $container = $this->container();
+        $container->registerExtension(new StubExtension('nowo_form_kit'));
+        (new PdfEditorExtension())->prepend($container);
+
+        self::assertSame(
+            [['profiles' => [PdfEditorExtension::FORM_KIT_PROFILE => PdfEditorExtension::FORM_KIT_PROFILE_CONFIG]]],
+            $container->getExtensionConfig('nowo_form_kit'),
+        );
+    }
+
+    public function testPrependKeepsTheHostFormKitProfile(): void
+    {
+        $container = $this->container();
+        $container->registerExtension(new StubExtension('nowo_form_kit'));
+        $host = ['profiles' => ['pdf_editor' => ['alias' => 'pdf_editor', 'translation_domain' => 'messages']]];
+        $container->prependExtensionConfig('nowo_form_kit', $host);
+        (new PdfEditorExtension())->prepend($container);
+
+        self::assertSame([$host], $container->getExtensionConfig('nowo_form_kit'));
+    }
+
     public function testPrependFrameworkWithoutTwig(): void
     {
         $container = $this->container();

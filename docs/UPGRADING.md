@@ -22,6 +22,19 @@
 
 ## Unreleased
 
+From **1.5.0**. **New required dependency: `nowo-tech/form-kit-bundle` (^2.16).** The editor forms (`PdfUploadType`,
+`EditorTextType`) are FormKit Types (REQ-TWIG-005 rule 11) using the profile `nowo_form_kit.profiles.pdf_editor`,
+prepended by the bundle.
+
+```bash
+composer update nowo-tech/pdf-editor-bundle --with-dependencies
+```
+
+Register `Nowo\FormKitBundle\NowoFormKitBundle` in `config/bundles.php` if Flex did not. Field names, labels and
+markup of the upload page are unchanged. To change field classes / row attributes, define the `pdf_editor` profile
+in `nowo_form_kit` instead of adding a `form_theme` to an overridden template (see
+[CONFIGURATION](CONFIGURATION.md#form-profile-formkit)).
+
 ## To 1.5.0
 
 From **1.4.1**:

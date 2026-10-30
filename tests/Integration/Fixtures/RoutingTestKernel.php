@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Nowo\PdfEditorBundle\Tests\Integration\Fixtures;
 
+use Nowo\FormKitBundle\NowoFormKitBundle;
 use Nowo\PdfEditorBundle\NowoPdfEditorBundle;
 use Nowo\UiKitBundle\NowoUiKitBundle;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
@@ -36,6 +37,7 @@ final class RoutingTestKernel extends Kernel
         yield new FrameworkBundle();
         yield new SecurityBundle();
         yield new TwigBundle();
+        yield new NowoFormKitBundle();
         yield new NowoUiKitBundle();
         yield new NowoPdfEditorBundle();
     }
