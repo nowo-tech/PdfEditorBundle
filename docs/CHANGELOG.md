@@ -25,6 +25,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Security
+
+REQ-SEC-004 audit (Appendix BT, 2026-10-30) of the merged 1.5.0 code:
+
+- **M1 — bounded page rendering.** Engine processes run with an address-space cap (`RLIMIT_AS`, new profile key
+  `engine_memory_limit`, default 1024 MiB); page previews are capped at `max_render_pixels` (default 25 MP, the dpi is
+  lowered); `/pdf-editor/{id}/pages/{page}` is 404 in `engine_mode: client` and for pages that do not exist (page
+  count cached per PDF revision, checked before spawning Python; page numbers limited to 5 digits); `apply` accepts at
+  most 500 operations; the engine refuses blank pages above 14400 pt and documents above 2000 pages.
+- **L1** — the apply body is read through a stream capped at the `max_upload_bytes` allowance, so chunked bodies
+  without `Content-Length` are bounded too.
+- **L2** — failed page renders no longer leave `page-N.png.lock` files behind.
+- **L3** — callers with neither a user nor a session can no longer create or open workspaces (fail closed); opt in with
+  `security.allow_ownerless_workspaces: true`.
+- **L4** — `workspace_dir` defaults to `%kernel.project_dir%/var/pdf-editor` (was the shared system temp dir); the root
+  is created `0700` and refused when another account owns it or it is group / world writable.
+- **I1** — client apply requires the full `%PDF-` signature; `/download` is always `Content-Type: application/pdf`.
+- **I4** — `pymupdf>=1.26.7` (engine requirements and Docker images).
+- **I5** — engine errors reach exception messages as one line without absolute paths or tracebacks.
+
+### Fixed
+
+- **Routes stay opt-in on Symfony 7.3+.** The editor controller is no longer autoconfigured (and drops `#[AsController]`; it keeps the `controller.service_arguments` tag explicitly), so the host's default `routing.controllers` import no longer loads the `nowo_pdf_editor_*` routes without importing `@NowoPdfEditorBundle/Resources/config/routing.yaml` (bypassing its prefix and `when@` guards).
+
 ### Added
 
 - **UiKit page contract (REQ-UI-001 / REQ-UI-003).** The upload page is the UiKit form scaffold (`PdfEditorPages::upload()`

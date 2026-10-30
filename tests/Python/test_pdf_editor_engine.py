@@ -174,3 +174,95 @@ def test_cli_commands(workspace: Path, capsys: pytest.CaptureFixture[str]) -> No
     with pytest.raises(SystemExit):
         engine.main(["apply", "--pdf", str(pdf), "--ops", str(ops), "--out", str(workspace / "r.pdf")])
     assert "Unsupported operation" in json.loads(capsys.readouterr().err)["error"]
+
+
+def make_big_page_pdf(path: Path, side: float) -> Path:
+    doc = fitz.open()
+    doc.new_page(width=side, height=side)
+    doc.save(str(path))
+    doc.close()
+    return path
+
+
+def test_render_dpi_is_capped_by_max_pixels() -> None:
+    assert engine.render_dpi(595, 842, 144, 25_000_000) == 144
+    assert engine.render_dpi(9000, 9000, 144, 25_000_000) == 40  # 18000² px at 144 dpi → ≤ 25 MP
+    assert engine.render_dpi(200_000, 200_000, 144, 25_000_000) == 1
+    assert engine.render_dpi(595, 842, 0, 25_000_000) == 1
+    assert engine.render_dpi(9000, 9000, 144, 0) == 144
+
+
+def test_render_of_a_pixel_bomb_page_stays_within_max_pixels(workspace: Path, capsys: pytest.CaptureFixture[str]) -> None:
+    pdf = make_big_page_pdf(workspace / "bomb.pdf", 9000)
+    png = workspace / "bomb.png"
+    engine.main(["render", "--pdf", str(pdf), "--page", "1", "--out", str(png), "--dpi", "144", "--max-pixels", "1000000"])
+    out = json.loads(capsys.readouterr().out)
+    assert out["width"] * out["height"] <= 1_000_000
+    assert out["dpi"] < 144
+
+
+def test_render_errors_are_one_json_line(workspace: Path, capsys: pytest.CaptureFixture[str]) -> None:
+    pdf = make_pdf(workspace / "one.pdf")
+    with pytest.raises(SystemExit) as failed:
+        engine.main(["render", "--pdf", str(pdf), "--page", "5", "--out", str(workspace / "x.png")])
+    assert failed.value.code == 1
+    assert "out of range" in json.loads(capsys.readouterr().err)["error"]
+
+
+def test_memory_error_is_reported_cleanly(workspace: Path, capsys: pytest.CaptureFixture[str], monkeypatch: pytest.MonkeyPatch) -> None:
+    def boom(_args: object) -> None:
+        raise MemoryError
+
+    monkeypatch.setattr(engine, "cmd_inspect", boom)
+    with pytest.raises(SystemExit):
+        engine.main(["inspect", "--pdf", str(workspace / "missing.pdf")])
+    assert "memory limit" in json.loads(capsys.readouterr().err)["error"]
+
+
+def test_insert_blank_page_size_is_bounded(workspace: Path) -> None:
+    pdf = make_pdf(workspace / "s.pdf")
+    with pytest.raises(ValueError, match="between 1 and 14400"):
+        engine.apply_ops(str(pdf), [{"op": "insert_blank_page", "width": 90000, "height": 842}], str(workspace / "o.pdf"))
+    with pytest.raises(ValueError, match="height must be between"):
+        engine.apply_ops(str(pdf), [{"op": "insert_blank_page", "width": 595, "height": -5}], str(workspace / "o.pdf"))
+
+
+def test_operation_and_page_counts_are_bounded(workspace: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    pdf = make_pdf(workspace / "c.pdf")
+    with pytest.raises(ValueError, match="Too many operations"):
+        engine.apply_ops(str(pdf), [{"op": "rotate_page", "page": 1}] * (engine.MAX_OPERATIONS + 1), str(workspace / "o.pdf"))
+    monkeypatch.setattr(engine, "MAX_PAGES", 3)
+    with pytest.raises(ValueError, match="more than 3 pages"):
+        engine.apply_ops(str(pdf), [{"op": "insert_blank_page"}] * 3, str(workspace / "o.pdf"))
+
+
+def test_apply_memory_limit(monkeypatch: pytest.MonkeyPatch) -> None:
+    import resource
+
+    calls: list[tuple[int, tuple[int, int]]] = []
+    monkeypatch.setattr(resource, "setrlimit", lambda kind, limits: calls.append((kind, limits)))
+    monkeypatch.setattr(resource, "getrlimit", lambda _kind: (resource.RLIM_INFINITY, resource.RLIM_INFINITY))
+    engine.apply_memory_limit(0)
+    assert calls == []
+    engine.apply_memory_limit(512)
+    assert calls == [(resource.RLIMIT_AS, (512 * 1024 * 1024, resource.RLIM_INFINITY))]
+
+    calls.clear()
+    monkeypatch.setattr(resource, "getrlimit", lambda _kind: (100, 100))
+    engine.apply_memory_limit(512)
+    assert calls == [(resource.RLIMIT_AS, (100, 100))]
+
+
+def test_memory_limit_stops_a_pixel_bomb_in_a_real_process(workspace: Path) -> None:
+    import subprocess
+
+    pdf = make_big_page_pdf(workspace / "bomb.pdf", 9000)
+    script = Path(__file__).resolve().parents[2] / "engine" / "pdf_editor_engine.py"
+    result = subprocess.run(
+        [sys.executable, str(script), "--memory-limit", "400", "render", "--pdf", str(pdf), "--page", "1",
+         "--out", str(workspace / "b.png"), "--dpi", "144", "--max-pixels", "0"],
+        capture_output=True, text=True, timeout=120, check=False,
+    )
+    assert result.returncode == 1
+    assert json.loads(result.stderr.strip().splitlines()[-1])["ok"] is False
+    assert not (workspace / "b.png").exists()

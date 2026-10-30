@@ -46,6 +46,41 @@ WIDGET_TYPES = {
 
 WATERMARK_TOKENS = ("draft", "copy", "confidential", "sample", "watermark", "preview")
 
+# Resource bounds (REQ-SEC-004 audit BT, M1): a tiny PDF can declare huge pages, and one apply can add many pages.
+DEFAULT_MAX_RENDER_PIXELS = 25_000_000
+MAX_PAGE_SIDE_PT = 14_400.0  # PDF user-space limit (200 inches)
+MAX_OPERATIONS = 500
+MAX_PAGES = 2_000
+
+
+def apply_memory_limit(megabytes: int) -> None:
+    """Cap the address space of this process (RLIMIT_AS) so a decompression or pixmap bomb fails cleanly."""
+    if megabytes <= 0:
+        return
+    import resource  # POSIX only; imported lazily
+
+    limit = megabytes * 1024 * 1024
+    _soft, hard = resource.getrlimit(resource.RLIMIT_AS)
+    if hard != resource.RLIM_INFINITY and hard < limit:
+        limit = hard
+    resource.setrlimit(resource.RLIMIT_AS, (limit, hard))
+
+
+def render_dpi(width_pt: float, height_pt: float, dpi: int, max_pixels: int) -> int:
+    """Largest dpi <= the requested one whose pixmap stays within max_pixels (at least 1 dpi)."""
+    dpi = max(1, dpi)
+    if max_pixels <= 0:
+        return dpi
+    area_in = (max(width_pt, 1.0) / 72.0) * (max(height_pt, 1.0) / 72.0)
+    return max(1, min(dpi, int((max_pixels / area_in) ** 0.5)))
+
+
+def page_side(raw: dict[str, Any], key: str, default: float) -> float:
+    value = float(raw.get(key) or default)
+    if not 1.0 <= value <= MAX_PAGE_SIDE_PT:
+        raise ValueError(f"insert_blank_page {key} must be between 1 and {int(MAX_PAGE_SIDE_PT)} points.")
+    return value
+
 
 def _resolve_add_image_path(image_path: str, pdf_path: str) -> str:
     """Resolve add_image path under the PDF's parent directory (workspace)."""
@@ -234,6 +269,8 @@ def inspect_pdf(path: str) -> dict[str, Any]:
 
 
 def apply_ops(pdf_path: str, ops: list[dict[str, Any]], out_path: str) -> dict[str, Any]:
+    if len(ops) > MAX_OPERATIONS:
+        raise ValueError(f"Too many operations ({len(ops)}); the maximum is {MAX_OPERATIONS} per apply.")
     doc = fitz.open(pdf_path)
     applied = 0
     try:
@@ -342,8 +379,8 @@ def apply_ops(pdf_path: str, ops: list[dict[str, Any]], out_path: str) -> dict[s
                 after = int(raw.get("after") or doc.page_count)
                 doc.new_page(
                     pno=after,
-                    width=float(raw.get("width") or 595),
-                    height=float(raw.get("height") or 842),
+                    width=page_side(raw, "width", 595),
+                    height=page_side(raw, "height", 842),
                 )
             elif op == "reorder_pages":
                 order = [int(n) - 1 for n in raw["order"]]
@@ -359,6 +396,8 @@ def apply_ops(pdf_path: str, ops: list[dict[str, Any]], out_path: str) -> dict[s
             else:
                 raise ValueError(f"Unsupported operation: {op}")
             applied += 1
+            if doc.page_count > MAX_PAGES:
+                raise ValueError(f"The document would have more than {MAX_PAGES} pages.")
         doc.save(out_path, deflate=True, garbage=3, incremental=False)
         return {"applied": applied, "pageCount": doc.page_count, "out": out_path}
     finally:
@@ -377,11 +416,12 @@ def cmd_render(args: argparse.Namespace) -> None:
     doc = fitz.open(args.pdf)
     try:
         page = load_page(doc, args.page)
-        pix = page.get_pixmap(dpi=args.dpi, alpha=False)
+        dpi = render_dpi(page.rect.width, page.rect.height, args.dpi, args.max_pixels)
+        pix = page.get_pixmap(dpi=dpi, alpha=False)
         tmp = f"{args.out}.{os.getpid()}.png"
         pix.save(tmp)
         os.replace(tmp, args.out)
-        emit_ok({"page": args.page, "width": pix.width, "height": pix.height, "out": args.out})
+        emit_ok({"page": args.page, "width": pix.width, "height": pix.height, "dpi": dpi, "out": args.out})
     finally:
         doc.close()
 
@@ -401,6 +441,7 @@ def cmd_apply(args: argparse.Namespace) -> None:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="pdf_editor_engine")
+    parser.add_argument("--memory-limit", type=int, default=0, help="RLIMIT_AS in MiB (0 = unlimited)")
     sub = parser.add_subparsers(dest="command", required=True)
     sub.add_parser("version")
 
@@ -412,6 +453,7 @@ def build_parser() -> argparse.ArgumentParser:
     render.add_argument("--page", type=int, required=True)
     render.add_argument("--out", required=True)
     render.add_argument("--dpi", type=int, default=144)
+    render.add_argument("--max-pixels", type=int, default=DEFAULT_MAX_RENDER_PIXELS)
 
     apply_cmd = sub.add_parser("apply")
     apply_cmd.add_argument("--pdf", required=True)
@@ -423,16 +465,16 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None) -> None:
     parser = build_parser()
     args = parser.parse_args(argv)
-    if args.command == "version":
-        cmd_version(args)
-    elif args.command == "inspect":
-        cmd_inspect(args)
-    elif args.command == "render":
-        cmd_render(args)
-    elif args.command == "apply":
-        cmd_apply(args)
-    else:  # pragma: no cover
-        fail(f"Unknown command: {args.command}")
+    apply_memory_limit(args.memory_limit)
+    commands = {"version": cmd_version, "inspect": cmd_inspect, "render": cmd_render, "apply": cmd_apply}
+    try:
+        commands[args.command](args)
+    except MemoryError:
+        fail("The PDF engine ran out of memory (memory limit reached).")
+    except SystemExit:
+        raise
+    except Exception as exc:  # noqa: BLE001 - one JSON error line, never a traceback (REQ-SEC-004 I5)
+        fail(str(exc) or exc.__class__.__name__)
 
 
 if __name__ == "__main__":

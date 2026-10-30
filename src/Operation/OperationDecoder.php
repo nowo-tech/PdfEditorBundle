@@ -7,6 +7,7 @@ namespace Nowo\PdfEditorBundle\Operation;
 use Nowo\PdfEditorBundle\Exception\PdfEditorException;
 
 use function basename;
+use function count;
 use function dirname;
 use function in_array;
 use function is_array;
@@ -22,6 +23,9 @@ use const DIRECTORY_SEPARATOR;
 
 final class OperationDecoder
 {
+    /** Operations accepted per apply (the Python engine enforces the same bound; REQ-SEC-004 M1). */
+    public const MAX_OPERATIONS = 500;
+
     private const OPS = [
         'replace_text',
         'insert_text',
@@ -48,6 +52,9 @@ final class OperationDecoder
      */
     public function decode(array $raw): array
     {
+        if (count($raw) > self::MAX_OPERATIONS) {
+            throw new PdfEditorException(sprintf('Too many operations (%d); the maximum is %d per apply.', count($raw), self::MAX_OPERATIONS));
+        }
         $ops = [];
         foreach ($raw as $item) {
             if (!is_array($item) || !is_string($item['op'] ?? null)) {

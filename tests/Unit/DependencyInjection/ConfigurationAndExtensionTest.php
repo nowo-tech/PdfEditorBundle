@@ -35,6 +35,13 @@ final class ConfigurationAndExtensionTest extends TestCase
         self::assertSame(['ROLE_ADMIN'], $config['security']['access_roles']);
         self::assertNull($config['security']['access_checker']);
         self::assertNull($config['web_ui']['layout_template']);
+        self::assertFalse($config['security']['allow_ownerless_workspaces']);
+        self::assertSame('%kernel.project_dir%/var/pdf-editor', $config['profiles']['default']['workspace_dir']);
+        self::assertSame(25_000_000, $config['profiles']['default']['max_render_pixels']);
+        self::assertSame(1024, $config['profiles']['default']['engine_memory_limit']);
+        $explicit = (new Processor())->processConfiguration(new Configuration(), [['profiles' => ['default' => []]]]);
+        self::assertSame('%kernel.project_dir%/var/pdf-editor', $explicit['profiles']['default']['workspace_dir']);
+        self::assertSame(25_000_000, $explicit['profiles']['default']['max_render_pixels']);
         self::assertSame([
             'upload'    => '@NowoPdfEditorBundle/editor/index.html.twig',
             'workspace' => '@NowoPdfEditorBundle/editor/workspace.html.twig',
@@ -142,6 +149,9 @@ final class ConfigurationAndExtensionTest extends TestCase
         self::assertTrue($container->hasAlias(EditorProfile::class));
         self::assertSame('default', $container->getParameter('nowo_pdf_editor.default_profile'));
         self::assertSame(RolePdfEditorAccessChecker::class, $container->getDefinition('nowo_pdf_editor.access_checker')->getClass());
+        self::assertSame(25_000_000, $container->getDefinition('nowo_pdf_editor.profile')->getArgument('$maxRenderPixels'));
+        self::assertSame(1024, $container->getDefinition('nowo_pdf_editor.profile')->getArgument('$engineMemoryLimit'));
+        self::assertFalse($container->getDefinition('nowo_pdf_editor.workspace_manager')->getArgument('$allowOwnerlessWorkspaces'));
         self::assertSame(['ROLE_ADMIN'], $container->getDefinition('nowo_pdf_editor.access_checker')->getArgument('$roles'));
         self::assertSame(['ROLE_ADMIN'], $container->getParameter('nowo_pdf_editor.security.access_roles'));
         self::assertNull($container->getParameter('nowo_pdf_editor.security.access_checker'));

@@ -22,4 +22,9 @@ final class DocumentException extends PdfEditorException
     {
         return new self(sprintf('The PDF exceeds the maximum size of %d bytes.', $bytes));
     }
+
+    public static function unsafeWorkspaceRoot(string $path): self
+    {
+        return new self(sprintf('The PDF editor workspace root "%s" must belong to the PHP user and must not be group- or world-writable (chmod 0700).', $path));
+    }
 }

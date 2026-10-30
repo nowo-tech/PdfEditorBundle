@@ -51,7 +51,7 @@ Standalone Symfony **PDF editor workspace**: upload a PDF, edit in a CKEditor-li
 
 - **FR-DOC-001**: `Workspace` VO + `WorkspaceManager` (create, get, replace, page image path).
 - **FR-ENG-001**: `PdfEngineInterface`, `PythonPdfEngine`, `ProcessRunnerInterface`, `SymfonyProcessRunner`, `ProcessOutcome`.
-- **FR-ENG-002**: Process `timeout` / `idle_timeout` stop-on-expiry (REQ-RUNTIME-001).
+- **FR-ENG-002**: Process `timeout` / `idle_timeout` stop-on-expiry (REQ-RUNTIME-001); engine address-space cap (`engine_memory_limit`), preview pixel cap (`max_render_pixels`), at most 500 operations per apply and 2000 pages per document (REQ-SEC-004).
 - **FR-OPS-001**: `EditorOperation`, `OperationDecoder`.
 
 ### HTTP & forms

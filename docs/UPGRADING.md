@@ -43,7 +43,12 @@ composer update nowo-tech/pdf-editor-bundle --with-dependencies
    deprecated and mapped). New `security.access_checker` (service id of your `PdfEditorAccessCheckerInterface`). An
    empty `access_roles` list without a custom checker now fails the container build instead of locking everybody out.
    The container also fails to build without SecurityBundle or with CSRF protection disabled.
-3. **Template contract** (REQ-UI-003 / REQ-TWIG-002):
+3. **Security bounds** (REQ-SEC-004 audit BT): `workspace_dir` now defaults to `%kernel.project_dir%/var/pdf-editor`
+   (set it explicitly to keep the old `/tmp/nowo-pdf-editor`; the root must belong to the PHP user and must not be
+   group / world writable). `/pdf-editor/{id}/pages/{n}` is 404 in `engine_mode: client`. Callers without user and
+   session get no workspace unless `security.allow_ownerless_workspaces: true`. New profile keys
+   `max_render_pixels` / `engine_memory_limit` (defaults 25 MP / 1024 MiB). Install `pymupdf>=1.26.7`.
+4. **Template contract** (REQ-UI-003 / REQ-TWIG-002):
    - Twig namespace: `@NowoPdfEditorBundle/...` (application overrides under `templates/bundles/NowoPdfEditorBundle/`).
      `@PdfEditor/...` still resolves to the bundle views until 2.0, but the bundle renders `@NowoPdfEditorBundle/...`,
      so files under `templates/bundles/PdfEditorBundle/` **no longer override the editor pages**: move them to

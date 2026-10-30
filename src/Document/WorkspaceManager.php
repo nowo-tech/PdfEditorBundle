@@ -13,6 +13,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 use function bin2hex;
+use function clearstatcache;
 use function copy;
 use function count;
 use function fclose;
@@ -21,6 +22,7 @@ use function file_put_contents;
 use function filemtime;
 use function fopen;
 use function fread;
+use function function_exists;
 use function hash_equals;
 use function is_dir;
 use function is_file;
@@ -29,6 +31,7 @@ use function is_string;
 use function lstat;
 use function max;
 use function mkdir;
+use function posix_geteuid;
 use function preg_match;
 use function preg_replace;
 use function random_bytes;
@@ -36,6 +39,7 @@ use function rename;
 use function rmdir;
 use function scandir;
 use function sprintf;
+use function stat;
 use function str_contains;
 use function strtolower;
 use function time;
@@ -45,16 +49,21 @@ final class WorkspaceManager
 {
     private const OWNER_FILE = 'owner.txt';
 
+    private const PAGE_COUNT_FILE = 'page-count.txt';
+
     /**
-     * @param WorkspaceOwnerResolverInterface|null $owners binds workspaces to their creator; null disables the check (direct instantiation / BC)
-     * @param ClockInterface|null                  $clock  time source for the workspace TTL (REQ-DI-001); system time when null
-     * @param LoggerInterface|null                 $logger logs workspace creation and purges, never file contents or names (REQ-OBS-001)
+     * @param WorkspaceOwnerResolverInterface|null $owners                   binds workspaces to their creator; null disables the check (direct instantiation / BC)
+     * @param ClockInterface|null                  $clock                    time source for the workspace TTL (REQ-DI-001); system time when null
+     * @param LoggerInterface|null                 $logger                   logs workspace creation and purges, never file contents or names (REQ-OBS-001)
+     * @param bool                                 $allowOwnerlessWorkspaces with an owner resolver, callers without user and session may
+     *                                                                       create / open workspaces (reachable by id only); false fails closed
      */
     public function __construct(
         private readonly EditorProfile $profile,
         private readonly ?WorkspaceOwnerResolverInterface $owners = null,
         private readonly ?ClockInterface $clock = null,
         private readonly ?LoggerInterface $logger = null,
+        private readonly bool $allowOwnerlessWorkspaces = false,
     ) {
     }
 
@@ -73,6 +82,7 @@ final class WorkspaceManager
         if ($ext !== 'pdf') {
             throw DocumentException::invalidUpload('Only PDF files are accepted.');
         }
+        $this->assertCallerCanOwnWorkspaces();
 
         $id        = bin2hex(random_bytes(16));
         $directory = $this->profile->workspaceDir . '/' . $id;
@@ -109,6 +119,7 @@ final class WorkspaceManager
         if (!is_file($sourcePath)) {
             throw DocumentException::invalidUpload(sprintf('Fixture PDF not found: "%s".', $sourcePath));
         }
+        $this->assertCallerCanOwnWorkspaces();
 
         $id        = bin2hex(random_bytes(16));
         $directory = $this->profile->workspaceDir . '/' . $id;
@@ -170,6 +181,36 @@ final class WorkspaceManager
         return sprintf('%s/page-%d.png', $workspace->directory, $page);
     }
 
+    /**
+     * Page count of the current PDF cached by {@see self::storePageCount()}; null when unknown or older than the PDF.
+     */
+    public function cachedPageCount(Workspace $workspace): ?int
+    {
+        $file = $workspace->directory . '/' . self::PAGE_COUNT_FILE;
+        if (!is_file($file) || (int) filemtime($file) < (int) filemtime($workspace->pdfPath)) {
+            return null;
+        }
+        $count = (string) file_get_contents($file);
+
+        return preg_match('/^\d{1,9}$/', $count) === 1 ? (int) $count : null;
+    }
+
+    public function storePageCount(Workspace $workspace, int $pageCount): void
+    {
+        file_put_contents($workspace->directory . '/' . self::PAGE_COUNT_FILE, (string) $pageCount);
+    }
+
+    /**
+     * Without an identity (no user, no session) a workspace could not be bound to anyone: refuse unless the host
+     * opted in (security.allow_ownerless_workspaces). REQ-SEC-004 L3.
+     */
+    private function assertCallerCanOwnWorkspaces(): void
+    {
+        if ($this->owners instanceof WorkspaceOwnerResolverInterface && !$this->allowOwnerlessWorkspaces && $this->owners->currentOwner() === null) {
+            throw DocumentException::invalidUpload('A PDF workspace needs an authenticated user or a session to be bound to (nowo_pdf_editor.security.allow_ownerless_workspaces).');
+        }
+    }
+
     private function writeOwner(string $directory): void
     {
         $owner = $this->owners?->currentOwner();
@@ -181,7 +222,7 @@ final class WorkspaceManager
     /**
      * Workspaces are bound to the user (or anonymous session) that created them; anyone else gets "not found".
      * A workspace without a stored owner (created from CLI or before owner binding existed) is only reachable by callers that have
-     * no identity either.
+     * no identity either, and only with security.allow_ownerless_workspaces.
      */
     private function isOwnedByCurrentCaller(string $directory): bool
     {
@@ -194,7 +235,8 @@ final class WorkspaceManager
         $current   = $this->owners->currentOwner();
 
         if ($stored === null || $current === null) {
-            return $stored === $current;
+            // Fail closed: owner-less workspaces are only reachable when the host opted in (REQ-SEC-004 L3).
+            return $this->allowOwnerlessWorkspaces && $stored === $current;
         }
 
         return hash_equals($stored, $current);
@@ -287,10 +329,29 @@ final class WorkspaceManager
         @rmdir($directory);
     }
 
+    /**
+     * Creates the workspace root (0700) and refuses one that another account owns or that is group / world writable:
+     * on a shared host such a directory would let other users swap workspaces (REQ-SEC-004 L4).
+     */
     public function ensureWorkspaceDir(): void
     {
-        if (!is_dir($this->profile->workspaceDir) && !@mkdir($this->profile->workspaceDir, 0700, true) && !is_dir($this->profile->workspaceDir)) { // @codeCoverageIgnoreStart
-            throw DocumentException::invalidUpload(sprintf('Could not create workspace root "%s".', $this->profile->workspaceDir));
+        $root = $this->profile->workspaceDir;
+        if (!is_dir($root) && !@mkdir($root, 0700, true) && !is_dir($root)) { // @codeCoverageIgnoreStart
+            throw DocumentException::invalidUpload(sprintf('Could not create workspace root "%s".', $root));
+            // @codeCoverageIgnoreEnd
+        }
+
+        clearstatcache(true, $root);
+        $stat = @stat($root);
+        if ($stat === false) { // @codeCoverageIgnoreStart
+            throw DocumentException::unsafeWorkspaceRoot($root);
+            // @codeCoverageIgnoreEnd
+        }
+        if (($stat['mode'] & 0o022) !== 0) {
+            throw DocumentException::unsafeWorkspaceRoot($root);
+        }
+        if (function_exists('posix_geteuid') && $stat['uid'] !== posix_geteuid()) { // @codeCoverageIgnoreStart
+            throw DocumentException::unsafeWorkspaceRoot($root);
             // @codeCoverageIgnoreEnd
         }
     }

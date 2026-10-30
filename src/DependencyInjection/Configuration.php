@@ -12,7 +12,6 @@ use function array_key_exists;
 use function array_keys;
 use function implode;
 use function is_string;
-use function sys_get_temp_dir;
 
 /**
  * @author Héctor Franco Aceituno <hectorfranco@nowo.tech>
@@ -46,7 +45,8 @@ final class Configuration implements ConfigurationInterface
                                 ->cannotBeEmpty()
                             ->end()
                             ->scalarNode('workspace_dir')
-                                ->defaultValue(sys_get_temp_dir() . '/nowo-pdf-editor')
+                                ->info('Private directory for uploaded PDFs (created 0700; refused when another user owns it or it is group/world-writable)')
+                                ->defaultValue('%kernel.project_dir%/var/pdf-editor')
                                 ->cannotBeEmpty()
                             ->end()
                             ->floatNode('timeout')
@@ -68,6 +68,16 @@ final class Configuration implements ConfigurationInterface
                                 ->min(72)
                                 ->max(300)
                             ->end()
+                            ->integerNode('max_render_pixels')
+                                ->info('Largest page preview (width x height pixels); larger pages are rendered at a lower dpi (REQ-SEC-004)')
+                                ->defaultValue(25_000_000)
+                                ->min(1_000_000)
+                            ->end()
+                            ->integerNode('engine_memory_limit')
+                                ->info('Address-space cap (RLIMIT_AS) of each Python engine process in MiB; 0 = no cap (REQ-SEC-004)')
+                                ->defaultValue(1024)
+                                ->min(0)
+                            ->end()
                             ->enumNode('engine_mode')
                                 ->info('client = browser embedpdf/pdf-lib; python = PyMuPDF server engine')
                                 ->values(['client', 'python'])
@@ -77,14 +87,16 @@ final class Configuration implements ConfigurationInterface
                     ->end()
                     ->defaultValue([
                         'default' => [
-                            'python_binary'    => 'python3',
-                            'engine_script'    => '%kernel.project_dir%/vendor/nowo-tech/pdf-editor-bundle/engine/pdf_editor_engine.py',
-                            'workspace_dir'    => sys_get_temp_dir() . '/nowo-pdf-editor',
-                            'timeout'          => 60.0,
-                            'idle_timeout'     => 30.0,
-                            'max_upload_bytes' => 25 * 1024 * 1024,
-                            'render_dpi'       => 144,
-                            'engine_mode'      => 'client',
+                            'python_binary'       => 'python3',
+                            'engine_script'       => '%kernel.project_dir%/vendor/nowo-tech/pdf-editor-bundle/engine/pdf_editor_engine.py',
+                            'workspace_dir'       => '%kernel.project_dir%/var/pdf-editor',
+                            'timeout'             => 60.0,
+                            'idle_timeout'        => 30.0,
+                            'max_upload_bytes'    => 25 * 1024 * 1024,
+                            'render_dpi'          => 144,
+                            'engine_mode'         => 'client',
+                            'max_render_pixels'   => 25_000_000,
+                            'engine_memory_limit' => 1024,
                         ],
                     ])
                 ->end()
@@ -127,6 +139,10 @@ final class Configuration implements ConfigurationInterface
                         ->end()
                         ->booleanNode('allow_unauthenticated')
                             ->info('DEV/DEMO only: open the editor to anonymous users (refused in prod and in non-debug kernels).')
+                            ->defaultFalse()
+                        ->end()
+                        ->booleanNode('allow_ownerless_workspaces')
+                            ->info('Allow workspaces for callers with neither a user nor a session (stateless firewalls with a custom access_checker). Such workspaces are reachable by anyone who knows their id.')
                             ->defaultFalse()
                         ->end()
                         ->arrayNode('roles')

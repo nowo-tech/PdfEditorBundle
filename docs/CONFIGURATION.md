@@ -13,6 +13,8 @@ nowo_pdf_editor:
             max_upload_bytes: 26214400
             render_dpi: 144
             engine_mode: client   # client | python
+            max_render_pixels: 25000000   # largest page preview (python engine); the dpi is lowered to fit
+            engine_memory_limit: 1024     # MiB, RLIMIT_AS of each engine process; 0 = no cap
     web_ui:
         layout_template: null            # null = nowo_ui_kit.layouts.admin
         templates:
@@ -21,6 +23,7 @@ nowo_pdf_editor:
     security:
         access_roles: [ROLE_ADMIN]
         access_checker: null             # service id of your PdfEditorAccessCheckerInterface
+        allow_ownerless_workspaces: false # true only for stateless callers without user or session (see SECURITY.md)
         allow_unauthenticated: false     # dev/demo only
 ```
 
@@ -43,7 +46,7 @@ Only the profile named by `default_profile` is used: the engine, the workspace m
 
 | Item | Behaviour |
 | --- | --- |
-| Canonical keys | `default_profile` + `profiles.<name>` (`python_binary`, `engine_script`, `workspace_dir`, `timeout`, `idle_timeout`, `max_upload_bytes`, `render_dpi`, `engine_mode`) |
+| Canonical keys | `default_profile` + `profiles.<name>` (`python_binary`, `engine_script`, `workspace_dir`, `timeout`, `idle_timeout`, `max_upload_bytes`, `render_dpi`, `engine_mode`, `max_render_pixels`, `engine_memory_limit`) |
 | Legacy synonyms | None: the bundle was created with the profiles shape (no `default_config` / `configs` keys) |
 | Validation | Container build fails when `default_profile` is not a key of `profiles` |
 | Runtime selection | Always `default_profile`: one engine, workspace manager and controller per application; no request, route or option selects another profile |
@@ -58,6 +61,7 @@ The editor is a private UI (REQ-UI-002). Every route checks the access checker; 
 | `security.access_roles` | `[ROLE_ADMIN]` | The user must be granted at least one role (`isGranted`). Anonymous users are always denied by the built-in checker. An **empty list is refused** at container build unless `access_checker` is set or `allow_unauthenticated` is true (an empty list never means "everyone"). |
 | `security.access_checker` | `null` | Service id of your own `Nowo\PdfEditorBundle\Security\PdfEditorAccessCheckerInterface` (`canUseEditor(?object $user): bool`); the interface and `nowo_pdf_editor.access_checker` are aliased to it. `null` = built-in role checker. |
 | `security.allow_unauthenticated` | `false` | **DEV/DEMO only**: no role check, anonymous visitors may use the editor (workspaces are then bound to the session). Refused at container build in the `prod` environment and in non-debug kernels (test environments excepted). |
+| `security.allow_ownerless_workspaces` | `false` | Callers with neither a user nor a session (stateless firewall + custom checker) are refused workspaces; `true` lets them in, but such workspaces are reachable by anyone who knows the id. |
 | `security.roles` | — | Deprecated since 1.5 (removed in 2.0): mapped onto `access_roles` (when both are set, `access_roles` wins unless it is the default). |
 
 The container also refuses to compile when SecurityBundle is not enabled (the editor binds workspaces to the current

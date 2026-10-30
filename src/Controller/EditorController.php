@@ -24,7 +24,6 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
-use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -43,18 +42,25 @@ use function glob;
 use function intdiv;
 use function is_array;
 use function is_file;
+use function is_int;
 use function is_object;
 use function is_string;
 use function json_decode;
+use function max;
 use function sprintf;
 use function str_starts_with;
+use function stream_get_contents;
 use function strlen;
 use function unlink;
 
 use const LOCK_EX;
 use const LOCK_UN;
 
-#[AsController]
+/**
+ * Editor pages and API. Routes are #[Route] attributes loaded only through the opt-in
+ * `@NowoPdfEditorBundle/Resources/config/routing.yaml` import; the service is deliberately not autoconfigured (see
+ * services.yaml) so the host's `routing.controllers` import does not pick them up.
+ */
 final class EditorController
 {
     /** Room for the JSON envelope / operation list around a base64 PDF in the apply body. */
@@ -135,16 +141,28 @@ final class EditorController
             ]);
         }
 
-        return new JsonResponse($this->engine->inspect($workspace->pdfPath));
+        $result = $this->engine->inspect($workspace->pdfPath);
+        if (is_int($result['pageCount'] ?? null)) {
+            $this->workspaces->storePageCount($workspace, $result['pageCount']);
+        }
+
+        return new JsonResponse($result);
     }
 
-    #[Route(path: '/pdf-editor/{id}/pages/{page}', name: 'nowo_pdf_editor_page', requirements: ['id' => '[a-f0-9]{32}', 'page' => '\d+'], methods: ['GET'])]
+    /**
+     * Server-rendered page preview (python engine only; the client editor renders pages in the browser). The page must
+     * exist before the engine is spawned, and the engine caps the preview size and its own memory (REQ-SEC-004 M1).
+     */
+    #[Route(path: '/pdf-editor/{id}/pages/{page}', name: 'nowo_pdf_editor_page', requirements: ['id' => '[a-f0-9]{32}', 'page' => '[1-9]\d{0,4}'], methods: ['GET'])]
     public function pageImage(string $id, int $page): BinaryFileResponse
     {
         $this->assertAccess();
         $workspace = $this->ownedWorkspace($id);
-        if ($page < 1) {
-            throw new PdfEditorException('Page number must be 1 or greater.');
+        if ($this->profile->engineMode === 'client') {
+            throw new NotFoundHttpException('Page previews are rendered by the browser in engine_mode "client".');
+        }
+        if ($page < 1 || $page > $this->pageCount($workspace)) {
+            throw new NotFoundHttpException('Page not found.');
         }
 
         $png = $this->workspaces->pageImagePath($workspace, $page);
@@ -158,6 +176,17 @@ final class EditorController
         $response->setContentDisposition(ResponseHeaderBag::DISPOSITION_INLINE, sprintf('page-%d.png', $page));
 
         return $response;
+    }
+
+    private function pageCount(Workspace $workspace): int
+    {
+        $count = $this->workspaces->cachedPageCount($workspace);
+        if ($count === null) {
+            $count = (int) ($this->engine->inspect($workspace->pdfPath)['pageCount'] ?? 0);
+            $this->workspaces->storePageCount($workspace, $count);
+        }
+
+        return $count;
     }
 
     private function ensurePageImage(Workspace $workspace, int $page, string $png): void
@@ -193,6 +222,10 @@ final class EditorController
         } finally {
             flock($lock, LOCK_UN);
             fclose($lock);
+            if (!is_file($png)) {
+                // No preview produced (engine error): do not leave lock files behind (REQ-SEC-004 L2).
+                @unlink($lockPath);
+            }
         }
     }
 
@@ -206,13 +239,14 @@ final class EditorController
         }
         $workspace = $this->ownedWorkspace($id);
         $this->assertDeclaredBodySize($request);
+        $body        = $this->readBody($request);
         $contentType = strtolower((string) $request->headers->get('Content-Type', ''));
 
         if (str_starts_with($contentType, 'application/pdf')) {
-            return $this->applyClientPdf($request, $workspace);
+            return $this->applyClientPdf($body, $workspace);
         }
 
-        $payload = json_decode($request->getContent(), true);
+        $payload = json_decode($body, true);
         if (!is_array($payload)) {
             throw new PdfEditorException('Request body must be JSON {"ops": [...]} or application/pdf.');
         }
@@ -237,6 +271,9 @@ final class EditorController
         $result = $this->engine->apply($workspace->pdfPath, $ops, $target);
         $this->workspaces->replacePdf($workspace, $target);
         $this->clearPageImages($workspace);
+        if (is_int($result['pageCount'] ?? null)) {
+            $this->workspaces->storePageCount($workspace, $result['pageCount']);
+        }
 
         return new JsonResponse(['ok' => true, 'result' => $result]);
     }
@@ -263,6 +300,8 @@ final class EditorController
         $this->assertAccess();
         $workspace = $this->ownedWorkspace($id);
         $response  = new BinaryFileResponse($workspace->pdfPath);
+        // Never let finfo guess the type of user-supplied bytes (REQ-SEC-004 I1).
+        $response->headers->set('Content-Type', 'application/pdf');
         $response->headers->set('X-Content-Type-Options', 'nosniff');
         $response->setContentDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $workspace->originalName);
 
@@ -296,21 +335,46 @@ final class EditorController
      */
     private function assertDeclaredBodySize(Request $request): void
     {
-        $max      = $this->profile->maxUploadBytes;
         $declared = $request->headers->get('Content-Length');
-        if ($max <= 0 || $declared === null || !ctype_digit($declared)) {
+        if ($declared === null || !ctype_digit($declared)) {
             return;
         }
 
-        if ((int) $declared > intdiv($max * 4, 3) + self::JSON_ENVELOPE_BYTES) {
-            throw new PdfEditorException(sprintf('Request body exceeds max_upload_bytes (%d).', $max));
+        if ((int) $declared > $this->bodyLimit()) {
+            throw $this->bodyTooLarge();
         }
     }
 
-    private function applyClientPdf(Request $request, Workspace $workspace): JsonResponse
+    /**
+     * Reads the body with a hard cap, whatever Content-Length says: chunked bodies are not bounded by PHP's
+     * post_max_size on every SAPI (REQ-SEC-004 L1).
+     */
+    private function readBody(Request $request): string
     {
-        $bytes = $request->getContent();
-        if ($bytes === '' || $bytes === false) {
+        $limit  = $this->bodyLimit();
+        $stream = $request->getContent(true);
+        $body   = (string) stream_get_contents($stream, $limit + 1);
+        if (strlen($body) > $limit) {
+            throw $this->bodyTooLarge();
+        }
+
+        return $body;
+    }
+
+    /** A raw PDF may be up to max_upload_bytes, the base64 JSON variant up to 4/3 of it (plus a small envelope). */
+    private function bodyLimit(): int
+    {
+        return intdiv(max(0, $this->profile->maxUploadBytes) * 4, 3) + self::JSON_ENVELOPE_BYTES;
+    }
+
+    private function bodyTooLarge(): PdfEditorException
+    {
+        return new PdfEditorException(sprintf('Request body exceeds max_upload_bytes (%d).', $this->profile->maxUploadBytes));
+    }
+
+    private function applyClientPdf(string $bytes, Workspace $workspace): JsonResponse
+    {
+        if ($bytes === '') {
             throw new PdfEditorException('PDF body is empty.');
         }
 
@@ -334,7 +398,7 @@ final class EditorController
             throw new PdfEditorException(sprintf('PDF exceeds max_upload_bytes (%d).', $max));
         }
 
-        if (!str_starts_with($bytes, '%PDF')) {
+        if (!str_starts_with($bytes, '%PDF-')) {
             throw new PdfEditorException('Uploaded content is not a PDF file.');
         }
 
@@ -355,6 +419,7 @@ final class EditorController
         foreach (glob($workspace->directory . '/page-*.png') ?: [] as $stale) {
             @unlink($stale);
         }
+        @unlink($workspace->directory . '/page-count.txt');
         // Lock files survive PNG deletion; remove them so long-lived workers do not accumulate empties.
         foreach (glob($workspace->directory . '/page-*.png.lock') ?: [] as $lock) {
             @unlink($lock);
