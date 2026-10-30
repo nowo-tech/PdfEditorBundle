@@ -23,6 +23,8 @@ final class ExceptionFactoriesTest extends TestCase
         self::assertStringContainsString('not found', DocumentException::notFound('abc')->getMessage());
         self::assertStringContainsString('bad', DocumentException::invalidUpload('bad')->getMessage());
         self::assertStringContainsString('1024', DocumentException::tooLarge(1024)->getMessage());
+        self::assertStringContainsString('/srv/ws', DocumentException::unsafeWorkspaceRoot('/srv/ws')->getMessage());
+        self::assertSame('PDF engine failed: open [path] (1..2)', EngineException::failed("open C:\\tmp\\x.pdf (1..2)\nTraceback")->getMessage());
         self::assertStringContainsString('python3', EngineException::missingPython('python3')->getMessage());
         self::assertStringContainsString('engine.py', EngineException::missingEngineScript('engine.py')->getMessage());
         self::assertStringContainsString('1.5', EngineException::timedOut(1.5)->getMessage());

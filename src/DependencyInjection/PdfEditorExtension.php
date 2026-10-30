@@ -80,6 +80,8 @@ final class PdfEditorExtension extends Extension implements PrependExtensionInte
             '$engineMode'           => (string) $profileConfig['engine_mode'],
             '$allowUnauthenticated' => $allowUnauth,
             '$roles'                => $roles,
+            '$maxRenderPixels'      => (int) $profileConfig['max_render_pixels'],
+            '$engineMemoryLimit'    => (int) $profileConfig['engine_memory_limit'],
         ]);
         $container->setDefinition('nowo_pdf_editor.profile', $profileDef);
         $container->setAlias(EditorProfile::class, 'nowo_pdf_editor.profile');
@@ -95,10 +97,11 @@ final class PdfEditorExtension extends Extension implements PrependExtensionInte
         $container->setAlias(ProcessRunnerInterface::class, 'nowo_pdf_editor.process_runner');
 
         $workspace = new Definition(WorkspaceManager::class, [
-            '$profile' => new Reference('nowo_pdf_editor.profile'),
-            '$owners'  => new Reference(WorkspaceOwnerResolverInterface::class),
-            '$clock'   => new Reference(ClockInterface::class, ContainerInterface::IGNORE_ON_INVALID_REFERENCE),
-            '$logger'  => new Reference('logger', ContainerInterface::IGNORE_ON_INVALID_REFERENCE),
+            '$profile'                  => new Reference('nowo_pdf_editor.profile'),
+            '$owners'                   => new Reference(WorkspaceOwnerResolverInterface::class),
+            '$clock'                    => new Reference(ClockInterface::class, ContainerInterface::IGNORE_ON_INVALID_REFERENCE),
+            '$logger'                   => new Reference('logger', ContainerInterface::IGNORE_ON_INVALID_REFERENCE),
+            '$allowOwnerlessWorkspaces' => (bool) $security['allow_ownerless_workspaces'],
         ]);
         $container->setDefinition('nowo_pdf_editor.workspace_manager', $workspace);
         $container->setAlias(WorkspaceManager::class, 'nowo_pdf_editor.workspace_manager');

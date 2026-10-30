@@ -51,15 +51,23 @@ This bundle provides:
 - **Workspaces**
   - Random 32-hex ids; reject empty id, `/`, `\`, and `..`.
   - Each workspace is bound to its creator (`owner.txt`: SHA-256 of the user identifier, or of a random token stored in the anonymous session). Every `{id}` route returns **404** for other users/sessions (`WorkspaceOwnerResolverInterface`, overridable).
-  - Residual: with no authenticated user **and** no session (stateless firewall), workspaces cannot be bound and stay reachable by id.
-  - Keep `workspace_dir` outside the web root and off public file servers.
+  - Callers with neither a user nor a session (stateless firewall + a custom `access_checker`) cannot create or open workspaces: they could not be bound to anyone. Opt in with `security.allow_ownerless_workspaces: true` only if you accept that such workspaces are reachable by anyone who knows their 128-bit id.
+  - `workspace_dir` defaults to `%kernel.project_dir%/var/pdf-editor` (not the shared system temp dir). The root is created `0700`; the editor refuses a root owned by another account or writable by group / others. Keep it outside the web root and off public file servers.
+  - Residual: no per-owner quota (count / bytes). Schedule `nowo:pdf-editor:purge --older-than=24h` (cron or Symfony Scheduler) so abandoned workspaces are removed; rate-limit the upload route in the host if editor users are not trusted.
 - **Uploads & client apply**
   - Extension must be `.pdf` **and** the stored file must start with the `%PDF-` signature; create path enforces `max_upload_bytes` (default 25 MiB).
   - `/view` serves the PDF inline with `X-Content-Type-Options: nosniff` and `Content-Security-Policy: sandbox`; `/download` sends `nosniff`.
-  - Client apply checks `%PDF` magic and `max_upload_bytes`; a declared `Content-Length` above `max_upload_bytes × 4/3` (+64 KiB JSON envelope) is rejected **before** the body is read. Residual: chunked bodies without `Content-Length` are read before the size check — keep host PHP `post_max_size` / proxy `client_max_body_size` limits, and virus-scan if needed.
+  - Client apply requires the `%PDF-` signature and `max_upload_bytes`. The body is read through a stream capped at `max_upload_bytes × 4/3` (+64 KiB JSON envelope), so chunked bodies without `Content-Length` are bounded too; a larger declared `Content-Length` is rejected before reading. PHP's `post_max_size` does **not** bound chunked bodies on every SAPI (FrankenPHP / Caddy): also cap the request body at the proxy (`request_body { max_size 40MB }` in Caddy, `client_max_body_size` in nginx). Virus-scan if needed.
+  - `/download` is always `Content-Type: application/pdf` (never sniffed) with `nosniff` and `attachment`.
   - Residual: no per-owner workspace quota; abandoned workspaces are removed by `nowo:pdf-editor:purge` (schedule it).
 - **Python engine**
   - Argv-only `Process` with `timeout` / `idle_timeout` (defaults 60s / 30s).
+  - Each engine process runs with an address-space cap (`RLIMIT_AS`, profile `engine_memory_limit`, default 1024 MiB): decompression or pixmap bombs fail cleanly instead of exhausting the host.
+  - Page previews are capped at `max_render_pixels` (default 25 MP): a tiny PDF declaring a huge page is rendered at a lower dpi instead of allocating gigabytes.
+  - `/pages/{n}` is 404 in `engine_mode: client` (the browser renders pages) and for pages that do not exist (the page count is cached per PDF revision, so no engine process is spawned for them; failed renders leave no lock files).
+  - `apply` accepts at most 500 operations; the engine refuses blank pages larger than 14400 pt and results above 2000 pages.
+  - Engine errors reach exception messages as one line with absolute paths replaced by `[path]` (no tracebacks).
+  - Residual: no global limit on concurrent engine processes — size PHP workers accordingly.
   - Never pass unsanitized shell strings.
 - **XSS / output**
   - Twig escapes config JSON for HTML attributes; prefer `textContent` in legacy JS.
@@ -102,6 +110,6 @@ Before tagging a release, confirm:
 | **Process / engine** | Argv-only Process; timeouts set; Python mode residuals documented. |
 | **Permissions / exposure** | Editor firewall + access checker; `workspace_dir` not web-exposed. |
 | **Limits / DoS** | `max_upload_bytes` on create; host body-size limits for client apply. |
-| **REQ-SEC-004 (AI audit)** | Pass (good) — Low after `max_upload_bytes` + relative `add_image`; residual host workspace authz; see monorepo `BUNDLES_SECURITY_ANALYSIS.md` (re-audit **2026-09-28**). |
+| **REQ-SEC-004 (AI audit)** | Appendix BT, **2026-10-30**, on 1.5.0 as merged (`7b315cb`): **Pass (conditional) / Medium** — M1 (unbounded render memory / page numbers), L1 (chunked apply bodies), L2 (lock-file litter, no quota), L3 (owner-less workspaces), L4 (shared `/tmp` workspace root), I1 / I4 / I5. Fixed before the 1.5.0 tag (see CHANGELOG `### Security`); remaining residuals: no per-owner quota, no global engine concurrency limit, purge must be scheduled. Expected grade after re-verification: Pass (good) / Low. See monorepo `BUNDLES_SECURITY_ANALYSIS.md`. |
 
 Record confirmation in the release PR or tag notes.

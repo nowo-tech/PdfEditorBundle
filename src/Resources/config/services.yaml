@@ -28,8 +28,13 @@ services:
     Nowo\PdfEditorBundle\Operation\OperationDecoder: ~
     Nowo\PdfEditorBundle\Form\PdfUploadType: ~
 
-    # #[AsController] + autoconfigure tag it controller.service_arguments (REQ-SF-003).
+    # Not autoconfigured: since Symfony 7.3 autoconfiguration tags #[Route] classes `routing.controller`, and the
+    # host's default `routing.controllers` import would load the editor routes without the opt-in
+    # @NowoPdfEditorBundle/Resources/config/routing.yaml import (prefix / when@ guards). Only the controller
+    # argument resolver tag is set, explicitly.
     Nowo\PdfEditorBundle\Controller\EditorController:
+        autoconfigure: false
+        tags: ['controller.service_arguments']
         arguments:
             $layoutTemplate: '%nowo_pdf_editor.web_ui.layout_template%'
             $templates: '%nowo_pdf_editor.web_ui.templates%'

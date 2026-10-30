@@ -130,8 +130,65 @@ final class EditorControllerTest extends TestCase
     {
         $root = $this->workspaceRoot();
         $ws   = $this->seedWorkspace($root);
-        $this->expectException(PdfEditorException::class);
+        $this->expectException(NotFoundHttpException::class);
         $this->controller(workspaceRoot: $root)->pageImage($ws->id, 0);
+    }
+
+    public function testPageImageOfAMissingPageIs404WithoutRendering(): void
+    {
+        $root   = $this->workspaceRoot();
+        $ws     = $this->seedWorkspace($root);
+        $engine = $this->createMock(PdfEngineInterface::class);
+        $engine->expects(self::once())->method('inspect')->willReturn(['pageCount' => 2]);
+        $engine->expects(self::never())->method('renderPage');
+        $controller = $this->controllerWithEngine($root, $engine);
+
+        foreach ([3, 99999] as $page) {
+            try {
+                $controller->pageImage($ws->id, $page);
+                self::fail('Expected a 404 for page ' . $page);
+            } catch (NotFoundHttpException $e) {
+                self::assertSame('Page not found.', $e->getMessage());
+            }
+        }
+        self::assertStringEqualsFile($ws->directory . '/page-count.txt', '2');
+        self::assertFileDoesNotExist($ws->directory . '/page-3.png.lock');
+    }
+
+    public function testPageImageIs404InClientMode(): void
+    {
+        $root   = $this->workspaceRoot();
+        $ws     = $this->seedWorkspace($root);
+        $engine = $this->createMock(PdfEngineInterface::class);
+        $engine->expects(self::never())->method('inspect');
+        $engine->expects(self::never())->method('renderPage');
+
+        $this->expectException(NotFoundHttpException::class);
+        $this->controllerWithProfile($this->clientProfile($root, 1024 * 1024), $engine)->pageImage($ws->id, 1);
+    }
+
+    public function testPageCountComesFromTheCacheWhileThePdfIsUnchanged(): void
+    {
+        $root = $this->workspaceRoot();
+        $ws   = $this->seedWorkspace($root);
+        touch($ws->pdfPath, time() - 10);
+        file_put_contents($ws->directory . '/page-count.txt', '1');
+        $engine = $this->createMock(PdfEngineInterface::class);
+        $engine->expects(self::never())->method('inspect');
+        $engine->method('renderPage')->willReturnCallback(static function (string $pdf, int $page, string $png): void {
+            file_put_contents($png, 'png');
+        });
+
+        self::assertSame(200, $this->controllerWithEngine($root, $engine)->pageImage($ws->id, 1)->getStatusCode());
+    }
+
+    public function testInspectStoresThePageCount(): void
+    {
+        $root = $this->workspaceRoot();
+        $ws   = $this->seedWorkspace($root);
+        $this->controller(workspaceRoot: $root, inspect: ['pageCount' => 4])->inspect($ws->id);
+
+        self::assertStringEqualsFile($ws->directory . '/page-count.txt', '4');
     }
 
     public function testPageImageOk(): void
@@ -164,8 +221,13 @@ final class EditorControllerTest extends TestCase
     {
         $root = $this->workspaceRoot();
         $ws   = $this->seedWorkspace($root);
-        $this->expectException(PdfEditorException::class);
-        $this->controller(workspaceRoot: $root, writePageImage: false)->pageImage($ws->id, 1);
+        try {
+            $this->controller(workspaceRoot: $root, writePageImage: false)->pageImage($ws->id, 1);
+            self::fail('Expected a missing preview error.');
+        } catch (PdfEditorException $e) {
+            self::assertSame('The page image was not generated.', $e->getMessage());
+        }
+        self::assertFileDoesNotExist($ws->directory . '/page-1.png.lock');
     }
 
     public function testApplyRequiresCsrf(): void
@@ -192,12 +254,14 @@ final class EditorControllerTest extends TestCase
         $ws   = $this->seedWorkspace($root);
         file_put_contents($ws->directory . '/page-1.png', 'png');
         file_put_contents($ws->directory . '/page-1.png.lock', '');
+        file_put_contents($ws->directory . '/page-count.txt', '1');
         $request = Request::create('/', 'POST', [], [], [], [], '{"ops":[{"op":"rotate_page","page":1}]}');
         $request->headers->set('X-CSRF-TOKEN', 'token');
         $response = $this->controller(workspaceRoot: $root)->apply($request, $ws->id);
         self::assertSame(200, $response->getStatusCode());
         self::assertFileDoesNotExist($ws->directory . '/page-1.png');
         self::assertFileDoesNotExist($ws->directory . '/page-1.png.lock');
+        self::assertStringEqualsFile($ws->directory . '/page-count.txt', '3');
     }
 
     public function testApplyClientPdfBytes(): void
@@ -293,10 +357,13 @@ final class EditorControllerTest extends TestCase
 
     public function testDownload(): void
     {
-        $root     = $this->workspaceRoot();
-        $ws       = $this->seedWorkspace($root);
+        $root = $this->workspaceRoot();
+        $ws   = $this->seedWorkspace($root);
+        file_put_contents($ws->pdfPath, "%PDF-1.4\n<html><script>alert(1)</script></html>");
         $response = $this->controller(workspaceRoot: $root)->download($ws->id);
+        $response->prepare(Request::create('/'));
         self::assertSame(200, $response->getStatusCode());
+        self::assertSame('application/pdf', $response->headers->get('Content-Type'));
         self::assertSame('nosniff', $response->headers->get('X-Content-Type-Options'));
     }
 
@@ -390,6 +457,33 @@ final class EditorControllerTest extends TestCase
         self::assertSame(200, $response->getStatusCode());
     }
 
+    public function testApplyCapsAChunkedBodyWithoutContentLength(): void
+    {
+        $root    = $this->workspaceRoot();
+        $ws      = $this->seedWorkspace($root);
+        $request = Request::create('/', 'POST', [], [], [], [], '%PDF-1.4 ' . str_repeat('x', intdiv(1024 * 4, 3) + 65536));
+        $request->headers->set('Content-Type', 'application/pdf');
+        $request->headers->remove('Content-Length');
+        $request->headers->set('X-CSRF-TOKEN', 'token');
+
+        $this->expectException(PdfEditorException::class);
+        $this->expectExceptionMessage('Request body exceeds max_upload_bytes (1024).');
+        $this->controllerWithProfile($this->clientProfile($root, 1024))->apply($request, $ws->id);
+    }
+
+    public function testApplyRequiresTheFullPdfSignature(): void
+    {
+        $root    = $this->workspaceRoot();
+        $ws      = $this->seedWorkspace($root);
+        $request = Request::create('/', 'POST', [], [], [], [], "%PDF\n<html><script>alert(1)</script></html>");
+        $request->headers->set('Content-Type', 'application/pdf');
+        $request->headers->set('X-CSRF-TOKEN', 'token');
+
+        $this->expectException(PdfEditorException::class);
+        $this->expectExceptionMessage('not a PDF file');
+        $this->controllerWithProfile($this->clientProfile($root, 1024 * 1024))->apply($request, $ws->id);
+    }
+
     public function testApplyIgnoresANonNumericContentLength(): void
     {
         $root    = $this->workspaceRoot();
@@ -447,13 +541,13 @@ final class EditorControllerTest extends TestCase
             $token->method('getUser')->willReturn($user);
             $tokens->method('getToken')->willReturn($token);
         }
-        $workspaces = new WorkspaceManager(ProfileFactory::create($root), new WorkspaceOwnerResolver($tokens));
+        $workspaces = new WorkspaceManager(ProfileFactory::create($root), new WorkspaceOwnerResolver($tokens), allowOwnerlessWorkspaces: true);
         $engine     = $this->createMock(PdfEngineInterface::class);
-        $engine->method('inspect')->willReturn($inspect);
+        $engine->method('inspect')->willReturn($inspect + ['pageCount' => 1]);
         $engine->method('apply')->willReturnCallback(static function (string $pdf, array $operations, string $out): array {
             file_put_contents($out, 'rewritten');
 
-            return ['applied' => 1];
+            return ['applied' => 1, 'pageCount' => 3];
         });
         $engine->method('renderPage')->willReturnCallback(static function (string $pdf, int $page, string $png) use ($writePageImage): void {
             if ($writePageImage) {

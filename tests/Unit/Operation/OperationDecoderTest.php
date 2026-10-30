@@ -25,6 +25,16 @@ final class OperationDecoderTest extends TestCase
         self::assertSame('replace_text', $ops[0]->toArray()['op']);
     }
 
+    public function testRejectsTooManyOperations(): void
+    {
+        $decoder = new OperationDecoder();
+        self::assertCount(OperationDecoder::MAX_OPERATIONS, $decoder->decode(array_fill(0, OperationDecoder::MAX_OPERATIONS, ['op' => 'rotate_page', 'page' => 1])));
+
+        $this->expectException(PdfEditorException::class);
+        $this->expectExceptionMessage('Too many operations (501); the maximum is 500 per apply.');
+        $decoder->decode(array_fill(0, OperationDecoder::MAX_OPERATIONS + 1, ['op' => 'rotate_page', 'page' => 1]));
+    }
+
     public function testRejectsInvalidShape(): void
     {
         $this->expectException(PdfEditorException::class);

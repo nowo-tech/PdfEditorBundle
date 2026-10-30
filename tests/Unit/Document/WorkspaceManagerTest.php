@@ -174,12 +174,83 @@ final class WorkspaceManagerTest extends TestCase
         $this->assertNotFound($manager, $workspace->id);
     }
 
+    public function testOwnerlessWorkspacesFailClosedByDefault(): void
+    {
+        $root = sys_get_temp_dir() . '/pdfed-' . bin2hex(random_bytes(4));
+        mkdir($root, 0700, true);
+        $fixture = $root . '/fixture.pdf';
+        file_put_contents($fixture, '%PDF-1.4 fixture');
+        $workspace = (new WorkspaceManager(ProfileFactory::create($root), new MutableOwnerResolver(null), allowOwnerlessWorkspaces: true))->createFromPath($fixture);
+
+        $manager = new WorkspaceManager(ProfileFactory::create($root), new MutableOwnerResolver(null));
+        $this->assertNotFound($manager, $workspace->id);
+
+        $this->expectException(DocumentException::class);
+        $this->expectExceptionMessage('needs an authenticated user or a session');
+        $manager->createFromPath($fixture);
+    }
+
+    public function testOwnerlessUploadIsRefusedByDefault(): void
+    {
+        $root = sys_get_temp_dir() . '/pdfed-' . bin2hex(random_bytes(4));
+        mkdir($root, 0700, true);
+        $pdf = $root . '/in.pdf';
+        file_put_contents($pdf, '%PDF-1.4');
+
+        $this->expectException(DocumentException::class);
+        $this->expectExceptionMessage('needs an authenticated user or a session');
+        (new WorkspaceManager(ProfileFactory::create($root), new MutableOwnerResolver(null)))
+            ->createFromUpload(new UploadedFile($pdf, 'in.pdf', 'application/pdf', null, true));
+    }
+
+    public function testPageCountCache(): void
+    {
+        $root = sys_get_temp_dir() . '/pdfed-' . bin2hex(random_bytes(4));
+        mkdir($root, 0700, true);
+        $fixture = $root . '/fixture.pdf';
+        file_put_contents($fixture, '%PDF-1.4 fixture');
+        $manager   = new WorkspaceManager(ProfileFactory::create($root));
+        $workspace = $manager->createFromPath($fixture);
+
+        self::assertNull($manager->cachedPageCount($workspace));
+        touch($workspace->pdfPath, time() - 10);
+        $manager->storePageCount($workspace, 7);
+        self::assertSame(7, $manager->cachedPageCount($workspace));
+
+        file_put_contents($workspace->directory . '/page-count.txt', 'garbage');
+        self::assertNull($manager->cachedPageCount($workspace));
+
+        $manager->storePageCount($workspace, 7);
+        touch($workspace->directory . '/page-count.txt', time() - 20);
+        self::assertNull($manager->cachedPageCount($workspace), 'a count older than the PDF is stale');
+    }
+
+    public function testWorkspaceRootIsCreatedPrivateAndUnsafeRootsAreRefused(): void
+    {
+        $root    = sys_get_temp_dir() . '/pdfed-' . bin2hex(random_bytes(4)) . '/nested';
+        $manager = new WorkspaceManager(ProfileFactory::create($root));
+        $manager->ensureWorkspaceDir();
+        self::assertSame(0o700, fileperms($root) & 0o777);
+
+        chmod($root, 0o777);
+        try {
+            $manager->ensureWorkspaceDir();
+            self::fail('A world-writable workspace root must be refused.');
+        } catch (DocumentException $e) {
+            self::assertStringContainsString('must not be group- or world-writable', $e->getMessage());
+        }
+
+        chmod($root, 0o755);
+        $manager->ensureWorkspaceDir();
+        $this->addToAssertionCount(1);
+    }
+
     public function testUnownedWorkspaceOnlyReachableWithoutIdentity(): void
     {
         $root = sys_get_temp_dir() . '/pdfed-' . bin2hex(random_bytes(4));
         mkdir($root, 0700, true);
         $owner   = new MutableOwnerResolver(null);
-        $manager = new WorkspaceManager(ProfileFactory::create($root), $owner);
+        $manager = new WorkspaceManager(ProfileFactory::create($root), $owner, allowOwnerlessWorkspaces: true);
         $fixture = $root . '/fixture.pdf';
         file_put_contents($fixture, '%PDF-1.4 fixture');
 

@@ -63,6 +63,8 @@ final class PythonPdfEngine implements PdfEngineInterface
             $outputPng,
             '--dpi',
             (string) $dpi,
+            '--max-pixels',
+            (string) $this->profile->maxRenderPixels,
         ]);
     }
 
@@ -107,7 +109,13 @@ final class PythonPdfEngine implements PdfEngineInterface
             throw EngineException::missingEngineScript($this->profile->engineScript);
         }
 
-        $command = array_merge([$this->profile->pythonBinary, $this->profile->engineScript], $args);
+        $command = [$this->profile->pythonBinary, $this->profile->engineScript];
+        if ($this->profile->engineMemoryLimit > 0) {
+            // RLIMIT_AS of the engine process: a decompression or pixmap bomb fails cleanly instead of exhausting the host.
+            $command[] = '--memory-limit';
+            $command[] = (string) $this->profile->engineMemoryLimit;
+        }
+        $command = array_merge($command, $args);
         $outcome = $this->processRunner->run($command, $this->profile->timeout, $this->profile->idleTimeout);
 
         if ($outcome->timedOut) {
@@ -125,7 +133,7 @@ final class PythonPdfEngine implements PdfEngineInterface
             $decoded = json_decode($raw, true, 512, JSON_THROW_ON_ERROR);
         } catch (JsonException $exception) {
             if (!$outcome->isSuccessful()) {
-                throw EngineException::failed(trim($outcome->stderr !== '' ? $outcome->stderr : $outcome->stdout) ?: sprintf('exit %d', $outcome->exitCode));
+                throw EngineException::failed(sprintf('exit %d', $outcome->exitCode));
             }
 
             throw EngineException::invalidJson($exception->getMessage());
@@ -141,7 +149,7 @@ final class PythonPdfEngine implements PdfEngineInterface
         }
 
         if (!$outcome->isSuccessful()) {
-            throw EngineException::failed(trim($outcome->stderr) !== '' ? $outcome->stderr : sprintf('exit %d', $outcome->exitCode));
+            throw EngineException::failed(sprintf('exit %d', $outcome->exitCode));
         }
 
         unset($decoded['ok']);

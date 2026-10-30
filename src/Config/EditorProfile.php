@@ -24,6 +24,10 @@ final readonly class EditorProfile
         public string $engineMode,
         public bool $allowUnauthenticated,
         public array $roles,
+        /** Largest page preview in pixels (width × height); the engine lowers the dpi to fit (REQ-SEC-004 M1) */
+        public int $maxRenderPixels = 25_000_000,
+        /** Address-space cap (RLIMIT_AS) of each engine process in MiB; 0 = no cap */
+        public int $engineMemoryLimit = 1024,
     ) {
     }
 }
