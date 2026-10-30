@@ -44,6 +44,10 @@ REQ-SEC-004 audit (Appendix BT, 2026-10-30) of the merged 1.5.0 code:
 - **I1** — client apply requires the full `%PDF-` signature; `/download` is always `Content-Type: application/pdf`.
 - **I4** — `pymupdf>=1.26.7` (engine requirements and Docker images).
 - **I5** — engine errors reach exception messages as one line without absolute paths or tracebacks.
+- **N1** (re-audit) — the python-mode `apply` response only carries `applied` and `pageCount` (no workspace path); the
+  engine no longer reports output paths.
+- **N2** (re-audit) — the 2000-page bound limits growth only: documents that already have more pages stay editable
+  (an apply may not take them above `max(2000, original page count)`).
 
 ### Fixed
 

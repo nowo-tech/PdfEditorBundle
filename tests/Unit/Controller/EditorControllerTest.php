@@ -259,6 +259,8 @@ final class EditorControllerTest extends TestCase
         $request->headers->set('X-CSRF-TOKEN', 'token');
         $response = $this->controller(workspaceRoot: $root)->apply($request, $ws->id);
         self::assertSame(200, $response->getStatusCode());
+        self::assertSame(['ok' => true, 'result' => ['applied' => 1, 'pageCount' => 3]], json_decode((string) $response->getContent(), true));
+        self::assertStringNotContainsString($root, (string) $response->getContent());
         self::assertFileDoesNotExist($ws->directory . '/page-1.png');
         self::assertFileDoesNotExist($ws->directory . '/page-1.png.lock');
         self::assertStringEqualsFile($ws->directory . '/page-count.txt', '3');
@@ -547,7 +549,7 @@ final class EditorControllerTest extends TestCase
         $engine->method('apply')->willReturnCallback(static function (string $pdf, array $operations, string $out): array {
             file_put_contents($out, 'rewritten');
 
-            return ['applied' => 1, 'pageCount' => 3];
+            return ['applied' => 1, 'pageCount' => 3, 'out' => $out];
         });
         $engine->method('renderPage')->willReturnCallback(static function (string $pdf, int $page, string $png) use ($writePageImage): void {
             if ($writePageImage) {

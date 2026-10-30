@@ -65,7 +65,7 @@ This bundle provides:
   - Each engine process runs with an address-space cap (`RLIMIT_AS`, profile `engine_memory_limit`, default 1024 MiB): decompression or pixmap bombs fail cleanly instead of exhausting the host.
   - Page previews are capped at `max_render_pixels` (default 25 MP): a tiny PDF declaring a huge page is rendered at a lower dpi instead of allocating gigabytes.
   - `/pages/{n}` is 404 in `engine_mode: client` (the browser renders pages) and for pages that do not exist (the page count is cached per PDF revision, so no engine process is spawned for them; failed renders leave no lock files).
-  - `apply` accepts at most 500 operations; the engine refuses blank pages larger than 14400 pt and results above 2000 pages.
+  - `apply` accepts at most 500 operations; the engine refuses blank pages larger than 14400 pt and growing a document above 2000 pages (larger uploads stay editable but cannot grow).
   - Engine errors reach exception messages as one line with absolute paths replaced by `[path]` (no tracebacks).
   - Residual: no global limit on concurrent engine processes — size PHP workers accordingly.
   - Never pass unsanitized shell strings.

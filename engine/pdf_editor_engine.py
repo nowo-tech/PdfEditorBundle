@@ -273,6 +273,8 @@ def apply_ops(pdf_path: str, ops: list[dict[str, Any]], out_path: str) -> dict[s
         raise ValueError(f"Too many operations ({len(ops)}); the maximum is {MAX_OPERATIONS} per apply.")
     doc = fitz.open(pdf_path)
     applied = 0
+    # Bound growth only: documents that already have more pages than MAX_PAGES stay editable.
+    page_limit = max(MAX_PAGES, doc.page_count)
     try:
         for raw in ops:
             op = str(raw.get("op") or "")
@@ -396,10 +398,11 @@ def apply_ops(pdf_path: str, ops: list[dict[str, Any]], out_path: str) -> dict[s
             else:
                 raise ValueError(f"Unsupported operation: {op}")
             applied += 1
-            if doc.page_count > MAX_PAGES:
-                raise ValueError(f"The document would have more than {MAX_PAGES} pages.")
+            if doc.page_count > page_limit:
+                raise ValueError(f"The document would have more than {page_limit} pages.")
         doc.save(out_path, deflate=True, garbage=3, incremental=False)
-        return {"applied": applied, "pageCount": doc.page_count, "out": out_path}
+        # No paths in results: they reach the HTTP response (REQ-SEC-004 audit BT N1).
+        return {"applied": applied, "pageCount": doc.page_count}
     finally:
         doc.close()
 
@@ -421,7 +424,7 @@ def cmd_render(args: argparse.Namespace) -> None:
         tmp = f"{args.out}.{os.getpid()}.png"
         pix.save(tmp)
         os.replace(tmp, args.out)
-        emit_ok({"page": args.page, "width": pix.width, "height": pix.height, "dpi": dpi, "out": args.out})
+        emit_ok({"page": args.page, "width": pix.width, "height": pix.height, "dpi": dpi})
     finally:
         doc.close()
 

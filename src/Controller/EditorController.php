@@ -275,7 +275,11 @@ final class EditorController
             $this->workspaces->storePageCount($workspace, $result['pageCount']);
         }
 
-        return new JsonResponse(['ok' => true, 'result' => $result]);
+        // Only the documented fields: never echo engine internals such as paths (REQ-SEC-004 audit BT N1).
+        return new JsonResponse(['ok' => true, 'result' => [
+            'applied'   => is_int($result['applied'] ?? null) ? $result['applied'] : null,
+            'pageCount' => is_int($result['pageCount'] ?? null) ? $result['pageCount'] : null,
+        ]]);
     }
 
     #[Route(path: '/pdf-editor/{id}/view', name: 'nowo_pdf_editor_view', requirements: ['id' => '[a-f0-9]{32}'], methods: ['GET'])]
