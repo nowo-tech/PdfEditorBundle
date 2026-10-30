@@ -3,6 +3,7 @@
 ## Table of contents
 
 - [Unreleased](#unreleased)
+- [To 1.5.0](#to-150)
 - [To 1.4.1](#to-141)
 - [To 1.4.0](#to-140)
 - [To 1.3.1](#to-131)
@@ -20,6 +21,14 @@
 - [From nothing → 1.0.0](#from-nothing--100)
 
 ## Unreleased
+
+## To 1.5.0
+
+From **1.4.1**:
+
+```bash
+composer update nowo-tech/pdf-editor-bundle
+```
 
 From **1.4.1**. Requires Symfony **7.4 / 8.0 / 8.1** (6.4 and 7.0–7.3 are no longer supported: the pages now use
 `nowo-tech/ui-kit-bundle` 2.x, installed as a dependency).
