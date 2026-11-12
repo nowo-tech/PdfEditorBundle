@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
+use Symfony\Component\HttpKernel\HttpKernel;
 
 use function bin2hex;
 use function file_put_contents;
@@ -26,7 +27,7 @@ use function sys_get_temp_dir;
 use function uniqid;
 
 /**
- * REQ-RUNTIME-002: ONE booted kernel, `services_resetter` / `kernel.reset` never called (FrankenPHP worker, kernel
+ * REQ-RUNTIME-002: ONE booted kernel, `services_resetter` / `kernel.reset` never called (requests go through the `http_kernel` service, not `Kernel::handle()`, which resets services after a terminate()) (FrankenPHP worker, kernel
  * reset false). Two anonymous users (two sessions) each own one workspace. N iterations alternate them through
  * `http_kernel` `handle()` + `terminate()`: the workspace page and the PDF download of the caller's own workspace
  * must answer with its own file name / bytes, the other user's workspace id must always be a 404, and memory growth
@@ -55,6 +56,9 @@ final class WorkerKeptAliveKernelTest extends TestCase
     {
         $this->kernel = new WorkerTestKernel(sys_get_temp_dir() . '/nowo-pdf-editor-worker-' . uniqid('', true));
         $this->kernel->boot();
+        // The `http_kernel` service directly, never `Kernel::handle()`: after a terminate() that one runs the services resetter.
+        $httpKernel = $this->kernel->getContainer()->get('http_kernel');
+        self::assertInstanceOf(HttpKernel::class, $httpKernel);
 
         $users = [];
         foreach (['alice', 'bob'] as $name) {
@@ -82,29 +86,29 @@ final class WorkerKeptAliveKernelTest extends TestCase
 
             // The caller's own workspace page.
             $request  = $this->request('/pdf-editor/' . $users[$me]['id'], $users[$me]['session']);
-            $response = $this->kernel->handle($request);
+            $response = $httpKernel->handle($request);
             $content  = (string) $response->getContent();
             self::assertSame(Response::HTTP_OK, $response->getStatusCode(), $context);
             self::assertTrue(str_contains($content, $me . '-report.pdf'), $context . ': own file name missing');
             self::assertFalse(str_contains($content, $other . '-report.pdf'), $context . ': other user file name present');
             self::assertFalse(str_contains($content, $users[$other]['id']), $context . ': other workspace id present');
-            $this->kernel->terminate($request, $response);
+            $httpKernel->terminate($request, $response);
 
             // The caller's own PDF bytes.
             $request  = $this->request('/pdf-editor/' . $users[$me]['id'] . '/download', $users[$me]['session']);
-            $response = $this->kernel->handle($request);
+            $response = $httpKernel->handle($request);
             self::assertInstanceOf(BinaryFileResponse::class, $response, $context);
             self::assertStringContainsString($me . '-report.pdf', (string) $response->headers->get('Content-Disposition'), $context);
             self::assertStringNotContainsString($other, (string) $response->headers->get('Content-Disposition'), $context);
             self::assertStringEqualsFile($response->getFile()->getPathname(), '%PDF-1.4 ' . $me . '-secret-bytes', $context);
-            $this->kernel->terminate($request, $response);
+            $httpKernel->terminate($request, $response);
 
             // The other user's workspace is never reachable.
             $request  = $this->request('/pdf-editor/' . $users[$other]['id'], $users[$me]['session']);
-            $response = $this->kernel->handle($request);
+            $response = $httpKernel->handle($request);
             self::assertSame(Response::HTTP_NOT_FOUND, $response->getStatusCode(), $context . ': foreign workspace reachable');
             self::assertFalse(str_contains((string) $response->getContent(), $other . '-report.pdf'), $context);
-            $this->kernel->terminate($request, $response);
+            $httpKernel->terminate($request, $response);
         }
 
         gc_collect_cycles();
