@@ -27,6 +27,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Tests
+
+- Added `WorkerKeptAliveKernelTest` (REQ-RUNTIME-002): one kernel, 1,200 alternating users on workspace page / download / foreign workspace, no services resetter, flat memory.
+
+### Docs
+
+- Refreshed `docs/FRANKENPHP-WORKER-AUDIT.md` (reviewed version, owner resolver row, kept-alive test, rule 7 note).
+
 ## [1.6.0] - 2026-10-30
 
 Page forms are FormKit types with a bundle FormKit profile; requires nowo-tech/form-kit-bundle (REQ-TWIG-005 rule 11). See [UPGRADING](UPGRADING.md#to-160).

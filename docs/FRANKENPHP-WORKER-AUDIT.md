@@ -4,7 +4,8 @@
 |-------|-------|
 | Package | `nowo-tech/pdf-editor-bundle` (`symfony-bundle`) |
 | Audited revision | `v1.0.2` |
-| Audit date | 2026-09-24 |
+| Reviewed version | `v1.6.0` (re-checked 2026-11-12 against the kept-alive test below; `git diff v1.6.0 -- src` is empty at `bcb5e43`) |
+| Audit date | 2026-11-12 (earlier audit date 2026-09-24 kept in the history) |
 | Method | Manual review of every PHP file under `src/` (controller, services, command, forms, DI extension, configuration, `Resources/config/services.yaml`); PHPStan classic + worker + hardening |
 | **Verdict** | ✅ **100% compatible** with FrankenPHP worker mode and **`reset_kernel: false`** (scenario B below) |
 
@@ -16,8 +17,9 @@
 - [Findings](#findings)
   - [W-01 — Python engine calls block a worker thread for up to the configured timeout (Low)](#w-01--python-engine-calls-block-a-worker-thread-for-up-to-the-configured-timeout-low)
   - [W-02 — Workspaces are never removed (Low)](#w-02--workspaces-are-never-removed-low)
-  - [W-03 — Workspace isolation is by unguessable id, not by owner (Info)](#w-03--workspace-isolation-is-by-unguessable-id-not-by-owner-info)
+  - [W-03 — Workspace isolation is by owner and unguessable id (Info; updated 2026-11-12)](#w-03--workspace-isolation-is-by-owner-and-unguessable-id-info-updated-2026-11-12)
 - [Usage recommendations in worker mode](#usage-recommendations-in-worker-mode)
+- [Kept-alive test (REQ-RUNTIME-002)](#kept-alive-test-req-runtime-002)
 - [Re-audit triggers](#re-audit-triggers)
 
 ## Execution model assumed
@@ -60,6 +62,7 @@ Worker demo: `demo/symfony8/docker/frankenphp/Caddyfile` declares a `worker` blo
 | `nowo_pdf_editor.process_runner` (`Engine\SymfonyProcessRunner`) | yes | none; a new `Process` per call | ✅ | ✅ |
 | `nowo_pdf_editor.workspace_manager` (`Document\WorkspaceManager`) | yes | none (`readonly` profile) | ✅ | ✅ |
 | `nowo_pdf_editor.access_checker` (`RolePdfEditorAccessChecker` or `AllowAllPdfEditorAccessChecker`) | yes | none (`final readonly`; asks `AuthorizationChecker` per call) | ✅ | ✅ |
+| `nowo_pdf_editor.workspace_owner_resolver` (`Security\WorkspaceOwnerResolver`) | yes | none (`final readonly`; user from `TokenStorageInterface`, anonymous token in the current request's session, read per call) | ✅ | ✅ |
 | `Operation\OperationDecoder` | yes | none (only a class constant) | ✅ | ✅ |
 | `Command\CheckEngineCommand` | yes (CLI only) | none | ✅ | ✅ |
 | 2 form types (`PdfUploadType`, `EditorTextType`) | yes | stateless | ✅ | ✅ |
@@ -80,11 +83,11 @@ Value objects (`Workspace`, `EditorOperation`, `ProcessOutcome`) are `readonly`,
 - **Worker impact:** no in-memory growth, but disk usage grows with every upload for the lifetime of the host/container. In a long-lived worker container nothing restarts the temp directory. Page PNG lock files are removed together with page images after apply (1.0.2).
 - **Recommendation:** run a periodic cleanup (cron / scheduled command) that deletes workspace directories older than a TTL, or put `workspace_dir` on a volume with a cleanup policy.
 
-### W-03 — Workspace isolation is by unguessable id, not by owner (Info)
+### W-03 — Workspace isolation is by owner and unguessable id (Info; updated 2026-11-12)
 
-- **Where:** `WorkspaceManager` uses `bin2hex(random_bytes(16))`; `EditorController::assertAccess()` only checks roles.
-- **Worker impact:** none specific to worker mode — nothing is cached in memory, so one user never sees another user's workspace through leaked service state. Any user who passes the role check and knows a workspace id can open it; this is the same in classic mode.
-- **Recommendation:** if workspaces must be per-user, bind the id to the user (e.g. store the owner in `meta.txt` or the session) in a custom access checker.
+- **Where:** `WorkspaceManager` uses `bin2hex(random_bytes(16))` for the id and stores the creator in `owner.txt`; `WorkspaceOwnerResolver` resolves the owner per call (authenticated user, or a random token kept in the caller's session). The 2026-09-24 review described isolation by id only.
+- **Worker impact:** none specific to worker mode — nothing is cached in memory, so one user never sees another user's workspace through leaked service state, and a workspace of another owner is a plain 404. Covered by the kept-alive test below.
+- **Recommendation:** none; stateless firewalls with a custom access checker must opt in to `allow_ownerless_workspaces` (such workspaces are reachable by id only).
 
 No other findings. The client-PDF upload path (`EditorController::applyClientPdf()`) reads the whole body into memory per request; it is freed at the end of the request and does not accumulate.
 
@@ -95,6 +98,16 @@ No other findings. The client-PDF upload path (`EditorController::applyClientPdf
 - Keep the default `engine_mode: client` when possible; with `python`, tune `timeout` / `idle_timeout` and the worker thread count (W-01).
 - Schedule cleanup of `workspace_dir` (W-02).
 - Custom `PdfEditorAccessCheckerInterface`, `ProcessRunnerInterface` or `PdfEngineInterface` implementations must stay stateless (or implement `ResetInterface`); do not cache the current user, request or workspace in a property.
+
+## Kept-alive test (REQ-RUNTIME-002)
+
+Test: `Nowo\PdfEditorBundle\Tests\Integration\Worker\WorkerKeptAliveKernelTest` (`tests/Integration/Worker/WorkerKeptAliveKernelTest.php`, host kernel `WorkerTestKernel`). It boots **one** kernel with the editor routes imported and drives `http_kernel` `handle()` + `terminate()` 1,200 times, alternating two anonymous users (two sessions, each owning one workspace): every iteration loads the caller's own workspace page, downloads the caller's own PDF and requests the other user's workspace id. `services_resetter` / `kernel.reset` is **never** called: requests are sent through the `http_kernel` service itself, because `Kernel::handle()` runs the services resetter on the next boot after a `terminate()`. Each response must contain only the caller's own file name / bytes, the other user's workspace must always be a 404, and memory growth after a 100-iteration warm-up must stay below 4 MiB.
+
+Result: no state is carried between requests (the owner is resolved from the current session on every call), so the bundle is **safe with kernel reset false**.
+
+The test kernel is `debug: false` (the `test` environment is accepted by `allow_unauthenticated`): in a debug kernel Twig's profiler keeps one profile per render for the life of the process, which is a development-only host setting and not bundle state.
+
+Rule 7: the bundle has no persistence layer and never clears, flushes or resets the host's default EntityManager (workspaces live on the filesystem).
 
 ## Re-audit triggers
 
