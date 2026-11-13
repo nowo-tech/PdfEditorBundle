@@ -8,8 +8,12 @@ use LogicException;
 use Nowo\PdfEditorBundle\Config\EditorProfile;
 use Nowo\PdfEditorBundle\DependencyInjection\Configuration;
 use Nowo\PdfEditorBundle\DependencyInjection\PdfEditorExtension;
+use Nowo\PdfEditorBundle\Document\WorkspaceManager;
+use Nowo\PdfEditorBundle\Document\WorkspaceStorageInterface;
 use Nowo\PdfEditorBundle\Engine\PdfEngineInterface;
 use Nowo\PdfEditorBundle\Engine\ProcessRunnerInterface;
+use Nowo\PdfEditorBundle\Operation\OperationDecoder;
+use Nowo\PdfEditorBundle\Operation\OperationDecoderInterface;
 use Nowo\PdfEditorBundle\Security\AllowAllPdfEditorAccessChecker;
 use Nowo\PdfEditorBundle\Security\PdfEditorAccessCheckerInterface;
 use Nowo\PdfEditorBundle\Security\RolePdfEditorAccessChecker;
@@ -105,6 +109,21 @@ final class ConfigurationAndExtensionTest extends TestCase
             'upload'    => 'admin/pdf_upload.html.twig',
             'workspace' => '@NowoPdfEditorBundle/editor/workspace.html.twig',
         ], $container->getParameter('nowo_pdf_editor.web_ui.templates'));
+    }
+
+    public function testPortsAreAliasedAndAHostCanOverrideThem(): void
+    {
+        $container = $this->container();
+        (new PdfEditorExtension())->load([], $container);
+
+        self::assertSame('nowo_pdf_editor.workspace_manager', (string) $container->getAlias(WorkspaceStorageInterface::class));
+        self::assertSame(WorkspaceManager::class, $container->getDefinition('nowo_pdf_editor.workspace_manager')->getClass());
+        self::assertSame(OperationDecoder::class, (string) $container->getAlias(OperationDecoderInterface::class));
+
+        $container->setAlias(WorkspaceStorageInterface::class, 'app.workspaces');
+        $container->setAlias(OperationDecoderInterface::class, 'app.decoder');
+        self::assertSame('app.workspaces', (string) $container->getAlias(WorkspaceStorageInterface::class));
+        self::assertSame('app.decoder', (string) $container->getAlias(OperationDecoderInterface::class));
     }
 
     public function testUnknownDefaultProfile(): void

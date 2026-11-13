@@ -10,6 +10,7 @@ use Nowo\PdfEditorBundle\Document\Workspace;
 use Nowo\PdfEditorBundle\Document\WorkspaceManager;
 use Nowo\PdfEditorBundle\Engine\PdfEngineInterface;
 use Nowo\PdfEditorBundle\Exception\AccessDeniedException;
+use Nowo\PdfEditorBundle\Exception\DocumentException;
 use Nowo\PdfEditorBundle\Exception\PdfEditorException;
 use Nowo\PdfEditorBundle\Operation\OperationDecoder;
 use Nowo\PdfEditorBundle\Security\PdfEditorAccessCheckerInterface;
@@ -35,6 +36,7 @@ use Twig\Environment;
 use function intdiv;
 
 use const JSON_THROW_ON_ERROR;
+use const UPLOAD_ERR_INI_SIZE;
 
 #[CoversClass(EditorController::class)]
 final class EditorControllerTest extends TestCase
@@ -114,6 +116,17 @@ final class EditorControllerTest extends TestCase
         $upload   = new UploadedFile($pdf, 'in.pdf', 'application/pdf', null, true);
         $response = $this->controller(workspaceRoot: $root, submittedPdf: $upload)->index(new Request());
         self::assertSame(302, $response->getStatusCode());
+    }
+
+    public function testIndexRefusesAnInvalidUploadBeforeStoringAnything(): void
+    {
+        $root = $this->workspaceRoot();
+        $pdf  = $root . '/in.pdf';
+        file_put_contents($pdf, '%PDF-1.4');
+        $upload = new UploadedFile($pdf, 'in.pdf', 'application/pdf', UPLOAD_ERR_INI_SIZE, true);
+
+        $this->expectException(DocumentException::class);
+        $this->controller(workspaceRoot: $root, submittedPdf: $upload)->index(new Request());
     }
 
     public function testWorkspaceAndInspect(): void

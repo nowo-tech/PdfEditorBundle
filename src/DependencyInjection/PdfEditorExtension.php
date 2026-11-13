@@ -7,6 +7,7 @@ namespace Nowo\PdfEditorBundle\DependencyInjection;
 use LogicException;
 use Nowo\PdfEditorBundle\Config\EditorProfile;
 use Nowo\PdfEditorBundle\Document\WorkspaceManager;
+use Nowo\PdfEditorBundle\Document\WorkspaceStorageInterface;
 use Nowo\PdfEditorBundle\Engine\PdfEngineInterface;
 use Nowo\PdfEditorBundle\Engine\ProcessRunnerInterface;
 use Nowo\PdfEditorBundle\Engine\PythonPdfEngine;
@@ -130,6 +131,8 @@ final class PdfEditorExtension extends Extension implements PrependExtensionInte
         ]);
         $container->setDefinition('nowo_pdf_editor.workspace_manager', $workspace);
         $container->setAlias(WorkspaceManager::class, 'nowo_pdf_editor.workspace_manager');
+        // REQ-ARCH-001 rules 1 and 5: the controller and the purge command use the storage port.
+        $container->setAlias(WorkspaceStorageInterface::class, 'nowo_pdf_editor.workspace_manager');
 
         if (is_string($customChecker) && $customChecker !== '') {
             // Host checker (REQ-UI-002): the interface alias points at the configured service.

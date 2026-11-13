@@ -6,14 +6,14 @@ namespace Nowo\PdfEditorBundle\Controller;
 
 use Nowo\PdfEditorBundle\Config\EditorProfile;
 use Nowo\PdfEditorBundle\Document\Workspace;
-use Nowo\PdfEditorBundle\Document\WorkspaceManager;
+use Nowo\PdfEditorBundle\Document\WorkspaceStorageInterface;
 use Nowo\PdfEditorBundle\Engine\PdfEngineInterface;
 use Nowo\PdfEditorBundle\Exception\AccessDeniedException;
 use Nowo\PdfEditorBundle\Exception\DocumentException;
 use Nowo\PdfEditorBundle\Exception\PdfEditorException;
 use Nowo\PdfEditorBundle\Form\EditorTextType;
 use Nowo\PdfEditorBundle\Form\PdfUploadType;
-use Nowo\PdfEditorBundle\Operation\OperationDecoder;
+use Nowo\PdfEditorBundle\Operation\OperationDecoderInterface;
 use Nowo\PdfEditorBundle\Security\PdfEditorAccessCheckerInterface;
 use Nowo\PdfEditorBundle\View\PdfEditorPages;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -68,9 +68,9 @@ final class EditorController
 
     public function __construct(
         private readonly PdfEditorAccessCheckerInterface $accessChecker,
-        private readonly WorkspaceManager $workspaces,
+        private readonly WorkspaceStorageInterface $workspaces,
         private readonly PdfEngineInterface $engine,
-        private readonly OperationDecoder $decoder,
+        private readonly OperationDecoderInterface $decoder,
         private readonly FormFactoryInterface $formFactory,
         private readonly Environment $twig,
         private readonly TokenStorageInterface $tokenStorage,
@@ -94,7 +94,11 @@ final class EditorController
         if ($form->isSubmitted() && $form->isValid()) {
             $pdf = $form->get('pdf')->getData();
             if ($pdf instanceof UploadedFile) {
-                $workspace = $this->workspaces->createFromUpload($pdf);
+                if (!$pdf->isValid()) {
+                    throw DocumentException::invalidUpload($pdf->getErrorMessage());
+                }
+                $size      = $pdf->getSize();
+                $workspace = $this->workspaces->createFromUploadedFile($pdf->getPathname(), $pdf->getClientOriginalName(), $size === false ? null : $size);
 
                 return new RedirectResponse($this->urlGenerator->generate('nowo_pdf_editor_workspace', ['id' => $workspace->id]));
             }

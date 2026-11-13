@@ -3,6 +3,7 @@
 ## Table of contents
 
 - [Unreleased](#unreleased)
+- [To 1.7.0](#to-170)
 - [To 1.6.0](#to-160)
 - [To 1.5.0](#to-150)
 - [To 1.4.1](#to-141)
@@ -22,6 +23,10 @@
 - [From nothing → 1.0.0](#from-nothing--100)
 
 ## Unreleased
+
+## To 1.7.0
+
+From **1.6.0**: no action. `WorkspaceStorageInterface` and `OperationDecoderInterface` are new and additive (the `WorkspaceManager` / `OperationDecoder` class ids still work). `WorkspaceManager::createFromUpload(UploadedFile)` is deprecated in favour of `createFromUploadedFile($path, $originalName, $size)` and is removed in 2.0. If you decorate or mock `WorkspaceManager` and pass it to `EditorController` by hand, type it as `WorkspaceStorageInterface`. See [ARCHITECTURE](ARCHITECTURE.md).
 
 ## To 1.6.0
 

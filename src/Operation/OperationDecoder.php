@@ -21,7 +21,7 @@ use function str_starts_with;
 
 use const DIRECTORY_SEPARATOR;
 
-final class OperationDecoder
+final class OperationDecoder implements OperationDecoderInterface
 {
     /** Operations accepted per apply (the Python engine enforces the same bound; REQ-SEC-004 M1). */
     public const MAX_OPERATIONS = 500;

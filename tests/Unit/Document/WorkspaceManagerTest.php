@@ -45,6 +45,152 @@ final class WorkspaceManagerTest extends TestCase
         $manager->get('../nope');
     }
 
+    public function testCreateFromUploadedFileTakesPathNameAndSizeWithoutHttpTypes(): void
+    {
+        $root = sys_get_temp_dir() . '/pdfed-' . bin2hex(random_bytes(4));
+        mkdir($root, 0700, true);
+        $manager = new WorkspaceManager(ProfileFactory::create($root));
+        $manager->ensureWorkspaceDir();
+
+        $pdf = $root . '/in.pdf';
+        file_put_contents($pdf, '%PDF-1.4 test');
+        $workspace = $manager->createFromUploadedFile($pdf, 'My Doc.PDF', 13);
+
+        self::assertFileExists($workspace->pdfPath);
+        self::assertFileDoesNotExist($pdf, 'The upload is taken over, as UploadedFile::move() does.');
+        self::assertSame('My_Doc.PDF', $workspace->originalName);
+        self::assertSame($workspace->id, $manager->get($workspace->id)->id);
+    }
+
+    public function testCreateFromUploadedFileRefusesWrongExtensionAndOversize(): void
+    {
+        $root = sys_get_temp_dir() . '/pdfed-' . bin2hex(random_bytes(4));
+        mkdir($root, 0700, true);
+        $base = ProfileFactory::create($root);
+        $pdf  = $root . '/in.pdf';
+        file_put_contents($pdf, '%PDF-1.4 test');
+
+        try {
+            (new WorkspaceManager($base))->createFromUploadedFile($pdf, 'notes.txt', 13);
+            self::fail('A non-PDF extension must be refused.');
+        } catch (DocumentException) {
+            self::assertFileExists($pdf);
+        }
+
+        $this->expectException(DocumentException::class);
+        (new WorkspaceManager($base))->createFromUploadedFile($pdf, 'in.pdf', $base->maxUploadBytes + 1);
+    }
+
+    private function managerWithLimit(string $root, int $max): WorkspaceManager
+    {
+        $base = ProfileFactory::create($root);
+
+        return new WorkspaceManager(new EditorProfile(
+            name: $base->name,
+            pythonBinary: $base->pythonBinary,
+            engineScript: $base->engineScript,
+            timeout: $base->timeout,
+            idleTimeout: $base->idleTimeout,
+            maxUploadBytes: $max,
+            renderDpi: $base->renderDpi,
+            workspaceDir: $base->workspaceDir,
+            engineMode: $base->engineMode,
+            allowUnauthenticated: $base->allowUnauthenticated,
+            roles: $base->roles,
+        ));
+    }
+
+    private function tempRoot(): string
+    {
+        $root = sys_get_temp_dir() . '/pdfed-' . bin2hex(random_bytes(4));
+        mkdir($root, 0700, true);
+
+        return $root;
+    }
+
+    public function testUploadedFileSymlinkIsRefusedAndTargetKept(): void
+    {
+        $root = $this->tempRoot();
+        $real = $root . '/real.pdf';
+        file_put_contents($real, '%PDF-1.4 test');
+        $link = $root . '/link.pdf';
+        symlink($real, $link);
+
+        try {
+            (new WorkspaceManager(ProfileFactory::create($root)))->createFromUploadedFile($link, 'link.pdf', 13);
+            self::fail('A symlink must be refused.');
+        } catch (DocumentException) {
+            self::assertFileExists($real);
+            self::assertTrue(is_link($link));
+        }
+    }
+
+    public function testUploadedNonRegularFileIsRefused(): void
+    {
+        $root = $this->tempRoot();
+
+        $this->expectException(DocumentException::class);
+        (new WorkspaceManager(ProfileFactory::create($root)))->createFromUploadedFile($root, 'dir.pdf', 1);
+    }
+
+    public function testLyingSizeDoesNotBypassTheLimit(): void
+    {
+        $root = $this->tempRoot();
+        $pdf  = $root . '/big.pdf';
+        file_put_contents($pdf, '%PDF-1.4 much-bigger-than-four');
+
+        try {
+            $this->managerWithLimit($root, 4)->createFromUploadedFile($pdf, 'big.pdf', 1);
+            self::fail('The real size must be enforced.');
+        } catch (DocumentException) {
+            self::assertFileExists($pdf);
+        }
+    }
+
+    public function testNullSizeStillEnforcesTheRealSize(): void
+    {
+        $root = $this->tempRoot();
+        $pdf  = $root . '/big.pdf';
+        file_put_contents($pdf, '%PDF-1.4 much-bigger-than-four');
+
+        $this->expectException(DocumentException::class);
+        $this->managerWithLimit($root, 4)->createFromUploadedFile($pdf, 'big.pdf');
+    }
+
+    public function testNonPdfIsRefusedAndNeverMoved(): void
+    {
+        $root = $this->tempRoot();
+        $fake = $root . '/fake.pdf';
+        file_put_contents($fake, 'MZ not a pdf');
+        $manager = new WorkspaceManager(ProfileFactory::create($root));
+        $manager->ensureWorkspaceDir();
+
+        try {
+            $manager->createFromUploadedFile($fake, 'fake.pdf', 12);
+            self::fail('A non-PDF must be refused.');
+        } catch (DocumentException) {
+            self::assertFileExists($fake);
+            self::assertSame('MZ not a pdf', file_get_contents($fake));
+            self::assertSame([], glob($root . '/*/') ?: [], 'No workspace directory is created for a refused file.');
+        }
+    }
+
+    public function testGetRequiresAWorkspaceIdShape(): void
+    {
+        $root    = $this->tempRoot();
+        $manager = new WorkspaceManager(ProfileFactory::create($root));
+
+        $refused = 0;
+        foreach (['abc', str_repeat('A', 32), str_repeat('a', 31), str_repeat('a', 32) . "\n", str_repeat('g', 32)] as $id) {
+            try {
+                $manager->get($id);
+            } catch (DocumentException) {
+                ++$refused;
+            }
+        }
+        self::assertSame(5, $refused);
+    }
+
     public function testTooLarge(): void
     {
         $root = sys_get_temp_dir() . '/pdfed-' . bin2hex(random_bytes(4));

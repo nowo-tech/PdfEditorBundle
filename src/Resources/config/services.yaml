@@ -26,6 +26,9 @@ services:
         alias: Nowo\PdfEditorBundle\Security\WorkspaceOwnerResolver
 
     Nowo\PdfEditorBundle\Operation\OperationDecoder: ~
+    # REQ-ARCH-001 rule 1: the controller depends on the interface; a host replaces the alias.
+    Nowo\PdfEditorBundle\Operation\OperationDecoderInterface:
+        alias: Nowo\PdfEditorBundle\Operation\OperationDecoder
     Nowo\PdfEditorBundle\Form\PdfUploadType: ~
 
     # Not autoconfigured: since Symfony 7.3 autoconfiguration tags #[Route] classes `routing.controller`, and the

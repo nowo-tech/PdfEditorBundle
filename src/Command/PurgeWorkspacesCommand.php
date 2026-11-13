@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Nowo\PdfEditorBundle\Command;
 
-use Nowo\PdfEditorBundle\Document\WorkspaceManager;
+use Nowo\PdfEditorBundle\Document\WorkspaceStorageInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -28,7 +28,7 @@ final class PurgeWorkspacesCommand extends Command
 {
     private const UNITS = ['' => 1, 's' => 1, 'm' => 60, 'h' => 3600, 'd' => 86400, 'w' => 604800];
 
-    public function __construct(private readonly WorkspaceManager $workspaces)
+    public function __construct(private readonly WorkspaceStorageInterface $workspaces)
     {
         parent::__construct();
     }

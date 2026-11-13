@@ -27,6 +27,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Ports (REQ-ARCH-001 rules 1, 3 and 5):** `Document\WorkspaceStorageInterface` (the storage port: `ensureWorkspaceDir`, `createFromUploadedFile`, `createFromPath`, `get`, `replacePdf`, `pageImagePath`, `cachedPageCount`, `storePageCount`, `purgeOlderThan`) and `Operation\OperationDecoderInterface`. `WorkspaceManager` and `OperationDecoder` implement them; both are aliased in the container and `EditorController` and `PurgeWorkspacesCommand` depend on the interfaces, so a host can keep workspaces elsewhere or accept more operations by overriding an alias.
+- `WorkspaceManager::createFromUploadedFile(string $path, string $originalName, ?int $size)`: the upload entry point without an `UploadedFile` in the signature (size, extension and magic-byte checks, ownership binding). It requires a regular, non-symlink file, measures the real size (the larger of it and the declared one) and checks the `%PDF-` magic bytes before the file is moved, so a refused file is never moved or deleted; the path must be a validated upload temp file, as it is moved.
+- `docs/ARCHITECTURE.md`: SPI table (engine, storage, decoder, access checker, owner resolver, process runner), the event note and a "Standard Symfony and DDD hosts" section.
+
+### Deprecated
+
+- `WorkspaceManager::createFromUpload(UploadedFile)`: use `createFromUploadedFile()`. Removed in 2.0.
+
 ### Tests
 
 - Added `WorkerKeptAliveKernelTest` (REQ-RUNTIME-002): one kernel, 1,200 alternating users on workspace page / download / foreign workspace, no services resetter, flat memory.
