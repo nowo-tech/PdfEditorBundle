@@ -45,6 +45,42 @@ final class WorkspaceManagerTest extends TestCase
         $manager->get('../nope');
     }
 
+    public function testCreateFromUploadedFileTakesPathNameAndSizeWithoutHttpTypes(): void
+    {
+        $root = sys_get_temp_dir() . '/pdfed-' . bin2hex(random_bytes(4));
+        mkdir($root, 0700, true);
+        $manager = new WorkspaceManager(ProfileFactory::create($root));
+        $manager->ensureWorkspaceDir();
+
+        $pdf = $root . '/in.pdf';
+        file_put_contents($pdf, '%PDF-1.4 test');
+        $workspace = $manager->createFromUploadedFile($pdf, 'My Doc.PDF', 13);
+
+        self::assertFileExists($workspace->pdfPath);
+        self::assertFileDoesNotExist($pdf, 'The upload is taken over, as UploadedFile::move() does.');
+        self::assertSame('My_Doc.PDF', $workspace->originalName);
+        self::assertSame($workspace->id, $manager->get($workspace->id)->id);
+    }
+
+    public function testCreateFromUploadedFileRefusesWrongExtensionAndOversize(): void
+    {
+        $root = sys_get_temp_dir() . '/pdfed-' . bin2hex(random_bytes(4));
+        mkdir($root, 0700, true);
+        $base = ProfileFactory::create($root);
+        $pdf  = $root . '/in.pdf';
+        file_put_contents($pdf, '%PDF-1.4 test');
+
+        try {
+            (new WorkspaceManager($base))->createFromUploadedFile($pdf, 'notes.txt', 13);
+            self::fail('A non-PDF extension must be refused.');
+        } catch (DocumentException) {
+            self::assertFileExists($pdf);
+        }
+
+        $this->expectException(DocumentException::class);
+        (new WorkspaceManager($base))->createFromUploadedFile($pdf, 'in.pdf', $base->maxUploadBytes + 1);
+    }
+
     public function testTooLarge(): void
     {
         $root = sys_get_temp_dir() . '/pdfed-' . bin2hex(random_bytes(4));

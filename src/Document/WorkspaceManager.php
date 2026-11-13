@@ -31,6 +31,7 @@ use function is_string;
 use function lstat;
 use function max;
 use function mkdir;
+use function pathinfo;
 use function posix_geteuid;
 use function preg_match;
 use function preg_replace;
@@ -45,7 +46,9 @@ use function strtolower;
 use function time;
 use function unlink;
 
-final class WorkspaceManager
+use const PATHINFO_EXTENSION;
+
+final class WorkspaceManager implements WorkspaceStorageInterface
 {
     private const OWNER_FILE = 'owner.txt';
 
@@ -67,6 +70,12 @@ final class WorkspaceManager
     ) {
     }
 
+    /**
+     * Creates a workspace from an uploaded file.
+     *
+     * @deprecated since 1.7.0, use {@see self::createFromUploadedFile()}: it takes the local path, the client name and the size
+     *             (no HTTP type in the port) and is what the bundle's controller calls. Kept for BC; removed in 2.0.
+     */
     public function createFromUpload(UploadedFile $file): Workspace
     {
         if (!$file->isValid()) {
@@ -74,11 +83,17 @@ final class WorkspaceManager
         }
 
         $size = $file->getSize();
-        if ($size !== false && $size > $this->profile->maxUploadBytes) {
+
+        return $this->createFromUploadedFile($file->getPathname(), $file->getClientOriginalName(), $size === false ? null : $size);
+    }
+
+    public function createFromUploadedFile(string $path, string $originalName, ?int $size = null): Workspace
+    {
+        if ($size !== null && $size > $this->profile->maxUploadBytes) {
             throw DocumentException::tooLarge($this->profile->maxUploadBytes);
         }
 
-        $ext = strtolower($file->getClientOriginalExtension());
+        $ext = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
         if ($ext !== 'pdf') {
             throw DocumentException::invalidUpload('Only PDF files are accepted.');
         }
@@ -92,7 +107,11 @@ final class WorkspaceManager
         }
 
         $target = $directory . '/current.pdf';
-        $file->move($directory, 'current.pdf');
+        if (!@rename($path, $target) && (!@copy($path, $target) || !@unlink($path))) { // @codeCoverageIgnoreStart
+            @rmdir($directory);
+            throw DocumentException::invalidUpload('The uploaded PDF could not be stored.');
+            // @codeCoverageIgnoreEnd
+        }
         if (!is_file($target)) { // @codeCoverageIgnoreStart
             throw DocumentException::invalidUpload('The uploaded PDF could not be stored.');
             // @codeCoverageIgnoreEnd
@@ -106,10 +125,10 @@ final class WorkspaceManager
             throw DocumentException::invalidUpload('The uploaded file is not a PDF document.');
         }
 
-        $original = preg_replace('/[^A-Za-z0-9._-]+/', '_', $file->getClientOriginalName()) ?: 'document.pdf';
+        $original = preg_replace('/[^A-Za-z0-9._-]+/', '_', $originalName) ?: 'document.pdf';
         file_put_contents($directory . '/meta.txt', $original);
         $this->writeOwner($directory);
-        $this->logger?->info('PDF editor workspace created from upload.', ['bundle' => 'pdf_editor', 'workspace' => $id, 'bytes' => $size === false ? null : $size]);
+        $this->logger?->info('PDF editor workspace created from upload.', ['bundle' => 'pdf_editor', 'workspace' => $id, 'bytes' => $size]);
 
         return new Workspace($id, $directory, $target, $original);
     }
