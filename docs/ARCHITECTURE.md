@@ -61,4 +61,6 @@ id and plain values (REQ-ARCH-001 rule 4).
 - Replace `WorkspaceStorageInterface` only when workspaces must live elsewhere; keep the contract (local directory per
   workspace, owner-bound access, PDF magic bytes checked on upload).
 - Never call the bundle from domain code, and never expose `UploadedFile` to the application layer: pass the local
-  path, the client name and the size to `createFromUploadedFile()` from your adapter.
+  path, the client name and the size to `createFromUploadedFile()` from your adapter. The path must be a validated
+  upload temp file and it is **moved** into the workspace (symlinks and non-regular files are refused; size, extension
+  and `%PDF-` magic bytes are checked before anything is moved).

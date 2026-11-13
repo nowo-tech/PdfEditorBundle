@@ -20,6 +20,7 @@ use function fclose;
 use function file_get_contents;
 use function file_put_contents;
 use function filemtime;
+use function filesize;
 use function fopen;
 use function fread;
 use function function_exists;
@@ -41,7 +42,6 @@ use function rmdir;
 use function scandir;
 use function sprintf;
 use function stat;
-use function str_contains;
 use function strtolower;
 use function time;
 use function unlink;
@@ -89,13 +89,27 @@ final class WorkspaceManager implements WorkspaceStorageInterface
 
     public function createFromUploadedFile(string $path, string $originalName, ?int $size = null): Workspace
     {
-        if ($size !== null && $size > $this->profile->maxUploadBytes) {
+        // The path is moved into the workspace: only a regular file (never a symlink) is accepted, and every check
+        // runs on the file itself BEFORE anything is moved or deleted, so a refused file is left untouched.
+        if (is_link($path) || !is_file($path)) {
+            throw DocumentException::invalidUpload('The uploaded file is not a regular file.');
+        }
+
+        clearstatcache(true, $path);
+        // The declared size is only a hint: the limit applies to the larger of the declared and the real size.
+        $realSize = max((int) filesize($path), $size ?? 0);
+        if ($realSize > $this->profile->maxUploadBytes) {
             throw DocumentException::tooLarge($this->profile->maxUploadBytes);
         }
 
         $ext = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
         if ($ext !== 'pdf') {
             throw DocumentException::invalidUpload('Only PDF files are accepted.');
+        }
+
+        // The client extension proves nothing: require the PDF magic bytes before keeping the file.
+        if (!$this->hasPdfSignature($path)) {
+            throw DocumentException::invalidUpload('The uploaded file is not a PDF document.');
         }
         $this->assertCallerCanOwnWorkspaces();
 
@@ -108,27 +122,16 @@ final class WorkspaceManager implements WorkspaceStorageInterface
 
         $target = $directory . '/current.pdf';
         if (!@rename($path, $target) && (!@copy($path, $target) || !@unlink($path))) { // @codeCoverageIgnoreStart
-            @rmdir($directory);
-            throw DocumentException::invalidUpload('The uploaded PDF could not be stored.');
-            // @codeCoverageIgnoreEnd
-        }
-        if (!is_file($target)) { // @codeCoverageIgnoreStart
-            throw DocumentException::invalidUpload('The uploaded PDF could not be stored.');
-            // @codeCoverageIgnoreEnd
-        }
-
-        // The client extension proves nothing: require the PDF magic bytes before keeping the file.
-        if (!$this->hasPdfSignature($target)) {
             @unlink($target);
             @rmdir($directory);
-
-            throw DocumentException::invalidUpload('The uploaded file is not a PDF document.');
+            throw DocumentException::invalidUpload('The uploaded PDF could not be stored.');
+            // @codeCoverageIgnoreEnd
         }
 
         $original = preg_replace('/[^A-Za-z0-9._-]+/', '_', $originalName) ?: 'document.pdf';
         file_put_contents($directory . '/meta.txt', $original);
         $this->writeOwner($directory);
-        $this->logger?->info('PDF editor workspace created from upload.', ['bundle' => 'pdf_editor', 'workspace' => $id, 'bytes' => $size]);
+        $this->logger?->info('PDF editor workspace created from upload.', ['bundle' => 'pdf_editor', 'workspace' => $id, 'bytes' => $realSize]);
 
         return new Workspace($id, $directory, $target, $original);
     }
@@ -162,7 +165,7 @@ final class WorkspaceManager implements WorkspaceStorageInterface
 
     public function get(string $id): Workspace
     {
-        if ($id === '' || str_contains($id, '/') || str_contains($id, '\\') || str_contains($id, '..')) {
+        if (preg_match('/^[a-f0-9]{32}$/D', $id) !== 1) {
             throw DocumentException::notFound($id);
         }
 

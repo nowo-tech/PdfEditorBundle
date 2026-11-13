@@ -30,12 +30,16 @@ interface WorkspaceStorageInterface
     /**
      * Creates a workspace from an uploaded file that is already on the local disk.
      *
-     * Enforces the profile's size limit, the `.pdf` extension and the PDF magic bytes, binds the workspace to the
-     * current caller and takes the file over (moved, or copied when it cannot be moved).
+     * The path MUST be a validated upload temp file (for example the temporary file of a PHP upload that passed
+     * `is_uploaded_file()` / `UploadedFile::isValid()`), because it is MOVED into the workspace (copied and deleted
+     * when it cannot be moved). Never pass a path an end user chooses. Symlinks and non-regular files are refused.
+     * Before anything is moved, the real file size (the larger of it and the declared size) is checked against the
+     * profile's limit, then the `.pdf` extension and the `%PDF-` magic bytes; a refused file is left untouched.
+     * The workspace is bound to the current caller.
      *
-     * @param string   $path         Local path of the uploaded file
+     * @param string   $path         Local path of the validated upload temp file (moved)
      * @param string   $originalName Client-side file name (only the extension and a sanitised copy are kept)
-     * @param int|null $size         Size in bytes when known (null skips the size check)
+     * @param int|null $size         Declared size in bytes when known; the real size is always measured too
      *
      * @throws DocumentException When the file is not an acceptable PDF
      */
