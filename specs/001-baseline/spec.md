@@ -50,9 +50,11 @@ Standalone Symfony **PDF editor workspace**: upload a PDF, edit in a CKEditor-li
 ### Document & engine
 
 - **FR-DOC-001**: `Workspace` VO + `WorkspaceManager` (create, get, replace, page image path).
+- **FR-DOC-002**: `WorkspaceStorageInterface` port (1.7.0); the bundle aliases it to `WorkspaceManager`, a host may store workspaces elsewhere (REQ-ARCH-001).
 - **FR-ENG-001**: `PdfEngineInterface`, `PythonPdfEngine`, `ProcessRunnerInterface`, `SymfonyProcessRunner`, `ProcessOutcome`.
 - **FR-ENG-002**: Process `timeout` / `idle_timeout` stop-on-expiry (REQ-RUNTIME-001); engine address-space cap (`engine_memory_limit`), preview pixel cap (`max_render_pixels`), at most 500 operations per apply and 2000 pages per document (REQ-SEC-004).
 - **FR-OPS-001**: `EditorOperation`, `OperationDecoder`.
+- **FR-OPS-002**: `OperationDecoderInterface` port (1.7.0); the bundle aliases it to `OperationDecoder`, a host may decorate it to add its own operations (REQ-ARCH-001).
 
 ### HTTP & forms
 
@@ -90,7 +92,7 @@ Standalone Symfony **PDF editor workspace**: upload a PDF, edit in a CKEditor-li
 
 ## Success Criteria
 
-- **SC-001**: **74/74** tracked files under `src/` mapped in [`code-inventory.md`](code-inventory.md) (build outputs as FR-BUILD-001 rows).
+- **SC-001**: **76/76** tracked files under `src/` mapped in [`code-inventory.md`](code-inventory.md) (build outputs as FR-BUILD-001 rows).
 - **SC-002**: Config matches `docs/CONFIGURATION.md`.
 - **SC-003**: QA/CI green; PHPStan classic + worker + hardening clean.
 - **SC-004**: Worker audit verdict remains 100% compatible under scenario B.

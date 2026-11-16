@@ -1,0 +1,119 @@
+# Dependabot configuration for automated dependency updates (REQ-GH-002)
+# https://docs.github.com/en/code-security/dependabot/dependabot-version-updates
+
+version: 2
+updates:
+  # Composer (bundle)
+  - package-ecosystem: "composer"
+    directory: "/"
+    versioning-strategy: widen
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Europe/Madrid"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "php"
+    groups:
+      symfony:
+        patterns:
+          - "symfony/*"
+      phpstan:
+        patterns:
+          - "phpstan/*"
+          - "rector/rector"
+    commit-message:
+      prefix: "chore(deps):"
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Europe/Madrid"
+    open-pull-requests-limit: 3
+    labels:
+      - "dependencies"
+      - "github-actions"
+    commit-message:
+      prefix: "chore(ci):"
+
+  # npm/pnpm dependencies (/)
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Europe/Madrid"
+    open-pull-requests-limit: 3
+    labels:
+      - "dependencies"
+      - "javascript"
+    groups:
+      npm-root:
+        patterns:
+          - "*"
+    commit-message:
+      prefix: "chore(deps):"
+
+  # npm/pnpm dependencies (/demo/symfony8)
+  - package-ecosystem: "npm"
+    directory: "/demo/symfony8"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Europe/Madrid"
+    open-pull-requests-limit: 3
+    labels:
+      - "dependencies"
+      - "javascript"
+    groups:
+      npm-demo-symfony8:
+        patterns:
+          - "*"
+    commit-message:
+      prefix: "chore(deps):"
+
+  # npm/pnpm dependencies (/demo/symfony8/e2e)
+  - package-ecosystem: "npm"
+    directory: "/demo/symfony8/e2e"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Europe/Madrid"
+    open-pull-requests-limit: 3
+    labels:
+      - "dependencies"
+      - "javascript"
+    groups:
+      npm-demo-symfony8-e2e:
+        patterns:
+          - "*"
+    commit-message:
+      prefix: "chore(deps):"
+
+  # pip dependencies of the PyMuPDF engine
+  - package-ecosystem: "pip"
+    directory: "/engine"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Europe/Madrid"
+    open-pull-requests-limit: 3
+    labels:
+      - "dependencies"
+      - "python"
+    groups:
+      pip-engine:
+        patterns:
+          - "*"
+    commit-message:
+      prefix: "chore(deps):"
