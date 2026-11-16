@@ -2,7 +2,7 @@
 
 **Baseline spec**: [`spec.md`](spec.md)  
 **Package**: `nowo-tech/pdf-editor-bundle`  
-**Last audited**: 2026-10-30 (audit: `git ls-files src | wc -l` → 74)
+**Last audited**: 2026-11-16 (audit: `git ls-files src | wc -l` → 76)
 
 Paths are relative to `src/`. Every tracked file is listed; Vite outputs under `Resources/public/build/` are rows of **Build outputs** (FR-BUILD-001), produced from `Resources/assets/src/main.tsx`.
 
@@ -38,6 +38,7 @@ Paths are relative to `src/`. Every tracked file is listed; Vite outputs under `
 | --- | --- | --- |
 | `Document/Workspace.php` | Workspace VO | FR-DOC-001, FR-WORKER-001 |
 | `Document/WorkspaceManager.php` | Workspace FS ops | FR-DOC-001, FR-WORKER-001 |
+| `Document/WorkspaceStorageInterface.php` | Port: workspace storage and access, aliased to `WorkspaceManager` (1.7.0) | FR-DOC-002 |
 
 ## Engine
 
@@ -55,6 +56,7 @@ Paths are relative to `src/`. Every tracked file is listed; Vite outputs under `
 | --- | --- | --- |
 | `Operation/EditorOperation.php` | Op VO | FR-OPS-001, FR-WORKER-001 |
 | `Operation/OperationDecoder.php` | JSON → ops | FR-OPS-001, FR-WORKER-001 |
+| `Operation/OperationDecoderInterface.php` | Port: editor JSON → validated `EditorOperation` list, aliased to `OperationDecoder` (1.7.0) | FR-OPS-002 |
 
 ## Controller & forms
 
@@ -157,9 +159,9 @@ Paths are relative to `src/`. Every tracked file is listed; Vite outputs under `
 | Symfony config | 2 | 2 |
 | Bundle & DI | 8 | 8 |
 | Config VO | 1 | 1 |
-| Document | 2 | 2 |
+| Document | 3 | 3 |
 | Engine | 5 | 5 |
-| Operations | 2 | 2 |
+| Operations | 3 | 3 |
 | Controller & forms | 3 | 3 |
 | Security | 5 | 5 |
 | CLI & exceptions | 7 | 7 |
@@ -168,7 +170,7 @@ Paths are relative to `src/`. Every tracked file is listed; Vite outputs under `
 | Frontend sources (React / TS) | 20 | 20 |
 | Static assets | 2 | 2 |
 | Build outputs (Vite) | 6 | 6 |
-| **Total production sources** | **74** | **74** |
+| **Total production sources** | **76** | **76** |
 
 ## FrankenPHP worker evidence (not inventory rows)
 
