@@ -5,7 +5,7 @@
 {% extends '@!NowoPdfEditorBundle/editor/index.html.twig' %}
 
 {% block nowo_ui_form_aside %}
-    <aside class="demo-upload-aside">
+    <aside class="nowo-ui-card" data-testid="demo-upload-aside"><div class="nowo-ui-card__body">
         <h2>{{ 'demo.upload.how_it_works'|trans }}</h2>
         <ol>
             <li>{{ 'demo.upload.step1'|trans }}</li>
@@ -13,5 +13,5 @@
             <li>{{ 'demo.upload.step3'|trans }}</li>
             <li>{{ 'demo.upload.step4'|trans }}</li>
         </ol>
-    </aside>
+    </div></aside>
 {% endblock %}

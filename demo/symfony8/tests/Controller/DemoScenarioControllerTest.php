@@ -33,7 +33,7 @@ final class DemoScenarioControllerTest extends WebTestCase
         $client->followRedirect();
 
         self::assertResponseIsSuccessful();
-        self::assertSelectorExists('.demo-topbar');
+        self::assertSelectorExists('[data-testid="demo-masthead"]');
         self::assertSelectorExists('main[data-nowo-ui-bundle="NowoPdfEditorBundle"] [data-testid="pdf-editor-workspace"] #nowo-pdf-editor-react-root');
         self::assertSelectorExists('script[type="module"][src="/bundles/nowopdfeditor/build/pdf-editor.js"]');
         $config = (string) $client->getCrawler()->filter('#nowo-pdf-editor-react-root')->attr('data-config');
@@ -46,8 +46,8 @@ final class DemoScenarioControllerTest extends WebTestCase
         $client->request('GET', '/pdf-editor');
 
         self::assertResponseIsSuccessful();
-        self::assertSelectorExists('.demo-topbar');
+        self::assertSelectorExists('[data-testid="demo-masthead"]');
         self::assertSelectorExists('[data-nowo-ui-page="form"][data-testid="pdf-editor-upload"] form[enctype="multipart/form-data"] input[type="file"]');
-        self::assertSelectorTextContains('.demo-upload-aside h2', 'How it works');
+        self::assertSelectorTextContains('[data-testid="demo-upload-aside"] h2', 'How it works');
     }
 }

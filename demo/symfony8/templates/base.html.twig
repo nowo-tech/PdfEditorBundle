@@ -1,26 +1,29 @@
-<!DOCTYPE html>
-<html lang="{{ app.request.locale|default('en') }}">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{% block title %}PdfEditorBundle Demo{% endblock %}</title>
-    <link rel="stylesheet" href="{{ asset('css/demo.css') }}">
-    {% block stylesheets %}{% endblock %}
-</head>
-<body class="demo-app">
-    <header class="demo-topbar">
-        <a href="{{ path('demo_home') }}" class="demo-brand">PdfEditorBundle</a>
-        <span class="demo-badge">{{ 'demo.badge'|trans }}</span>
-        <nav class="demo-nav">
-            <a href="{{ path('demo_home') }}">{{ 'demo.nav.about'|trans }}</a>
-            <a href="{{ path('demo_scenarios') }}">{{ 'demo.nav.scenarios'|trans }}</a>
-            {% include 'demo/_locale_switch.html.twig' %}
-            <a href="{{ path('nowo_pdf_editor_home') }}" class="demo-nav-primary">{{ 'demo.nav.editor'|trans }}</a>
+{#- REQ-DEMO-014: the demo shell is UiKit's admin layout with UiKit's default theme (nowo-ui.css from the bundle's own
+    asset package, no CSS framework, no CDN, no token overrides). It is also the host layout of the editor pages
+    (nowo_ui_kit.layouts.admin: the upload form scaffold and the PDF workspace unique page). -#}
+{% extends '@NowoUiKit/layout/admin.html.twig' %}
+
+{% block nowo_ui_document_title %}{% block title %}PdfEditorBundle Demo{% endblock %}{% endblock %}
+
+{% block nowo_ui_navigation %}
+    {% set _route = app.request.attributes.get('_route')|default('') %}
+    <header class="nowo-ui-header" data-testid="demo-masthead">
+        <a class="nowo-ui-brand" href="{{ path('demo_home') }}">PdfEditorBundle</a>
+        <nav class="nowo-ui-menu" aria-label="Demo">
+            <a class="nowo-ui-link" href="{{ path('demo_home') }}"{% if _route == 'demo_home' %} aria-current="page"{% endif %}>{{ 'demo.nav.about'|trans }}</a>
+            <a class="nowo-ui-link" href="{{ path('demo_scenarios') }}"{% if _route == 'demo_scenarios' %} aria-current="page"{% endif %}>{{ 'demo.nav.scenarios'|trans }}</a>
+            <a class="nowo-ui-link" href="{{ path('nowo_pdf_editor_home') }}"{% if _route starts with 'nowo_pdf_editor' %} aria-current="page"{% endif %}>{{ 'demo.nav.editor'|trans }}</a>
         </nav>
+        <span class="nowo-ui-badge nowo-ui-badge--neutral">{{ 'demo.badge'|trans }}</span>
+        {% include '@NowoUiKitBundle/partials/_locale_switcher.html.twig' with {
+            compact: true,
+            current: app.request.locale,
+            locales: [
+                {code: 'en', label: 'English', href: path('demo_locale_switch', {locale: 'en'}), current: app.request.locale == 'en'},
+                {code: 'es', label: 'Español', href: path('demo_locale_switch', {locale: 'es'}), current: app.request.locale == 'es'},
+            ]
+        } %}
     </header>
-    <main class="demo-main">
-        {% block body %}{% endblock %}
-    </main>
-    {% block javascripts %}{% endblock %}
-</body>
-</html>
+{% endblock %}
+
+{% block nowo_ui_content %}{% block body %}{% endblock %}{% endblock %}
