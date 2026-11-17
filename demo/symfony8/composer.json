@@ -5,6 +5,7 @@
     "license": "MIT",
     "require": {
         "nowo-tech/form-kit-bundle": "^2.16",
+        "nowo-tech/ui-kit-bundle": "^2.53",
         "nowo-tech/pdf-editor-bundle": "@dev",
         "pentatrion/vite-bundle": "^8.2",
         "php": ">=8.4,<8.6",

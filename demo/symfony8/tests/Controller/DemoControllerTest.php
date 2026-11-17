@@ -15,7 +15,7 @@ class DemoControllerTest extends WebTestCase
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('h1', 'Edit PDFs inside Symfony');
         self::assertSelectorExists('a[href="/demo/scenarios"]');
-        self::assertSelectorExists('.demo-locale-switch');
+        self::assertSelectorExists('[data-nowo-ui-locale-switcher]');
     }
 
     public function testLocaleSwitchToSpanish(): void
@@ -29,6 +29,6 @@ class DemoControllerTest extends WebTestCase
         $client->followRedirect();
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('h1', 'Edita PDFs en Symfony');
-        self::assertSelectorExists('a.demo-locale-btn.is-active[href="/demo/locale/es"]');
+        self::assertSelectorExists('a.nowo-ui-locale-switcher__option.is-active[href="/demo/locale/es"]');
     }
 }

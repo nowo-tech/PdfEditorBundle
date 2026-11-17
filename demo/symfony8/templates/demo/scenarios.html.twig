@@ -2,39 +2,40 @@
 
 {% block title %}{{ 'demo.scenarios.title'|trans }} — PdfEditorBundle{% endblock %}
 
-{% block body %}
-    <div class="demo-landing demo-scenarios">
-        <section class="demo-hero">
-            <div>
-                <h1>{{ 'demo.scenarios.title'|trans }}</h1>
-                <p class="demo-lead">{{ 'demo.scenarios.lead'|trans }}</p>
-                <div class="demo-actions">
-                    <a href="{{ path('nowo_pdf_editor_home') }}" class="demo-btn demo-btn-secondary">{{ 'demo.scenarios.upload'|trans }}</a>
-                    <a href="{{ path('demo_home') }}" class="demo-btn demo-btn-secondary">{{ 'demo.nav.about'|trans }}</a>
-                </div>
-            </div>
-        </section>
+{% block nowo_ui_page_header %}
+    {{ include(nowo_ui_partial('page_header'), {
+        title: 'demo.scenarios.title'|trans,
+        intro: 'demo.scenarios.lead'|trans,
+    }) }}
+{% endblock %}
 
-        <section class="demo-scenario-grid">
-            {% for scenario in scenarios %}
-                <article class="demo-scenario-card">
-                    <h2>{{ ('demo.scenario.' ~ scenario.id ~ '.title')|trans }}</h2>
-                    <p>{{ ('demo.scenario.' ~ scenario.id ~ '.lead')|trans }}</p>
-                    <ul class="demo-scenario-tools">
+{% block body %}
+    <div class="nowo-ui-row-actions">
+        <a href="{{ path('nowo_pdf_editor_home') }}" class="nowo-ui-btn nowo-ui-btn--outline">{{ 'demo.scenarios.upload'|trans }}</a>
+        <a href="{{ path('demo_home') }}" class="nowo-ui-btn nowo-ui-btn--outline">{{ 'demo.nav.about'|trans }}</a>
+    </div>
+
+    <div class="nowo-ui-cards">
+        {% for scenario in scenarios %}
+            <article class="nowo-ui-card" data-testid="demo-scenario-card">
+                <div class="nowo-ui-card__header"><h2>{{ ('demo.scenario.' ~ scenario.id ~ '.title')|trans }}</h2></div>
+                <div class="nowo-ui-card__body">
+                    <p class="nowo-ui-muted">{{ ('demo.scenario.' ~ scenario.id ~ '.lead')|trans }}</p>
+                    <p>
                         {% for tool in scenario.tools %}
-                            <li><code>{{ tool }}</code></li>
+                            <code class="nowo-ui-code">{{ tool }}</code>
                         {% endfor %}
-                    </ul>
-                    <ol class="demo-scenario-checklist">
+                    </p>
+                    <ol>
                         {% for item in scenario.checklist %}
                             <li>{{ item }}</li>
                         {% endfor %}
                     </ol>
-                    <a href="{{ path('demo_scenario_open', { scenario: scenario.id }) }}" class="demo-btn demo-btn-primary">
+                    <a href="{{ path('demo_scenario_open', { scenario: scenario.id }) }}" class="nowo-ui-btn nowo-ui-btn--primary">
                         {{ 'demo.scenarios.open'|trans }}
                     </a>
-                </article>
-            {% endfor %}
-        </section>
+                </div>
+            </article>
+        {% endfor %}
     </div>
 {% endblock %}

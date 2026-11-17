@@ -28,6 +28,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Demo: `nowo-tech/ui-kit-bundle` is required by the demo; the shell is UiKit's admin layout with its default theme (masthead with the active item, UiKit locale switcher, page header, cards). The custom `demo.css` shell and the UiKit token overrides are gone (REQ-DEMO-014).
+
 ### Documentation
 
 - REQ compliance sweep 2026-11-16: Spec Kit baseline maps the 1.7.0 ports (`WorkspaceStorageInterface`, `OperationDecoderInterface`; FR-DOC-002, FR-OPS-002), inventory 76/76 (REQ-SPECKIT-001/003); new `.github/dependabot.yml` (Composer, GitHub Actions, npm for the root, demo and demo e2e, pip for `engine/`; REQ-GH-002); README Python coverage set to the CI value (98.64%).
