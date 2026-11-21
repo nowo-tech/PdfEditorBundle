@@ -5,7 +5,8 @@ nowo_hot_reload:
     auto_inject: true
     require_frankenphp_env: true
     allow_production: false
-    idiomorph: true
+    client_mode: visibility
+    idiomorph: false
     idiomorph_script_url: '/build/hot-reload/idiomorph.js'
     hot_reload_script_url: '/build/hot-reload/frankenphp-hot-reload.js'
     preserve_selectors:

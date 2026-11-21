@@ -1,7 +1,9 @@
 # UiKit host setup of the demo (REQ-DEMO-014 / REQ-UI-003): UiKit's default theme, unchanged (no token overrides), with
 # UiKit's own semantic nowo-ui-* styles only (css_framework: custom: no CSS framework, no CDN). The editor pages render
-# in the demo shell (base.html.twig extends UiKit's admin layout).
+# in the demo platform shell (base.html.twig is the admin and guest layout).
 nowo_ui_kit:
     css_framework: custom
+    base_stylesheet: true
     layouts:
         admin: 'base.html.twig'
+        guest: 'base.html.twig'

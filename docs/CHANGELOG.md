@@ -30,6 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Demo: runs in UiKit's demo platform shell (`nowo-tech/ui-kit-bundle` ^2.60, locale links from the demo's own switch route); the demo's own header, `assets/app.css` and the old layout are gone, the pages use the shell page headers and section cards. The README screenshot spec no longer shows the Symfony toolbar. Demo only, no bundle change.
 - Demo: `nowo-tech/ui-kit-bundle` is required by the demo; the shell is UiKit's admin layout with its default theme (masthead with the active item, UiKit locale switcher, page header, cards). The custom `demo.css` shell and the UiKit token overrides are gone (REQ-DEMO-014).
 
 ### Documentation

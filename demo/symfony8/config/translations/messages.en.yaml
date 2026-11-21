@@ -23,6 +23,7 @@ demo:
         card_live_text: 'embedpdf + pdf-lib run in the browser; Symfony stores the rewritten bytes.'
         card_portable_title: 'Drop-in bundle'
         card_portable_text: 'Composer package with Twig UI, security gate and optional PyMuPDF engine.'
+        steps_title: 'How to try it'
         step1: 'Start from the <strong>scenario hub</strong> or upload a PDF.'
         step2: 'Queue edits in the draft panel.'
         step3: 'Click <strong>Save to PDF</strong>.'

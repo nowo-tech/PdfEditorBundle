@@ -13,7 +13,7 @@ test.describe('PdfEditor demo', () => {
   test('upload page renders on the UiKit form scaffold inside the demo layout', async ({ page }) => {
     const response = await page.goto('/pdf-editor');
     expect(response?.ok()).toBeTruthy();
-    await expect(page.locator('[data-testid="demo-masthead"]')).toBeVisible();
+    await expect(page.getByTestId('demo-platform')).toBeVisible();
     await expect(page.locator('[data-nowo-ui-page="form"][data-testid="pdf-editor-upload"]')).toBeVisible();
     await expect(page.locator('input[type="file"]')).toHaveCount(1);
     await expect(page.getByRole('button', { name: 'Open PDF' })).toBeVisible();
