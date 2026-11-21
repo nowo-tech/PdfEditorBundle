@@ -112,7 +112,11 @@ function demoPlatformRules(): string[] {
 
 const PAGES: PageEntry[] = ['/', '/demo/scenarios', '/pdf-editor', workspace];
 
-const BUNDLE_OWNED: Array<{ path: RegExp; rule: RegExp }> = [];
+// Bundle-owned findings (reported in the PR, fixed in a bundle release, never patched in the demo): the editor workspace page is
+// rendered by the bundle and its EmbedPDF viewer: Google Fonts stylesheet, 44 px targets, unlabeled viewer images / inputs, contrast.
+const BUNDLE_OWNED: Array<{ path: RegExp; rule: RegExp }> = [
+  { path: /^\/pdf-editor\/[0-9a-f]+$/, rule: /^(stylesheet:\/css2|target-under-44px:nowo-pdf-editor-(btn|page-thumb)|color-contrast|image-alt|label|label-content-name-mismatch|svg-img-alt)/ },
+];
 
 /** Findings on a bundle's own page are reported as bundle-owned (not patched in the demo): they are filtered here, by path and rule. */
 function demo(url: string, issues: string[]): string[] {
