@@ -1,29 +1,22 @@
-{#- REQ-DEMO-014: the demo shell is UiKit's admin layout with UiKit's default theme (nowo-ui.css from the bundle's own
-    asset package, no CSS framework, no CDN, no token overrides). It is also the host layout of the editor pages
-    (nowo_ui_kit.layouts.admin: the upload form scaffold and the PDF workspace unique page). -#}
-{% extends '@NowoUiKit/layout/admin.html.twig' %}
-
+{#- REQ-DEMO-014: the demo runs inside UiKit's shared demo platform shell. This file only declares the demo. It is
+    also the host layout of the editor pages (nowo_ui_kit.layouts.admin: the upload form scaffold and the PDF
+    workspace unique page). -#}
+{% extends '@NowoUiKit/demo_platform/layout.html.twig' %}
+{% set nowo_ui_demo_platform = {
+    bundle: 'PDF Editor',
+    home_route: 'demo_home',
+    repository: 'https://github.com/nowo-tech/PdfEditorBundle',
+    translation_domain: 'messages',
+    locales: [
+        {code: 'en', href: path('demo_locale_switch', {locale: 'en'})},
+        {code: 'es', href: path('demo_locale_switch', {locale: 'es'})},
+    ],
+    nav: [
+        {label: 'demo.nav.about', route: 'demo_home'},
+        {label: 'demo.nav.scenarios', route: 'demo_scenarios', active: ['demo_scenarios', 'demo_scenario_*']},
+        {label: 'demo.nav.editor', route: 'nowo_pdf_editor_home', active: ['nowo_pdf_editor*']},
+    ],
+} %}
 {% block nowo_ui_document_title %}{% block title %}PdfEditorBundle Demo{% endblock %}{% endblock %}
-
-{% block nowo_ui_navigation %}
-    {% set _route = app.request.attributes.get('_route')|default('') %}
-    <header class="nowo-ui-header" data-testid="demo-masthead">
-        <a class="nowo-ui-brand" href="{{ path('demo_home') }}">PdfEditorBundle</a>
-        <nav class="nowo-ui-menu" aria-label="Demo">
-            <a class="nowo-ui-link" href="{{ path('demo_home') }}"{% if _route == 'demo_home' %} aria-current="page"{% endif %}>{{ 'demo.nav.about'|trans }}</a>
-            <a class="nowo-ui-link" href="{{ path('demo_scenarios') }}"{% if _route == 'demo_scenarios' %} aria-current="page"{% endif %}>{{ 'demo.nav.scenarios'|trans }}</a>
-            <a class="nowo-ui-link" href="{{ path('nowo_pdf_editor_home') }}"{% if _route starts with 'nowo_pdf_editor' %} aria-current="page"{% endif %}>{{ 'demo.nav.editor'|trans }}</a>
-        </nav>
-        <span class="nowo-ui-badge nowo-ui-badge--neutral">{{ 'demo.badge'|trans }}</span>
-        {% include '@NowoUiKitBundle/partials/_locale_switcher.html.twig' with {
-            compact: true,
-            current: app.request.locale,
-            locales: [
-                {code: 'en', label: 'English', href: path('demo_locale_switch', {locale: 'en'}), current: app.request.locale == 'en'},
-                {code: 'es', label: 'Español', href: path('demo_locale_switch', {locale: 'es'}), current: app.request.locale == 'es'},
-            ]
-        } %}
-    </header>
-{% endblock %}
 
 {% block nowo_ui_content %}{% block body %}{% endblock %}{% endblock %}

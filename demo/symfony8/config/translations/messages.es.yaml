@@ -23,6 +23,7 @@ demo:
         card_live_text: 'embedpdf + pdf-lib en el navegador; Symfony guarda los bytes reescritos.'
         card_portable_title: 'Bundle portable'
         card_portable_text: 'Paquete Composer con UI Twig, seguridad y motor PyMuPDF opcional.'
+        steps_title: 'Cómo probarlo'
         step1: 'Empieza en el <strong>hub de escenarios</strong> o sube un PDF.'
         step2: 'Encola ediciones en el panel de borrador.'
         step3: 'Pulsa <strong>Guardar en PDF</strong>.'

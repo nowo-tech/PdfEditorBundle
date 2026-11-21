@@ -3,38 +3,36 @@
 {% block title %}PdfEditorBundle — Symfony 8.1 demo{% endblock %}
 
 {% block nowo_ui_page_header %}
+    {% set _toolbar %}
+        <a href="{{ path('nowo_pdf_editor_home') }}" class="nowo-ui-btn nowo-ui-btn--outline">{{ 'demo.home.upload'|trans }}</a>
+        <a href="{{ path('demo_scenarios') }}" class="nowo-ui-btn nowo-ui-btn--primary">{{ 'demo.home.browse_scenarios'|trans }}</a>
+    {% endset %}
     {{ include(nowo_ui_partial('page_header'), {
         title: 'demo.home.title'|trans,
         intro: 'demo.home.lead'|trans|striptags,
+        toolbar: _toolbar|trim,
     }) }}
 {% endblock %}
 
 {% block body %}
-    <div class="nowo-ui-row-actions">
-        <a href="{{ path('demo_scenarios') }}" class="nowo-ui-btn nowo-ui-btn--primary">{{ 'demo.home.browse_scenarios'|trans }}</a>
-        <a href="{{ path('nowo_pdf_editor_home') }}" class="nowo-ui-btn nowo-ui-btn--outline">{{ 'demo.home.upload'|trans }}</a>
-    </div>
-
-    <section class="nowo-ui-card">
-        <div class="nowo-ui-card__header"><h2>{{ 'demo.home.runtime'|trans }}</h2></div>
-        <div class="nowo-ui-card__body">
+    {% embed '@NowoUiKit/demo_platform/_section.html.twig' with {title: 'demo.home.runtime'|trans, kind: 'detail', testid: 'demo-runtime'} %}
+        {% block section_actions %}<span class="nowo-ui-badge nowo-ui-badge--neutral">{{ 'demo.badge'|trans }}</span>{% endblock %}
+        {% block section_body %}
             <p>
                 <span class="nowo-ui-badge nowo-ui-badge--neutral">Symfony {{ symfony_version }}</span>
                 <span class="nowo-ui-badge nowo-ui-badge--neutral">PHP {{ php_version }}</span>
                 <span class="nowo-ui-badge nowo-ui-badge--neutral">FrankenPHP {{ frankenphp_mode }}</span>
                 <span class="nowo-ui-badge nowo-ui-badge--neutral">engine: {{ profile.engineMode }}</span>
             </p>
-            <table class="nowo-ui-table">
-                <tbody>
-                    <tr><th scope="row">{{ 'demo.home.stack_symfony'|trans }}</th><td>{{ symfony_version }}</td></tr>
-                    <tr><th scope="row">{{ 'demo.home.stack_engine'|trans }}</th><td>{{ profile.engineMode }}</td></tr>
-                    <tr><th scope="row">{{ 'demo.home.stack_timeout'|trans }}</th><td>{{ profile.timeout }}s</td></tr>
-                    <tr><th scope="row">{{ 'demo.home.stack_dpi'|trans }}</th><td>{{ profile.renderDpi }}</td></tr>
-                    <tr><th scope="row">{{ 'demo.home.stack_fixtures'|trans }}</th><td>{{ 'demo.home.stack_fixtures_value'|trans }}</td></tr>
-                </tbody>
-            </table>
-        </div>
-    </section>
+            <dl class="nowo-ui-detail-list">
+                <div class="nowo-ui-detail-list__item"><dt class="nowo-ui-detail-list__term">{{ 'demo.home.stack_symfony'|trans }}</dt><dd class="nowo-ui-detail-list__value">{{ symfony_version }}</dd></div>
+                <div class="nowo-ui-detail-list__item"><dt class="nowo-ui-detail-list__term">{{ 'demo.home.stack_engine'|trans }}</dt><dd class="nowo-ui-detail-list__value">{{ profile.engineMode }}</dd></div>
+                <div class="nowo-ui-detail-list__item"><dt class="nowo-ui-detail-list__term">{{ 'demo.home.stack_timeout'|trans }}</dt><dd class="nowo-ui-detail-list__value">{{ profile.timeout }}s</dd></div>
+                <div class="nowo-ui-detail-list__item"><dt class="nowo-ui-detail-list__term">{{ 'demo.home.stack_dpi'|trans }}</dt><dd class="nowo-ui-detail-list__value">{{ profile.renderDpi }}</dd></div>
+                <div class="nowo-ui-detail-list__item"><dt class="nowo-ui-detail-list__term">{{ 'demo.home.stack_fixtures'|trans }}</dt><dd class="nowo-ui-detail-list__value">{{ 'demo.home.stack_fixtures_value'|trans }}</dd></div>
+            </dl>
+        {% endblock %}
+    {% endembed %}
 
     <div class="nowo-ui-cards">
         <article class="nowo-ui-card">
@@ -57,14 +55,14 @@
         </article>
     </div>
 
-    <section class="nowo-ui-card">
-        <div class="nowo-ui-card__body">
+    {% embed '@NowoUiKit/demo_platform/_section.html.twig' with {title: 'demo.home.steps_title'|trans, kind: 'list', testid: 'demo-steps'} %}
+        {% block section_body %}
             <ol>
                 <li>{{ 'demo.home.step1'|trans|raw }}</li>
                 <li>{{ 'demo.home.step2'|trans }}</li>
                 <li>{{ 'demo.home.step3'|trans|raw }}</li>
                 <li>{{ 'demo.home.step4'|trans }}</li>
             </ol>
-        </div>
-    </section>
+        {% endblock %}
+    {% endembed %}
 {% endblock %}
