@@ -28,6 +28,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Python engine: `engine/requirements.txt` is back on `pymupdf>=1.26.7,<2`, matching both Dockerfiles. A Dependabot bump had moved it to `>=2.1,<3`, an untested major with no musllinux wheel; Dependabot now ignores PyMuPDF majors (audit ZAI-1).
+
 ### Changed
 
 - Demo: runs in UiKit's demo platform shell (`nowo-tech/ui-kit-bundle` ^2.60, locale links from the demo's own switch route); the demo's own header, `assets/app.css` and the old layout are gone, the pages use the shell page headers and section cards. The README screenshot spec no longer shows the Symfony toolbar. Demo only, no bundle change.

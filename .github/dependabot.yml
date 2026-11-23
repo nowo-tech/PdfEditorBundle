@@ -108,6 +108,10 @@ updates:
       time: "09:00"
       timezone: "Europe/Madrid"
     open-pull-requests-limit: 3
+    # PyMuPDF 2.x has no musllinux wheel yet: the Alpine images stay on 1.x (audit ZAI-1).
+    ignore:
+      - dependency-name: "pymupdf"
+        update-types: ["version-update:semver-major"]
     labels:
       - "dependencies"
       - "python"
