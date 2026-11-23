@@ -37,6 +37,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - REQ compliance sweep 2026-11-16: Spec Kit baseline maps the 1.7.0 ports (`WorkspaceStorageInterface`, `OperationDecoderInterface`; FR-DOC-002, FR-OPS-002), inventory 76/76 (REQ-SPECKIT-001/003); new `.github/dependabot.yml` (Composer, GitHub Actions, npm for the root, demo and demo e2e, pip for `engine/`; REQ-GH-002); README Python coverage set to the CI value (98.64%).
 
+### Added
+
+- **Console**: `pdf-editor.js` logs one line on load, `📦 [pdf-editor] script loaded, build: 2026-11-23 14:05 UTC`, with the house `createBundleLogger`. The build time is read from the committed `build-info.json` (`{sourceHash, builtAt}`): it is reused while the sources are unchanged and renewed only when they change, so rebuilding unchanged sources never rewrites the committed assets (no wall-clock stamp, no user data). Quiet switch: `<html data-nowo-console="quiet">` or `globalThis.NOWO_CONSOLE = 'quiet'` prints nothing; the default is unchanged.
+
 ## [1.7.0] - 2026-11-13
 
 ### Added

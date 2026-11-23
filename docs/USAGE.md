@@ -28,3 +28,7 @@ or merge it), so prefer the layout / theme configuration or a surgical override 
 `@!NowoPdfEditorBundle/<subpath>`. The list of `<subpath>` values, blocks, the procedure and how to recover upstream
 after a freeze are in [TEMPLATES.md](TEMPLATES.md#overriding-templates); configuration keys in
 [CONFIGURATION.md](CONFIGURATION.md#web-ui-layout-look-and-feel-templates).
+
+## Browser console
+
+The bundle's script logs one line when it loads (`📦 [pdf-editor] script loaded, build: 2026-11-23 14:05 UTC`) so a developer can tell which build a page runs. To silence it, set `<html data-nowo-console="quiet">` or `globalThis.NOWO_CONSOLE = 'quiet'` before the script loads; nothing is printed then. The default is unchanged.
