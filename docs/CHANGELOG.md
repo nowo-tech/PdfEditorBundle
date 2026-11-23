@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Table of contents
 
 - [[Unreleased]](#unreleased)
+- [[1.8.0] - 2026-11-23](#180---2026-11-23)
 - [[1.7.0] - 2026-11-13](#170---2026-11-13)
 - [[1.6.0] - 2026-10-30](#160---2026-10-30)
 - [[1.5.0] - 2026-10-30](#150---2026-10-30)
@@ -27,6 +28,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [[1.0.0] - 2026-08-24](#100---2026-08-24)
 
 ## [Unreleased]
+
+## [1.8.0] - 2026-11-23
 
 ### Fixed
 
@@ -278,6 +281,7 @@ Dependency refresh (bundle and demos), php-cs-fixer ParallelConfig(2). See [UPGR
 
 - **Worker safety (Igor):** justified `// @igor-ignore` annotations and/or `ResetInterface` / request-scoped fixes so `make igor` passes on package `src/`.
 
+[1.8.0]: https://github.com/nowo-tech/PdfEditorBundle/releases/tag/v1.8.0
 [1.7.0]: https://github.com/nowo-tech/PdfEditorBundle/releases/tag/v1.7.0
 [1.6.0]: https://github.com/nowo-tech/PdfEditorBundle/releases/tag/v1.6.0
 [1.5.0]: https://github.com/nowo-tech/PdfEditorBundle/releases/tag/v1.5.0
