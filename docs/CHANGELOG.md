@@ -29,6 +29,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Docker images (`Dockerfile`, `demo/symfony8/Dockerfile`) install `pymupdf>=1.28.2,<2`, the same floor as `engine/requirements.txt` (ZCJ-PE-I1).
+
+
 ## [1.8.0] - 2026-11-23
 
 ### Fixed
