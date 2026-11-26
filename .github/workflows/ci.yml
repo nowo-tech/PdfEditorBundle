@@ -260,6 +260,9 @@ jobs:
       - name: Install JS dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Unit tests with coverage
+        run: pnpm run test:coverage
+
       - name: Type check and build
         run: pnpm run build
 

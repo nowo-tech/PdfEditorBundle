@@ -149,10 +149,11 @@ validate-translations: ensure-up
 test-python: ensure-up
 	$(COMPOSE) exec -T $(SERVICE_PHP) python3 -m pytest tests/Python -q -p no:cacheprovider --cov=engine --cov-report=term-missing --cov-fail-under=90
 
-# TypeScript: strict type check of the React editor (no TS unit tests yet; REQ-MAKE-002 "equivalent").
+# TypeScript: strict type check of the React editor plus the Vitest logger tests (REQ-ASSETS-005 rule 6).
 test-ts:
 	pnpm install --frozen-lockfile
 	pnpm run typecheck
+	pnpm run test:coverage
 
 release-check-demos:
 	@$(MAKE) -C demo release-check
