@@ -3,6 +3,7 @@
 ## Table of contents
 
 - [Unreleased](#unreleased)
+- [To 1.8.2](#to-182)
 - [To 1.8.1](#to-181)
 - [To 1.8.0](#to-180)
 - [To 1.7.0](#to-170)
@@ -25,6 +26,14 @@
 - [From nothing → 1.0.0](#from-nothing--100)
 
 ## Unreleased
+
+## To 1.8.2
+
+From **1.8.1**:
+
+```bash
+composer update nowo-tech/pdf-editor-bundle
+```
 
 ## To 1.8.1
 
