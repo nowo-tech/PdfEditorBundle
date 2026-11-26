@@ -2,7 +2,7 @@
 
 **Baseline spec**: [`spec.md`](spec.md)  
 **Package**: `nowo-tech/pdf-editor-bundle`  
-**Last audited**: 2026-11-26 (audit: `git ls-files src | wc -l` → 78)
+**Last audited**: 2026-11-26 (audit: `git ls-files src | wc -l` → 80)
 
 Paths are relative to `src/`. Every tracked file is listed; Vite outputs under `Resources/public/build/` are rows of **Build outputs** (FR-BUILD-001), produced from `Resources/assets/src/main.tsx`.
 
@@ -128,6 +128,8 @@ Paths are relative to `src/`. Every tracked file is listed; Vite outputs under `
 | `Resources/assets/src/engines/vensas/page-xobjects.ts` | vensas content-stream / XObject helper | FR-FE-002 |
 | `Resources/assets/src/main.tsx` | Entry point | FR-FE-001 |
 | `Resources/assets/src/logger.ts` | House bundle logger: the once-per-page `📦 [pdf-editor] script loaded` console line with the quiet switch; other levels stay behind the debug flag (REQ-ASSETS-005) | FR-FE-005 |
+| `Resources/assets/src/logger.test.ts` | Vitest: logger levels, debug flag and quiet switch (REQ-ASSETS-005) | FR-FE-005 |
+| `Resources/assets/src/logger-once.test.ts` | Vitest: the script-loaded banner prints once per page, even when the script is loaded twice (REQ-ASSETS-005) | FR-FE-005 |
 | `Resources/assets/src/vite-env.d.ts` | Ambient Vite client types (`/// <reference types="vite/client" />`) for the TypeScript sources | FR-FE-005 |
 | `Resources/assets/src/object-selection-bridge.ts` | embedpdf bridge | FR-FE-003 |
 | `Resources/assets/src/op-labels.ts` | Operation labels | FR-FE-001 |
@@ -169,10 +171,10 @@ Paths are relative to `src/`. Every tracked file is listed; Vite outputs under `
 | CLI & exceptions | 7 | 7 |
 | Twig views | 4 | 4 |
 | Translations | 7 | 7 |
-| Frontend sources (React / TS) | 22 | 22 |
+| Frontend sources (React / TS) | 24 | 24 |
 | Static assets | 2 | 2 |
 | Build outputs (Vite) | 6 | 6 |
-| **Total production sources** | **78** | **78** |
+| **Total production sources** | **80** | **80** |
 
 ## FrankenPHP worker evidence (not inventory rows)
 

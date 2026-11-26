@@ -93,7 +93,7 @@ Standalone Symfony **PDF editor workspace**: upload a PDF, edit in a CKEditor-li
 
 ## Success Criteria
 
-- **SC-001**: **78/78** tracked files under `src/` mapped in [`code-inventory.md`](code-inventory.md) (build outputs as FR-BUILD-001 rows).
+- **SC-001**: **80/80** tracked files under `src/` mapped in [`code-inventory.md`](code-inventory.md) (build outputs as FR-BUILD-001 rows).
 - **SC-002**: Config matches `docs/CONFIGURATION.md`.
 - **SC-003**: QA/CI green; PHPStan classic + worker + hardening clean.
 - **SC-004**: Worker audit verdict remains 100% compatible under scenario B.
