@@ -80,7 +80,7 @@ A PDF is not a word-processor file: scanned pages without text need OCR (out of 
 
 ## Requirements
 
-- PHP >= 8.2, < 8.6
+- PHP >= 8.2, < 8.7
 - Symfony 7.4 / 8.0 / 8.1+ and [UiKitBundle](https://github.com/nowo-tech/UiKitBundle) 2.17.3+ (installed with the bundle)
 - Node >= 20 + pnpm (to build the React editor assets)
 - Python 3.9+ and `pymupdf` — **only when** `engine_mode: python`

@@ -31,6 +31,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- PHP 8.6 and Symfony 8.2 support in CI (both stable, no allowed failures): `composer.json` allows PHP below 8.7 (was below 8.6) and `.github/workflows/forward-compat.yml` runs PHP 8.6 / Symfony 8.1 and PHP 8.5 / Symfony 8.2 cells.
+
 ## [1.8.2] - 2026-11-26
 
 ### Fixed
