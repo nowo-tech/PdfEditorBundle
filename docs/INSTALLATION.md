@@ -2,7 +2,7 @@
 
 ## Requirements
 
-- PHP >= 8.2, < 8.6
+- PHP >= 8.2, < 8.7
 - Symfony 7.4 / 8.0 / 8.1+, nowo-tech/ui-kit-bundle 2.17.3+ and nowo-tech/form-kit-bundle 2.16+ (dependencies; register `NowoUiKitBundle` and `NowoFormKitBundle` too)
 - Composer 2
 - Python 3.9+
